@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { CheckmarkIcon } from "./SVGIcon";
 import { useDispatch } from "react-redux";
 import {
   notificationFail,
@@ -23,8 +22,6 @@ export const ReportUserView = (props) => {
     if (!reason || reason == "") {
       dispatch(notificationFail("Please select any one reason"));
     } else {
-      console.log(reason);
-      console.log(props?.userAddress);
       const reqData = {
         to_report_user: props?.userAddress,
         reason,

@@ -8,8 +8,8 @@ import {
   database,
   firebaseMessages,
   messageTypes,
-} from "../layout/chat/config";
-import { sendMessage } from "../layout/chat/firebaseConfig";
+} from "./../helper/config";
+import { sendMessage } from "./../helper/firebaseConfig";
 import { userGetFullDetails } from "../store/slices/AuthSlice";
 import {
   notificationFail,

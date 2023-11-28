@@ -5,11 +5,10 @@ import { userDetails, userGetFullDetails } from "../store/slices/AuthSlice";
 import { onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { database, firebaseMessages } from "../layout/chat/config";
+import { database, firebaseMessages } from "./../helper/config";
 import { hideAddress } from "../utils";
 import {
   BellIcon,
-  LoginIcon,
   LogoutIcon,
   NotificationIcon,
   SettingIcon,

@@ -7,10 +7,10 @@ import { BackArrow, LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import ChatLoader from "./ChatLoader";
-import { messageTypes } from "./config";
-import { converImageToBase64, sendMessage } from "./firebaseConfig";
+import { messageTypes } from "../../helper/config";
+import { converImageToBase64, sendMessage } from "../../helper/firebaseConfig";
 import MessageList from "./MessageList";
-import { formateSize, RenderIcon } from "./RenderIcon";
+import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import UserList from "./UserList";
 import { notificationFail } from "../../store/slices/notificationSlice";
 

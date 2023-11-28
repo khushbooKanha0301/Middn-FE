@@ -5,7 +5,6 @@ import { useWeb3React } from "@web3-react/core";
 import { connectors as web3Connectors } from "../connectors";
 import Fortmatic from "fortmatic";
 import Web3 from "web3";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { checkAuth, logoutAuth, userDetails } from "../store/slices/AuthSlice";
@@ -40,10 +39,11 @@ export const LoginView = (props) => {
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
+ console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
-      if (!ethereum?.providers) {
+      if (!window.ethereum) {
         return undefined;
       }
       if (storageProvider == "injected") {
@@ -63,6 +63,9 @@ export const LoginView = (props) => {
             (provider) => provider.isMetaMask
           );
           metaAccounts = await provider.request({ method: "eth_accounts" });
+          if (!provider) {
+            return false;
+          }
         }
       }
 
@@ -70,13 +73,10 @@ export const LoginView = (props) => {
         await activateInjectedProvider("coinbaseWallet");
       }
 
-      if (!provider) {
-        return false;
-      }
 
       if (
-        !metaAccounts ||
-        metaAccounts[0] != userData?.account?.toLowerCase()
+      //  !metaAccounts ||
+      metaAccounts && metaAccounts[0] != userData?.account?.toLowerCase()
       ) {
         return false;
       }
@@ -111,13 +111,12 @@ export const LoginView = (props) => {
         );
       }
       let handleAccountsChangedOnMetaMask = async (accounts) => {
-        if (accounts.length) {
+         if (accounts.length) {
           let storageProvider = window.localStorage.getItem("provider");
-          if (storageProvider == "injected") {
             await activateInjectedProvider("injected");
             await activate(web3Connectors.injected);
             setProvider("injected");
-          }
+          
           if (storageProvider == "coinbaseWallet") {
             await activateInjectedProvider("coinbaseWallet");
           }
@@ -206,24 +205,23 @@ export const LoginView = (props) => {
     props.handleaccountaddress(accountAddress);
   }, [accountAddress]);
 
-  // const setCoinbaseEvent = async () => {
-  //   var coinbaseProvider = await window.ethereum.providers.find(
-  //     (provider) => provider.isCoinbaseWallet
-  //   );
-  //   console.log("coinbaseProvider ", coinbaseProvider);
-
-  //   var handleAccountsChangedOnCoinbase = async (accounts) => {
-  //     if (accounts.length) {
-  //       await activateInjectedProvider("coinbaseWallet");
-  //       await connect({ connector: wagmiConnector[1] });
-  //       setProvider("coinbaseWallet");
-  //     }
-  //   };
-  //   await coinbaseProvider.on(
-  //     "accountsChanged",
-  //     handleAccountsChangedOnCoinbase
-  //   );
-  // };
+  const setCoinbaseEvent = async () => {
+    var coinbaseProvider = await window.ethereum.providers.find(
+      (provider) => provider.isCoinbaseWallet
+    );
+  
+    var handleAccountsChangedOnCoinbase = async (accounts) => {
+      if (accounts.length) {
+        await activateInjectedProvider("coinbaseWallet");
+        await connect({ connector: wagmiConnector[1] });
+        setProvider("coinbaseWallet");
+      }
+    };
+    await coinbaseProvider.on(
+      "accountsChanged",
+      handleAccountsChangedOnCoinbase
+    );
+  };
 
   useEffect(() => {
     const checkMetaAcc = async () => {
@@ -241,21 +239,26 @@ export const LoginView = (props) => {
             metaAccounts = await window.ethereum.request({
               method: "eth_accounts",
             });
+            console.log("metaAccounts check", metaAccounts);
           } else {
             provider = window.ethereum.providers.find(
               (provider) => provider.isMetaMask
             );
             metaAccounts = await provider.request({ method: "eth_accounts" });
+            console.log("metaAccounts ", metaAccounts);
+            if (!provider) {
+              return false;
+            }
           }
         }
 
-        if (!provider) {
-          return false;
+        if (storageProvider == "coinbaseWallet") {
+          await activateInjectedProvider("coinbaseWallet");
         }
 
         if (
-          !metaAccounts ||
-          metaAccounts[0] != userData.account.toLowerCase()
+          //!metaAccounts ||
+          metaAccounts && metaAccounts[0] != userData.account.toLowerCase()
         ) {
           await disconnect();
           props.setTwoFAModal(false);

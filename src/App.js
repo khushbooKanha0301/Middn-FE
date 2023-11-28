@@ -17,7 +17,7 @@ import TraderProfileComponent from "./layout/TraderProfileComponent";
 import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
 import EscrowDetails from "./layout/escrow/EscrowDetails";
-import EscrowPay from "./layout/escrow/EscrowPay";
+// import EscrowPay from "./layout/escrow/EscrowPay";
 import EscrowBuySell from "./layout/escrow/EscrowBuySell";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
@@ -33,7 +33,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { child, get, ref, update } from "firebase/database";
-import { database, firebaseMessages } from "./layout/chat/config";
+import { database, firebaseMessages } from "./helper/config";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
@@ -46,12 +46,10 @@ export const App = () => {
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
- console.log("isSign ", isSign);
   const [isLogin, setisLogin] = useState(false);
   const acAddress = useSelector(userDetails);
   const token = localStorage.getItem("token");
   const [twoFAModal, setTwoFAModal] = useState(true);
- console.log("twoFAModal ", twoFAModal);
   const [isResponsive, setIsResponsive] = useState(false);
 
   const handleAccountAddress = (address) => {
@@ -200,7 +198,7 @@ export const App = () => {
               <Route path="/notification" element={<NotificationComponent />} />
               <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
               <Route path="/escrow-buy-sell/:id" element={<EscrowBuySell />} />  
-              <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
+              {/* <Route path="/escrow-offer-buy" element={<EscrowPay />} />   */}
               <Route
                 path="/profile/:address"
                 element={

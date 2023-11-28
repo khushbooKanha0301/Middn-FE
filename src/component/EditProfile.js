@@ -25,11 +25,10 @@ import {
   get,
   child,
 } from "firebase/database";
-import { database, firebaseMessages } from "../layout/chat/config";
+import { database, firebaseMessages } from "./../helper/config";
 import {
   converImageToBase64,
-  sendMessage,
-} from "../layout/chat/firebaseConfig";
+} from "./../helper/firebaseConfig";
 
 function simulateNetworkRequest() {
   return new Promise((resolve) => setTimeout(resolve, 2000));

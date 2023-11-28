@@ -8,13 +8,13 @@ import {
   database,
   firebaseMessages,
   generateFirebaseChatRootKey
-} from "../chat/config";
-import { setUnReadCountZero } from "../chat/firebaseConfig";
-import { formateSize, RenderIcon } from "../chat/RenderIcon";
+} from "../../helper/config";
+import { setUnReadCountZero } from "../../helper/firebaseConfig";
+import { formateSize, RenderIcon } from "../../helper/RenderIcon";
+//const CHAT_ROOM = "chat/escrow_room/";
 
 export const MessageList = (props) => {
   const { ReciverId } = props;
-  console.log("ReciverId ", ReciverId);
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
@@ -40,7 +40,7 @@ export const MessageList = (props) => {
       });
 
       var childKey =
-        firebaseMessages.CHAT_ROOM +
+      firebaseMessages.CHAT_ROOM +
         firebaseRootKey +
         "/" +
         firebaseMessages.MESSAGES;
@@ -55,6 +55,7 @@ export const MessageList = (props) => {
             if (snapshot.val()) {
               const values = snapshot.val();
               setUnReadCountZero(
+                //CHAT_ROOM,
                 userData?.account,
                 ReciverId
               );

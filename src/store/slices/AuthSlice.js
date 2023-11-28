@@ -8,7 +8,7 @@ import { notificationFail, notificationSuccess } from "./notificationSlice";
 import axios from "axios";
 import apiConfigs from "../../config/config";
 import listData from "../../layout/accountSetting/countryData";
-import { database, firebaseMessages } from "../../layout/chat/config";
+import { database, firebaseMessages } from "../../helper/config";
 import { child, get, ref, set, update } from "firebase/database";
 
 const authTokenData = JSON.parse(window?.localStorage?.getItem("userData"))

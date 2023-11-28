@@ -5,10 +5,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { useDispatch, useSelector } from "react-redux";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
-import { database, firebaseMessages } from "./config";
-import { setUnReadCountZero } from "./firebaseConfig";
-import axios from "axios";
-import jwtAxios from "../../service/jwtAxios";
+import { database, firebaseMessages } from "../../helper/config";
+import { setUnReadCountZero } from "../../helper/firebaseConfig";
+//const CHAT_ROOM = "chat/chat_room/";
 
 export const UserList = (props) => {
   const { setLoader, setReciverId } = props;
@@ -24,6 +23,7 @@ export const UserList = (props) => {
     setReciverId(user?.id);
     if (userData?.account && user?.id) {
       setUnReadCountZero(userData?.account, user?.id);
+      //setUnReadCountZero(CHAT_ROOM, userData?.account, user?.id);
     }
   };
   useEffect(() => {

@@ -225,7 +225,10 @@ function EscrowDetails() {
               </div>
 
               <div className="edit-btn ">
-                  <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
+                  {/* <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
+                    Submit
+                  </Button> */}
+                  <Button className="btn btn-success btn-width" variant="success">
                     Submit
                   </Button>
               </div>

@@ -8,9 +8,9 @@ import {
   database,
   firebaseMessages,
   generateFirebaseChatRootKey
-} from "./config";
-import { setUnReadCountZero } from "./firebaseConfig";
-import { formateSize, RenderIcon } from "./RenderIcon";
+} from "../../helper/config";
+import { setUnReadCountZero } from "../../helper/firebaseConfig";
+import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
 export const MessageList = (props) => {
   const { ReciverId } = props;
@@ -39,7 +39,7 @@ export const MessageList = (props) => {
       });
 
       var childKey =
-        firebaseMessages.CHAT_ROOM +
+      firebaseMessages.CHAT_ROOM +
         firebaseRootKey +
         "/" +
         firebaseMessages.MESSAGES;
@@ -54,6 +54,7 @@ export const MessageList = (props) => {
             if (snapshot.val()) {
               const values = snapshot.val();
               setUnReadCountZero(
+                //CHAT_ROOM,
                 userData?.account,
                 window.localStorage.getItem("user")
               );

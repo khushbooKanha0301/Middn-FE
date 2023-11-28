@@ -9,6 +9,7 @@ import {
 
 // function setFirebaseChatage(
 export const setFirebaseChatMessage = async (
+  //CHAT_ROOM,
   serverTime,
   message,
   messageType,
@@ -19,7 +20,7 @@ export const setFirebaseChatMessage = async (
 ) => {
   // firebase database successfully inserted record callback
   var childKey =
-    firebaseMessages.CHAT_ROOM +
+  firebaseMessages.CHAT_ROOM +
     firebaseRootKey +
     "/" +
     firebaseMessages.MESSAGES +
@@ -36,7 +37,7 @@ export const setFirebaseChatMessage = async (
     )
   )
     .then((sucess) => {
-      setUnReadCount(firebaseRootKey, reciverID, senderID, "NO");
+      setUnReadCount( firebaseRootKey, reciverID, senderID, "NO");
     })
     .catch((error) => {});
 };
@@ -71,11 +72,10 @@ function convertMessageObj(
     return firebaseInsertRecordObject;
   }
 }
-
-export const setUnReadCount = async (child, reciverID, senderID, isset) => {
+export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   let unreadCount = 0;
   var childKey =
-    firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
+  firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
   const setReciverReadCountNode = ref(database, childKey);
 
   if (setReciverReadCountNode) {
@@ -170,7 +170,7 @@ export const setUnReadCountZero = async (senderID, reciverID) => {
   });
 
   var childKey =
-    firebaseMessages.CHAT_ROOM +
+  firebaseMessages.CHAT_ROOM +
     firebaseRootKey +
     "/" +
     firebaseMessages.UN_READ_COUNT;

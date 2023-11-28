@@ -3,16 +3,16 @@ import Picker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { formateSize, RenderIcon } from "../chat/RenderIcon";
+import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import { LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
-import { converImageToBase64, sendMessage } from "../chat/firebaseConfig";
+import { converImageToBase64, sendMessage } from "../../helper/firebaseConfig";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
-import { messageTypes, database, firebaseMessages } from "../chat/config";
+import { messageTypes, database, firebaseMessages } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useLocation } from "react-router-dom";
-
+//const CHAT_ROOM = "chat/escrow_room/";
 export const EscrowPay = () => {
   const location = useLocation();
   const { state } = location;
@@ -22,6 +22,7 @@ export const EscrowPay = () => {
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
+
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
 
@@ -30,7 +31,7 @@ export const EscrowPay = () => {
   const { onClickOutside } = <Picker />;
   const [messageText, setMessageText] = useState("");
   const [messageFile, setMessageFile] = useState("");
- 
+
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
     return () => {
@@ -172,6 +173,7 @@ export const EscrowPay = () => {
         noError == true
       ) {
         sendMessage(
+          //CHAT_ROOM,
           messageText,
           userDetailsAll?.wallet_address,
           receiverAddress,

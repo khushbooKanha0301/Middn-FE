@@ -35,13 +35,11 @@ function EscrowDetails() {
       if (result.isConfirmed) {
         if (id) {
           jwtAxios
-            .get(`/escrows/deleteEscrows/${id}`)
+            .put(`/escrows/deleteEscrows/${id}`)
             .then((res) => {
-              console.log(res);
               Swal.fire("Deleted!", "Escrow deleted...", "danger");
             })
             .catch((err) => {
-              console.log(err.message);
               if (typeof err == "string") {
                 dispatch(notificationFail(err));
               } else {
