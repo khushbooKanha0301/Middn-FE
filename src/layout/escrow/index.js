@@ -270,26 +270,26 @@ export const Escrow = () => {
                 <div className="escrow-actions text-center d-flex justify-content-center">
                   <div className="actions profile-action text-center">
                     {userData && userData.account === escrow?.user_address ? (
-                      <Link
-                        className="action"
-                        to={`/escrow-details/${escrow?._id}`}
-                      >
+                      // <Link
+                      //   className="action"
+                      //   to={`/escrow-details/${escrow?._id}`}
+                      // >
                         <Button variant="primary">Details</Button>
-                      </Link>
+                      // </Link>
                     ) : escrow && escrow?.escrow_type === "buyer" ? (
-                      <Link
-                        className="action"
-                        to={`/escrow-buy-sell/${escrow?._id}`}
-                      >
+                      // <Link
+                      //   className="action"
+                      //   to={`/escrow-buy-sell/${escrow?._id}`}
+                      // >
                         <Button variant="primary">Sell</Button>
-                      </Link>
+                      // </Link>
                     ) : (
-                      <Link
-                        className="action"
-                        to={`/escrow-buy-sell/${escrow?._id}`}
-                      >
+                      // <Link
+                      //   className="action"
+                      //   to={`/escrow-buy-sell/${escrow?._id}`}
+                      // >
                         <Button variant="primary">Buy</Button>
-                      </Link>
+                      // </Link>
                     )}
                   </div>
                 </div>

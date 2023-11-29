@@ -17,9 +17,9 @@ export const CreateEscrowView = (props) => {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [category, setCategory] = useState("high_value_items");
-  const [object, setObject] = useState("jewelery");
+  const [object, setObject] = useState("Jewelery");
   const [description, setDescription] = useState(null);
-  const [processTime, setProcessTime] = useState("24_hours");
+  const [processTime, setProcessTime] = useState("24 Hours");
   const [escrowNumber, setEscrowNumber] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -372,7 +372,7 @@ export const CreateEscrowView = (props) => {
                       aria-label="Jewelery"
                       onChange={inputChangeHandler}
                     >
-                      <option value="jewelery">Jewelery</option>
+                      <option value="Jewelery">Jewelery</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -395,7 +395,7 @@ export const CreateEscrowView = (props) => {
                   name="processTime"
                   onChange={inputChangeHandler}
                 >
-                  <option value="24_hours">24 Hours</option>
+                  <option value="24 Hours">24 Hours</option>
                 </Form.Select>
               </Form.Group>
               <div className="form-action-group">

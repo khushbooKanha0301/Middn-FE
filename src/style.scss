@@ -4082,6 +4082,31 @@ body {
                                 background: #3C404E;
                             }
                         }
+
+                        .currency-info {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            .currency-type {
+                              font-size: 16px;
+                              line-height: 24px;
+                              color: $white;
+                              display: flex;
+                              align-items: center;
+                              .currency-flag {
+                                width: 32px;
+                                height: 32px;
+                                border-radius: 50%;
+                                background: #f4f4f6;
+                                margin-right: 4px;
+                              }
+                            }
+                            .currency-amount {
+                              font-size: 11px;
+                              line-height: 24px;
+                              color: #afb4c0;
+                            }
+                          }
                     }
 
                     &.yourself-option {
@@ -5383,6 +5408,13 @@ aside.EmojiPickerReact.epr-main {
       }
     }
   }
+
+.table-info {
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 20px;
+    color: rgba($color: $white, $alpha: 0.5);
+}
 
 .limit-txt-left-amount{
     color: #FFF;

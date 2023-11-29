@@ -23,7 +23,7 @@ function EscrowDetails() {
   const deleteUserKyc = (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to Delete this User?",
+      text: "Do you want to Delete this Escrow?",
       showCancelButton: true,
       confirmButtonColor: "red",
       cancelButtonColor: "#808080",
@@ -123,12 +123,29 @@ function EscrowDetails() {
                     name="phone"
                     type="text"
                     value="1"
-                    onChange={(e) => {
-                      onChange(e);
-                    }}
+                    // onChange={(e) => {
+                    //   onChange(e);
+                    // }}
                     maxLength="10"
                   />
-                  <div className="d-flex align-items-center">
+
+                  <div className="d-flex align-items-center currency-info">
+                    <div className="currency-type">
+                      <span className="currency-flag">
+                        <img
+                          className="currency-flag"
+                          src={require("../../content/images/bitcoin.png")}
+                          alt="Bitcoin"
+                        />
+                      </span>
+                      BTC
+                    </div>
+                    {/* <div className="text-white mb-0 currency-amount">
+                      USD
+                    </div> */}
+                  </div>
+
+                  {/* <div className="d-flex align-items-center">
                     {currentPre ? (
                       <img
                         src={currencyCountry()}
@@ -143,26 +160,26 @@ function EscrowDetails() {
                         countryInfo.find(
                           (item) => item.currency.code === currentPre
                         )?.currency.code
-                      }
+                      } BTC
                     </p>
-                  </div>
+                  </div> */}
                   <div className="country-select">
                     <Form.Select
                       size="sm"
                       value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
+                      // onChange={(e) => {
+                      //   setCurrentPre(e.target.value);
+                      //   dispatch(defineCurrency(e.target.value));
+                      // }}
                     >
-                      {countryInfo.map((data) => (
+                      {/* {countryInfo.map((data) => (
                         <option
                           value={`${data.currency.code}`}
                           key={`${data.currency.code}`}
                         >
                           {data.currency?.code}
                         </option>
-                      ))}
+                      ))} */}
                     </Form.Select>
                   </div>
                 </div>
@@ -177,46 +194,66 @@ function EscrowDetails() {
                     name="phone"
                     type="text"
                     value="1"
-                    onChange={(e) => {
-                      onChange(e);
-                    }}
+                    // onChange={(e) => {
+                    //   onChange(e);
+                    // }}
                     maxLength="10"
                   />
-                  <div className="d-flex align-items-center">
+                  {/* <div className="d-flex align-items-center">
                     {currentPre ? (
-                      <img
-                        src={currencyCountry()}
-                        alt="Flag"
-                        className="circle-data"
-                      />
+                      // <img
+                      //   src={currencyCountry()}
+                      //   alt="Flag"
+                      //   className="circle-data"
+                      // />
+
+                      
+                      
                     ) : (
                       "No Flag"
                     )}
                     <p className="text-white mb-0">
                       {
-                        countryInfo.find(
-                          (item) => item.currency.code === currentPre
-                        )?.currency.code
+                        // countryInfo.find(
+                        //   (item) => item.currency.code === currentPre
+                        // )?.currency.code
                       }
                     </p>
+                  </div> */}
+
+                  <div className="d-flex align-items-center currency-info">
+                    <div className="currency-type">
+                      <span className="currency-flag">
+                        <img
+                          className="currency-flag"
+                          src={require("../../content/images/usd-icon-resized.png")}
+                          alt="Bitcoin"
+                        />
+                      </span>
+                      USD
+                    </div>
+                    {/* <div className="text-white mb-0 currency-amount">
+                      USD
+                    </div> */}
                   </div>
+
                   <div className="country-select">
                     <Form.Select
                       size="sm"
                       value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
+                      // onChange={(e) => {
+                      //   setCurrentPre(e.target.value);
+                      //   dispatch(defineCurrency(e.target.value));
+                      // }}
                     >
-                      {countryInfo.map((data) => (
+                      {/* {countryInfo.map((data) => (
                         <option
                           value={`${data.currency.code}`}
                           key={`${data.currency.code}`}
                         >
                           {data.currency?.code}
                         </option>
-                      ))}
+                      ))} */}
                     </Form.Select>
                   </div>
                 </div>

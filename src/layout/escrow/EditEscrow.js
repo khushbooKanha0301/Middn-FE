@@ -340,7 +340,7 @@ export const EditEscrowView = (props) => {
                       onChange={inputChangeHandler}
                       value={object}
                     >
-                      <option value="jewelery">Jewelery</option>
+                      <option value="Jewelery">Jewelery</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -364,7 +364,7 @@ export const EditEscrowView = (props) => {
                   onChange={inputChangeHandler}
                   value={processTime}
                 >
-                  <option value="24_hours">24 Hours</option>
+                  <option value="24 Hours">24 Hours</option>
                 </Form.Select>
               </Form.Group>
               <div className="form-action-group">
