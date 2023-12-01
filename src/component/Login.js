@@ -36,9 +36,11 @@ export const LoginView = (props) => {
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
   };
+
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
+      console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
@@ -62,7 +64,6 @@ export const LoginView = (props) => {
             (provider) => provider.isMetaMask
           );
           metaAccounts = await provider.request({ method: "eth_accounts" });
- console.log("metaAccounts ", metaAccounts);
           if (!provider) {
             return false;
           }
@@ -71,12 +72,12 @@ export const LoginView = (props) => {
 
       if (storageProvider == "coinbaseWallet") {
         await activateInjectedProvider("coinbaseWallet");
+        setProvider("coinbaseWallet");
       }
 
       if (
         !metaAccounts ||
-        metaAccounts &&
-        metaAccounts[0] != userData?.account?.toLowerCase()
+        (metaAccounts && metaAccounts[0] != userData?.account?.toLowerCase())
       ) {
         return false;
       }
@@ -139,44 +140,116 @@ export const LoginView = (props) => {
     listenEventOnProvider();
   }, []);
 
+  useEffect(() => {
+    const checkMetaAcc = async () => {
+      if (userData.account && userData.account != "Connect Wallet") {
+        let storageProvider = window.localStorage.getItem("provider");
+        let provider = null;
+        let metaAccounts;
+        if (!window.ethereum) {
+          return undefined;
+        }
+
+        if (storageProvider == "injected") {
+          if (window.ethereum && !window.ethereum.providers) {
+            metaAccounts = await window.ethereum.request({
+              method: "eth_accounts",
+            });
+          } else {
+            provider = window.ethereum.providers.find(
+              (provider) => provider.isMetaMask
+            );
+            metaAccounts = await provider.request({ method: "eth_accounts" });
+            if (!provider) {
+              return false;
+            }
+          }
+        }
+
+        if (storageProvider == "coinbaseWallet") {
+          await activateInjectedProvider("coinbaseWallet");
+          setProvider("coinbaseWallet");
+        }
+
+        console.log(metaAccounts);
+
+        if (
+          //!metaAccounts ||
+          metaAccounts &&
+          metaAccounts[0] != userData.account.toLowerCase()
+        ) {
+          await disconnect();
+          props.setTwoFAModal(false);
+          dispatch(notificationSuccess("User logout successfully !"));
+        }
+      }
+
+      if (userData.account && userData.account == "Connect Wallet" && account) {
+        let checkAuthParams = {
+          account: account,
+          library: library,
+          checkValue: checkValue,
+          deactivate: deactivate,
+          hideLoginModal: props.onHide,
+        };
+        props.setTwoFAModal(false);
+        props.onHide();
+        dispatch(checkAuth(checkAuthParams)).unwrap();
+      }
+    };
+    checkMetaAcc();
+  }, [account]);
+
+  const activateInjectedProvider = async (providerName) => {
+    if (!window.ethereum?.providers) {
+      return undefined;
+    }
+    let provider;
+    switch (providerName) {
+      case "coinbaseWallet":
+        provider = ethereum.providers.find(
+          ({ isCoinbaseWallet }) => isCoinbaseWallet
+        );
+        provider.disableReloadOnDisconnect();
+        break;
+      case "injected":
+        provider = ethereum.providers.find(({ isMetaMask }) => isMetaMask);
+        break;
+    }
+
+    if (provider) {
+      ethereum.setSelectedProvider(provider);
+    }
+  };
+
   // useEffect(() => {
   //   const listenEventOnCoinbaseProvider = async () => {
   //     let coinbaseProvider;
-  //         if (!window.ethereum) {
-  //           return undefined;
-  //         }
+  //     if (!window.ethereum) {
+  //       return undefined;
+  //     }
 
-  //         if (window.ethereum && !window.ethereum.providers) {
-  //           coinbaseProvider = window.ethereum;
-  //         } else {
-  //           coinbaseProvider =  window.ethereum.providers.find(
-  //             (provider) => provider.isCoinbaseWallet
-  //           );
-  //         }
-  //         let handleAccountsChangedOnCoinbase = async (accounts) => {
-  //           if (accounts.length) {
-  //             activateInjectedProvider("coinbaseWallet");
-  //             connect({ connector: wagmiConnector[1] });
-  //             setProvider("coinbaseWallet");
-  //           }
-  //         };
-  //         await coinbaseProvider.on(
-  //           "accountsChanged",
-  //           handleAccountsChangedOnCoinbase
-  //         );
-    
-  //         return async () => {
-  //           if (
-  //             coinbaseProvider &&
-  //             typeof coinbaseProvider.removeListener === "function"
-  //           ) {
-  //             await coinbaseProvider.removeListener(
-  //               "accountsChanged",
-  //               handleAccountsChangedOnCoinbase
-  //             );
-  //           }
-  //         };
-       
+  //     if (window.ethereum && !window.ethereum.providers) {
+  //       coinbaseProvider = window.ethereum;
+  //     } else {
+  //       coinbaseProvider = window.ethereum.providers.find(
+  //         (provider) => provider.isCoinbaseWallet
+  //       );
+  //     }
+  //     // if(!window.web3.__isMetaMaskShim__)
+  //     // {
+  //     //   let handleAccountsChangedOnCoinbase = async (accounts) => {
+  //     //     if (accounts.length) {
+  //     //       activateInjectedProvider("coinbaseWallet");
+  //     //       connect({ connector: wagmiConnector[1] });
+  //     //       setProvider("coinbaseWallet");
+  //     //     }
+  //     //   };
+  //     //   await coinbaseProvider.on(
+  //     //     "accountsChanged",
+  //     //     handleAccountsChangedOnCoinbase
+  //     //   );
+  //     // }
   //   };
 
   //   listenEventOnCoinbaseProvider();
@@ -186,7 +259,7 @@ export const LoginView = (props) => {
     var coinbaseProvider = await window.ethereum.providers.find(
       (provider) => provider.isCoinbaseWallet
     );
-  
+
     var handleAccountsChangedOnCoinbase = async (accounts) => {
       if (accounts.length) {
         await activateInjectedProvider("coinbaseWallet");
@@ -261,64 +334,6 @@ export const LoginView = (props) => {
     props.handleaccountaddress(accountAddress);
   }, [accountAddress]);
 
-  useEffect(() => {
-    const checkMetaAcc = async () => {
-      if (userData.account && userData.account != "Connect Wallet") {
-        let storageProvider = window.localStorage.getItem("provider");
-        let provider = null;
-        let metaAccounts;
-        if (!window.ethereum) {
-          return undefined;
-        }
-
-        if (storageProvider == "injected") {
-          if (window.ethereum && !window.ethereum.providers) {
-            metaAccounts = await window.ethereum.request({
-              method: "eth_accounts",
-            });
-          } else {
-            provider = window.ethereum.providers.find(
-              (provider) => provider.isMetaMask
-            );
-            metaAccounts = await provider.request({ method: "eth_accounts" });
-            if (!provider) {
-              return false;
-            }
-          }
-        }
-
-        if (storageProvider == "coinbaseWallet") {
-          await activateInjectedProvider("coinbaseWallet");
-          setCoinbaseEvent()
-        }
-
-        if (
-          !metaAccounts ||
-          metaAccounts &&
-          metaAccounts[0] != userData.account.toLowerCase()
-        ) {
-          await disconnect();
-          props.setTwoFAModal(false);
-          dispatch(notificationSuccess("User logout successfully !"));
-        }
-      }
-
-      if (userData.account && userData.account == "Connect Wallet" && account) {
-        let checkAuthParams = {
-          account: account,
-          library: library,
-          checkValue: checkValue,
-          deactivate: deactivate,
-          hideLoginModal: props.onHide,
-        };
-        props.setTwoFAModal(false);
-        props.onHide();
-        dispatch(checkAuth(checkAuthParams)).unwrap();
-      }
-    };
-    checkMetaAcc();
-  }, [account]);
-
   const refreshState = () => {
     window.localStorage.setItem("provider", undefined);
     window.localStorage.removeItem("userData");
@@ -378,6 +393,7 @@ export const LoginView = (props) => {
       userData?.account !== "Connect Wallet" &&
       storageProvider == "coinbaseWallet"
     ) {
+      console.log("disconnect");
       disonnectWalletConnect();
       disconnect();
       dispatch(notificationSuccess("User logout successfully !"));
@@ -421,28 +437,6 @@ export const LoginView = (props) => {
       }
     }
   }, [address, userData?.account]);
-
-  const activateInjectedProvider = async (providerName) => {
-    if (!ethereum?.providers) {
-      return undefined;
-    }
-    let provider;
-    switch (providerName) {
-      case "coinbaseWallet":
-        provider = ethereum.providers.find(
-          ({ isCoinbaseWallet }) => isCoinbaseWallet
-        );
-        provider.disableReloadOnDisconnect();
-        break;
-      case "injected":
-        provider = ethereum.providers.find(({ isMetaMask }) => isMetaMask);
-        break;
-    }
-
-    if (provider) {
-      ethereum.setSelectedProvider(provider);
-    }
-  };
 
   const isChainIdSupported = async (chainId) => {
     return web3Connectors?.injected?.supportedChainIds?.includes(chainId);

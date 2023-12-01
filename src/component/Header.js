@@ -14,6 +14,7 @@ import {
   SettingIcon,
   UserIcon,
 } from "./SVGIcon";
+import { HeaderLoader } from "./HeaderLoader";
 
 export const Header = (props) => {
   const dispatch = useDispatch();
@@ -31,13 +32,13 @@ export const Header = (props) => {
   }, []);
 
   let addressLine = "";
-  if(acAddress.account === "Connect Wallet" && userDetailsAll === undefined)
+  if(acAddress?.account === "Connect Wallet" && userDetailsAll === undefined)
   {
     addressLine = "Connect Wallet";
-  }else if(acAddress.account !== "Connect Wallet" && userDetailsAll === undefined)
+  }else if(acAddress?.account !== "Connect Wallet" && userDetailsAll === undefined)
   {
     addressLine = "";
-  }else if(acAddress.account !== "Connect Wallet" && userDetailsAll?.is_2FA_login_verified !== false && (acAddress.account == userDetailsAll?.wallet_address))
+  }else if(acAddress?.account !== "Connect Wallet" && userDetailsAll?.is_2FA_login_verified !== false && (acAddress?.account == userDetailsAll?.wallet_address))
   {
     addressLine = hideAddress(acAddress?.account,5);
   }else{
@@ -45,7 +46,7 @@ export const Header = (props) => {
   }
 
   const findFirebaseUserList = async () => {
-    if (acAddress.authToken) {
+    if (acAddress?.authToken) {
       const starCountRef = ref(database, firebaseMessages.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
@@ -91,7 +92,8 @@ export const Header = (props) => {
         aria-controls="basic-navbar-nav"
       />
       <Nav className="ms-auto" as="ul">
-        {(acAddress.authToken && (addressLine != "" && addressLine != "Connect Wallet")) && (
+        {/* {(acAddress.authToken && (addressLine != "" && addressLine != "Connect Wallet")) && ( */}
+        {acAddress?.authToken && (
           <>
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/chat">
@@ -110,53 +112,58 @@ export const Header = (props) => {
         )}
         <Nav.Item
           as="li"
-          onClick={acAddress.authToken ? null : props.clickModalHandler}
+          onClick={acAddress?.authToken ? null : props.clickModalHandler}
           className="login-menu"
         >
-          {acAddress && addressLine != "" && (
+          {/* {acAddress && addressLine != "" && ( */}
+          {acAddress && (
             <span className="user-name d-none d-md-block">
-              {addressLine}
+              {addressLine ? addressLine : "**********"}
             </span>
           )}
-          {acAddress && addressLine != "" && (
-          <span className="login-btn d-flex d-md-none text-white">
-              {addressLine}
-          </span>
+          {/* {acAddress && addressLine != "" && ( */}
+          {acAddress && (
+            <span className="login-btn d-flex d-md-none text-white">
+              {addressLine ? addressLine : "**********"}
+            </span>
           )}
         </Nav.Item>
-        {(acAddress &&
-          acAddress?.authToken &&
-          userDetailsAll?.is_2FA_login_verified === true && (acAddress.account == userDetailsAll.wallet_address)) && (
-            <NavDropdown
-              as="li"
-              title={
-                <img
-                  className="rounded-circle"
-                  style={{ width: "48px", height: "48px" }}
-                  src={
-                    usergetdata?.imageUrl
-                      ? usergetdata?.imageUrl
-                      : require("../content/images/avatar.png")
-                  }
-                  alt="No Profile"
-                />
-              }
-              id="nav-dropdown"
-            >
-              <NavDropdown.Item as={Link} to={`/profile/${acAddress.account}`}>
-                <UserIcon width="18" height="18" />
-                Profile
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/settings">
-                <SettingIcon width="18" height="18" />
-                Account settings
-              </NavDropdown.Item>
-              <NavDropdown.Item onClick={props.signOut}>
-                <LogoutIcon width="18" height="18" />
-                Sign out
-              </NavDropdown.Item>
-            </NavDropdown>
-          )}
+        {acAddress &&
+        acAddress?.authToken &&
+        userDetailsAll?.is_2FA_login_verified === true &&
+        acAddress.account == userDetailsAll.wallet_address ? (
+          <NavDropdown
+            as="li"
+            title={
+              <img
+                className="rounded-circle"
+                style={{ width: "48px", height: "48px" }}
+                src={
+                  usergetdata?.imageUrl
+                    ? usergetdata?.imageUrl
+                    : require("../content/images/avatar.png")
+                }
+                alt="No Profile"
+              />
+            }
+            id="nav-dropdown"
+          >
+            <NavDropdown.Item as={Link} to={`/profile/${acAddress.account}`}>
+              <UserIcon width="18" height="18" />
+              Profile
+            </NavDropdown.Item>
+            <NavDropdown.Item as={Link} to="/settings">
+              <SettingIcon width="18" height="18" />
+              Account settings
+            </NavDropdown.Item>
+            <NavDropdown.Item onClick={props.signOut}>
+              <LogoutIcon width="18" height="18" />
+              Sign out
+            </NavDropdown.Item>
+          </NavDropdown>
+        ) : (
+          <HeaderLoader />
+        )}
       </Nav>
     </div>
   );

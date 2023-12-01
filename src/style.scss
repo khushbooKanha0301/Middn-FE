@@ -1989,6 +1989,28 @@ body {
                 right: 0px;
                 top: 4px;
             }
+
+            .profile-status-offline {
+                position: absolute;
+                width: 24px;
+                height: 24px;
+                background-color: $red-medium;
+                border-radius: 50%;
+                border: 2px solid $white;
+                right: 0px;
+                top: 4px;
+            }
+
+            .profile-status-absent {
+                position: absolute;
+                width: 24px;
+                height: 24px;
+                background-color: $orange-color;
+                border-radius: 50%;
+                border: 2px solid $white;
+                right: 0px;
+                top: 4px;
+            }
         }
 
         h1 {
@@ -2484,16 +2506,7 @@ body {
                             width: 62px;
                         }
 
-                        .chat-status {
-                            position: absolute;
-                            width: 16px;
-                            height: 16px;
-                            background-color: $green-dark;
-                            border-radius: 50%;
-                            border: 2px solid $white;
-                            right: -3px;
-                            top: 0px;
-                        }
+                        
                     }
 
                     .chat-name {
@@ -3728,6 +3741,27 @@ body {
                     border: 2px solid $white;
                     right: -3px;
                     top: 0px;
+                }
+            
+                .profile-status-offline {
+                    position: absolute;
+                    width: 16px;
+                    height: 16px;
+                    background-color: $red-medium;
+                    border-radius: 50%;
+                    border: 2px solid $white;
+                    right: -3px;
+                    top: 0px;
+                }
+                .profile-status-absent {
+                    position: absolute;
+                    width: 24px;
+                    height: 24px;
+                    background-color: $orange-color;
+                    border-radius: 50%;
+                    border: 2px solid $white;
+                    right: 0px;
+                    top: 4px;
                 }
             }
 
@@ -5535,4 +5569,35 @@ aside.EmojiPickerReact.epr-main {
         color: #FFF;
     }
     
+}
+
+.chat-status {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: $green-dark;
+    border-radius: 50%;
+    border: 2px solid $white;
+    right: -3px;
+    top: 0px;
+}
+.chat-status-offline {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: $red-medium;
+    border-radius: 50%;
+    border: 2px solid $white;
+    right: -3px;
+    top: 0px;
+}
+.chat-status-absent {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: $orange-color;
+    border-radius: 50%;
+    border: 2px solid $white;
+    right: -3px;
+    top: 0px;
 }

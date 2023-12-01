@@ -96,18 +96,38 @@ export const App = () => {
         if (decodedToken.exp < currentTime) {
           dispatch(logoutAuth()).unwrap();
         }
-        const dbRef = ref(database);
+      }, 1000); // 5 seconds in milliseconds
+
+      setInterval(function() {
+        const dbOfflineRef = ref(database);
         get(
-          child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
+          child(dbOfflineRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
         ).then((snapshot) => {
           const lastActive = snapshot.val()?.lastActive;
+          const isOnline = snapshot.val()?.isOnline;
           const now = Date.now();
-          if (now - lastActive > 10000) {
-            // 10 seconds in milliseconds
+          const timeWindow = 3 * 60 * 1000;
+          const timeDifference = now - lastActive;
+          const isMoreThan30Minutes = timeDifference > timeWindow;
+
+          if (isMoreThan30Minutes) {
+            //console.log("offline")
             updateOffline();
+          } 
+
+          const timeWindowAbsent = 1 * 60 * 1000;
+          const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
+          if(isMoreThan5Minutes && (isOnline != 2)){
+            //console.log("absent")
+            updateAbsent();
           }
+
+          // if (now - lastActive > 10000) {
+          //   // 10 seconds in milliseconds
+          //   updateOffline();
+          // }
         });
-      }, 1000); // 5 seconds in milliseconds
+      }, 60000);
 
       // Set up the event listeners to update the user's last activity timestamp
       const updateLastActive = () => {
@@ -115,13 +135,12 @@ export const App = () => {
         get(
           child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
         ).then((snapshot) => {
-          const data = snapshot.val();
           if (snapshot.exists()) {
             update(
               ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
               {
                 lastActive: Date.now(),
-                isOnline: true,
+                isOnline: 1,
               }
             );
           }
@@ -134,17 +153,33 @@ export const App = () => {
         get(
           child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
         ).then((snapshot) => {
-          const data = snapshot.val();
           if (snapshot.exists()) {
             update(
               ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
               {
-                isOnline: false,
+                isOnline: 0,
               }
             );
           }
         });
       };
+
+      const updateAbsent = () => {
+        const dbRef = ref(database);
+        get(
+          child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
+        ).then((snapshot) => {
+          if (snapshot.exists()) {
+            update(
+              ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
+              {
+                isOnline: 2,
+              }
+            );
+          }
+        });
+      };
+
       window.addEventListener("beforeunload", updateOffline);
       window.addEventListener("mousemove", updateLastActive);
       window.addEventListener("keydown", updateLastActive);

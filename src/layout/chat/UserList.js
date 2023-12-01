@@ -34,7 +34,6 @@ export const UserList = (props) => {
       })
       if(latestChanges){
         dispatch(setIsChatPage({ user: latestChanges[0], isChatOpen: true }));
-
       }
     }
 
@@ -164,7 +163,9 @@ export const UserList = (props) => {
                         }
                         alt={user?.fname_alias}
                       />
-                      {user?.isOnline === true && <div className="chat-status"></div>}
+                      {user?.isOnline === 0 && <div className="chat-status-offline"></div>}
+                      {user?.isOnline === 1 && <div className="chat-status"></div>}
+                      {user?.isOnline === 2 && <div className="chat-status-absent"></div>}
                     </div>
 
                     <div>

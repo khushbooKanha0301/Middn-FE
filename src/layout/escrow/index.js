@@ -8,6 +8,8 @@ import PaginationComponent from "../../component/Pagination";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { Link } from "react-router-dom";
+import { database, firebaseMessages } from "../../helper/config";
+import { get, ref } from "firebase/database";
 let PageSize = 5;
 
 function capitalizeFirstLetter(str) {
@@ -65,7 +67,7 @@ export const Escrow = () => {
   const [selectedOptionAny, setSelectedOptionAny] = useState(data[0]);
   const [selectedOptionBTC, setSelectedOptionBTC] = useState(data[1]);
   const [selectedOptionAnywhere, setSelectedOptionAnywhere] = useState(data[2]);
-  const [escrows, setEscrow] = useState(null);
+  const [escrows, setEscrow] = useState([]);
   const [totalEscrowCount, setTotalEscrowCount] = useState(0);
   const [escrowLoading, setEscrowLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,19 +76,48 @@ export const Escrow = () => {
 
   const getAllEscrow = async () => {
     if (currentPage) {
-      await jwtAxios
-        .get(`/escrows/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`)
-        .then((res) => {
-          setEscrowLoading(false);
-          setEscrow(res.data?.data);
-          setTotalEscrowCount(res.data?.escrowsCount);
-        })
-        .catch((err) => {
-          setEscrowLoading(false);
-          console.log(err);
-        });
+      try {
+        const res = await jwtAxios.get(
+          `/escrows/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
+        );
+        setEscrowLoading(false);
+
+        let escrowErr = await Promise.all(
+          res.data?.data.map(async (e) => {
+            if (e.user_address) {
+              const starCountRef = ref(
+                database,
+                firebaseMessages.CHAT_USERS + e.user_address
+              );
+              // Use await to wait for the onValue callback
+              const snapshot = await get(starCountRef);
+              if (snapshot.val()) {
+                if (snapshot.exists()) {
+                  // Return the updated object with the new key-value pair
+                  return {
+                    ...e,
+                    status: snapshot.val().isOnline,
+                  };
+                }
+              } else {
+                return {
+                  ...e,
+                  status: 0,
+                };
+              }
+            }
+            return e; // Return the original object if no update is needed
+          })
+        );
+        setEscrow(escrowErr); // Update the state with the new array
+        setTotalEscrowCount(res.data?.escrowsCount);
+      } catch (err) {
+        setEscrowLoading(false);
+        console.error(err);
+      }
     }
   };
+
   useEffect(() => {
     getAllEscrow();
   }, [currentPage, acAddress.authToken]);
@@ -246,7 +277,7 @@ export const Escrow = () => {
                 <div className="escrow-time d-flex justify-content-center">
                   {escrow?.time_constraints}
                 </div>
-                <div className="escrow-trader d-flex align-items-center justify-content-center">
+                <div className="escrow-trader d-flex align-items-center justify-content-start">
                   <div className="d-flex align-items-center">
                     <div className="chat-image">
                       <img
@@ -257,7 +288,16 @@ export const Escrow = () => {
                         }
                         alt={escrow?.newImage ? escrow?.newImage : "No Profile"}
                       />
-                      <span className="circle"></span>
+                      {/* <span className="circle"></span> */}
+                      {(escrow?.status === 0 || escrow?.status === false) && (
+                        <div className="chat-status-offline"></div>
+                      )}
+                      {(escrow?.status === 1 || escrow?.status === true) && (
+                        <div className="chat-status"></div>
+                      )}
+                      {escrow?.status === 2 && (
+                        <div className="chat-status-absent"></div>
+                      )}
                     </div>
                     <div className="content ms-3">
                       <h6>
@@ -274,21 +314,21 @@ export const Escrow = () => {
                       //   className="action"
                       //   to={`/escrow-details/${escrow?._id}`}
                       // >
-                        <Button variant="primary">Details</Button>
-                      // </Link>
-                    ) : escrow && escrow?.escrow_type === "buyer" ? (
+                      <Button variant="primary">Details</Button>
+                    ) : // </Link>
+                    escrow && escrow?.escrow_type === "buyer" ? (
                       // <Link
                       //   className="action"
                       //   to={`/escrow-buy-sell/${escrow?._id}`}
                       // >
-                        <Button variant="primary">Sell</Button>
-                      // </Link>
+                      <Button variant="primary">Sell</Button>
                     ) : (
+                      // </Link>
                       // <Link
                       //   className="action"
                       //   to={`/escrow-buy-sell/${escrow?._id}`}
                       // >
-                        <Button variant="primary">Buy</Button>
+                      <Button variant="primary">Buy</Button>
                       // </Link>
                     )}
                   </div>

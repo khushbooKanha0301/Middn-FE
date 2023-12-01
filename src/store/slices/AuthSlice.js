@@ -19,6 +19,7 @@ const accountData = JSON.parse(window?.localStorage?.getItem("userData"))
   ?.account
   ? JSON.parse(window.localStorage.getItem("userData")).account
   : "Connect Wallet";
+
 const useridData = JSON.parse(window?.localStorage?.getItem("userData"))?.userid
   ? JSON.parse(window.localStorage.getItem("userData")).userid
   : null;
@@ -139,16 +140,16 @@ export const checkAuth = createAsyncThunk(
           get(
             child(dbRef, firebaseMessages?.CHAT_USERS + userData?.account)
           ).then((snapshot) => {
-            const data = snapshot.val();
-            if (snapshot.exists()) {
+            // console.log("snapshot.exists()",snapshot.val())
+            // if (snapshot.exists()) {
               update(
                 ref(database, firebaseMessages?.CHAT_USERS + userData?.account),
                 {
-                  isOnline: true,
+                  isOnline: 1,
                   lastActive: Date.now(),
                 }
               );
-            }
+            //}
           });
           // update(ref(database, firebaseMessages.CHAT_USERS + userData?.account), {isOnline:true});
           dispatch(setLoading(false));
@@ -180,6 +181,21 @@ export const logoutAuth = createAsyncThunk(
   "logoutAuth",
   async (action, { dispatch }) => {
     try {
+      let accountAdrr = JSON.parse(window.localStorage.getItem("userData")).account;
+      const dbRef = ref(database);
+      await get(
+        child(dbRef, firebaseMessages?.CHAT_USERS + accountAdrr)
+      ).then((snapshot) => {
+        if (snapshot.exists()) {
+          update(
+            ref(database, firebaseMessages?.CHAT_USERS + accountAdrr),
+            {
+              isOnline: 0,
+            }
+          );
+        }
+      });
+
       jwtAxios
         .get(`/users/logout`)
         .then(() => {
@@ -193,6 +209,7 @@ export const logoutAuth = createAsyncThunk(
         });
 
       window.localStorage.removeItem("userData");
+     
       let userData = {
         account: "Connect Wallet",
         authToken: null,

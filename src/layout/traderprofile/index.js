@@ -20,7 +20,7 @@ import { useDispatch } from "react-redux";
 import { InfoLoader, ProfileLoader } from "./Loader";
 import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database, firebaseMessages } from "../../helper/config";
-import { onValue, ref } from "firebase/database";
+import { onValue, ref, get } from "firebase/database";
 import ReviewTransactionView from "../../component/ReviewTransaction";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
@@ -55,7 +55,7 @@ export const TraderProfile = (props) => {
   const [loader, setLoader] = useState(true);
   const { address } = useParams();
   const [isAuthAddress, setisAuthAddress] = useState(true);
-  const [otherStatus, setUserStatus] = useState(null);
+
   const [otherUserData, setOtherUserData] = useState({});
   const countryDetails = useSelector((state) => state.auth.countryDetails);
   const navigate = useNavigate();
@@ -63,24 +63,50 @@ export const TraderProfile = (props) => {
   const [activeEscrows, setActiveEscrows] = useState([]);
   const [totalActiveEscrowCount, setTotalActiveEscrowCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const [otherStatus, setUserStatus] = useState(null);
   let PageSize = 5;
 
   const getActiveEscrows = async () => {
     if (currentPage) {
-      await jwtAxios
-        .get(
+      try {
+        const res = await jwtAxios.get(
           `/auth/activeEscrows/${address}?page=${currentPage}&pageSize=${PageSize}`
-        )
-        .then((res) => {
-          setEscrowLoading(false);
-          setActiveEscrows(res.data?.data);
-          setTotalActiveEscrowCount(res.data?.escrowsCount);
-        })
-        .catch((err) => {
-          setEscrowLoading(false);
-          console.log(err);
-        });
+        );
+        setEscrowLoading(false);
+
+        let escrowErr = await Promise.all(
+          res.data?.data.map(async (e) => {
+            if (e.user_address) {
+              const starCountRef = ref(
+                database,
+                firebaseMessages.CHAT_USERS + e.user_address
+              );
+              // Use await to wait for the onValue callback
+              const snapshot = await get(starCountRef);
+              if (snapshot.val()) {
+                if (snapshot.exists()) {
+                  // Return the updated object with the new key-value pair
+                  return {
+                    ...e,
+                    status: snapshot.val().isOnline,
+                  };
+                }
+              } else {
+                return {
+                  ...e,
+                  status: 0,
+                };
+              }
+            }
+            return e; // Return the original object if no update is needed
+          })
+        );
+        setActiveEscrows(escrowErr); // Update the state with the new array
+        setTotalActiveEscrowCount(res.data?.escrowsCount);
+      } catch (err) {
+        setEscrowLoading(false);
+        console.error(err);
+      }
     }
   };
   useEffect(() => {
@@ -147,9 +173,26 @@ export const TraderProfile = (props) => {
       );
       onValue(starCountRef, (snapshot) => {
         setUserStatus(snapshot.val()?.isOnline);
+        // setOtherUserLastActive(snapshot.val()?.lastActive);
       });
     }
-  }, [otherUserData]);
+    if (loginuserdata && loginuserdata?.wallet_address) {
+      const starCountRef = ref(
+        database,
+        firebaseMessages.CHAT_USERS + loginuserdata?.wallet_address
+      );
+      onValue(starCountRef, (snapshot) => {
+        setUserStatus(snapshot.val()?.isOnline);
+        // setLoginUserLastActive(snapshot.val()?.lastActive);
+      });
+    }
+  }, [otherUserData, loginuserdata]);
+
+  // const getAllFirebaseUser = (userIds) => {
+  //   if (userIds) {
+
+  //   }
+  // };
 
   return (
     <div className="profile-view">
@@ -179,8 +222,14 @@ export const TraderProfile = (props) => {
                             : "No Profile"
                         }
                       />
-                      {otherStatus && otherStatus === true && (
+                      {otherStatus === 1 && (
                         <div className="profile-status"></div>
+                      )}
+                      {otherStatus === 0 && (
+                        <div className="profile-status-offline"></div>
+                      )}
+                      {otherStatus === 2 && (
+                        <div className="profile-status-absent"></div>
                       )}
                     </Button>
                   ) : (
@@ -193,8 +242,14 @@ export const TraderProfile = (props) => {
                         }
                         alt={"No Profile"}
                       />
-                      {otherStatus && otherStatus === true && (
+                      {otherStatus === 1 && (
                         <div className="profile-status"></div>
+                      )}
+                      {otherStatus === 0 && (
+                        <div className="profile-status-offline"></div>
+                      )}
+                      {otherStatus === 2 && (
+                        <div className="profile-status-absent"></div>
                       )}
                     </Button>
                   )}
@@ -381,10 +436,7 @@ export const TraderProfile = (props) => {
                 <div className="actions profile-action">Actions</div>
               </div>
               {activeEscrows?.map((escrow) => (
-                <div
-                  className="flex-table-body tradeListBody"
-                  key={escrow._id}
-                >
+                <div className="flex-table-body tradeListBody" key={escrow._id}>
                   {escrow && escrow.price_type === "fixed" && (
                     <div className="price">
                       {escrow.fixed_price} USD<span>Buy Limit 0.1-0.6 BTC</span>{" "}
@@ -406,7 +458,7 @@ export const TraderProfile = (props) => {
                   <div className="time d-flex justify-content-center">
                     {escrow.time_constraints}
                   </div>
-                  <div className="trader d-flex align-items-center justify-content-center">
+                  <div className="trader d-flex align-items-center justify-content-start">
                     <div className="d-flex align-items-center">
                       <div className="chat-image">
                         <img
@@ -419,7 +471,16 @@ export const TraderProfile = (props) => {
                             escrow?.newImage ? escrow?.newImage : "No Profile"
                           }
                         />
-                        <span className="circle"></span>
+                        {/* <span className="circle"></span> */}
+                        {(escrow?.status === 0 || escrow?.status === false) && (
+                          <div className="chat-status-offline"></div>
+                        )}
+                        {(escrow?.status === 1 || escrow?.status === true) && (
+                          <div className="chat-status"></div>
+                        )}
+                        {escrow?.status === 2 && (
+                          <div className="chat-status-absent"></div>
+                        )}
                       </div>
                       <div className="content ms-3">
                         <h6>
@@ -432,18 +493,16 @@ export const TraderProfile = (props) => {
                   <div className="actions profile-action text-center">
                     {userData && userData.account === escrow.user_address ? (
                       // <Link className="action" to={`/escrow-details/${escrow._id}`}>
-                           <Button variant="primary">Details</Button>
-                      // </Link>
+                      <Button variant="primary">Details</Button>
+                    ) : // </Link>
+                    escrow && escrow.escrow_type === "buyer" ? (
+                      // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
+                      <Button variant="primary">Sell</Button>
                     ) : (
-                      escrow && escrow.escrow_type === "buyer" ? (
-                        // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
-                          <Button variant="primary">Sell</Button>
-                        // </Link>
-                      ) : (
-                        // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
-                          <Button variant="primary">Buy</Button>
-                        // </Link>
-                      )
+                      // </Link>
+                      // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
+                      <Button variant="primary">Buy</Button>
+                      // </Link>
                     )}
                   </div>
                 </div>
