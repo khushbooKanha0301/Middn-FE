@@ -111,14 +111,12 @@ export const App = () => {
           const isMoreThan30Minutes = timeDifference > timeWindow;
 
           if (isMoreThan30Minutes) {
-            //console.log("offline")
-            updateOffline();
+           updateOffline();
           } 
 
           const timeWindowAbsent = 1 * 60 * 1000;
           const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
           if(isMoreThan5Minutes && (isOnline != 2)){
-            //console.log("absent")
             updateAbsent();
           }
 

@@ -40,7 +40,7 @@ export const LoginView = (props) => {
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
-      console.log("storageProvider ", storageProvider);
+      //console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
@@ -171,7 +171,7 @@ export const LoginView = (props) => {
           setProvider("coinbaseWallet");
         }
 
-        console.log(metaAccounts);
+        //console.log(metaAccounts);
 
         if (
           //!metaAccounts ||
@@ -221,39 +221,6 @@ export const LoginView = (props) => {
       ethereum.setSelectedProvider(provider);
     }
   };
-
-  // useEffect(() => {
-  //   const listenEventOnCoinbaseProvider = async () => {
-  //     let coinbaseProvider;
-  //     if (!window.ethereum) {
-  //       return undefined;
-  //     }
-
-  //     if (window.ethereum && !window.ethereum.providers) {
-  //       coinbaseProvider = window.ethereum;
-  //     } else {
-  //       coinbaseProvider = window.ethereum.providers.find(
-  //         (provider) => provider.isCoinbaseWallet
-  //       );
-  //     }
-  //     // if(!window.web3.__isMetaMaskShim__)
-  //     // {
-  //     //   let handleAccountsChangedOnCoinbase = async (accounts) => {
-  //     //     if (accounts.length) {
-  //     //       activateInjectedProvider("coinbaseWallet");
-  //     //       connect({ connector: wagmiConnector[1] });
-  //     //       setProvider("coinbaseWallet");
-  //     //     }
-  //     //   };
-  //     //   await coinbaseProvider.on(
-  //     //     "accountsChanged",
-  //     //     handleAccountsChangedOnCoinbase
-  //     //   );
-  //     // }
-  //   };
-
-  //   listenEventOnCoinbaseProvider();
-  // }, []);
 
   const setCoinbaseEvent = async () => {
     var coinbaseProvider = await window.ethereum.providers.find(
@@ -393,7 +360,7 @@ export const LoginView = (props) => {
       userData?.account !== "Connect Wallet" &&
       storageProvider == "coinbaseWallet"
     ) {
-      console.log("disconnect");
+      //console.log("disconnect");
       disonnectWalletConnect();
       disconnect();
       dispatch(notificationSuccess("User logout successfully !"));

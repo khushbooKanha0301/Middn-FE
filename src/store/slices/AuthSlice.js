@@ -185,14 +185,20 @@ export const logoutAuth = createAsyncThunk(
       const dbRef = ref(database);
       await get(
         child(dbRef, firebaseMessages?.CHAT_USERS + accountAdrr)
-      ).then((snapshot) => {
+      ).then(async (snapshot) => {
+        console.log(snapshot.exists())
         if (snapshot.exists()) {
           update(
             ref(database, firebaseMessages?.CHAT_USERS + accountAdrr),
             {
-              isOnline: 0,
+              isOnline: 0
             }
           );
+          const snapshotArr = await get(ref(
+            database,
+            firebaseMessages.CHAT_USERS + accountAdrr
+          ));
+          console.log("--------------" , snapshotArr.val())
         }
       });
 

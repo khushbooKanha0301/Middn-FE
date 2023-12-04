@@ -51,8 +51,10 @@ export const EditProfileView = (props) => {
   const [isLoading, setLoading] = useState(false);
   const [countryCode, setCountryCode] = useState("");
   const userData = useSelector(userDetails);
+
   const userDetailsAll = useSelector(userGetFullDetails);
   const countryDetails = useSelector((state) => state.auth.countryDetails);
+
   useEffect(() => {
     if (countryDetails) {
       setCountry(countryDetails?.country_name);
@@ -175,6 +177,8 @@ export const EditProfileView = (props) => {
 
             dispatch(notificationSuccess(response?.data.message));
             props.onHide();
+            //getActiveEscrows();
+            //window.location.reload();
           }
         })
         .catch((error) => {
@@ -187,6 +191,7 @@ export const EditProfileView = (props) => {
         });
     }
   };
+
   useEffect(() => {
     if (isLoading) {
       simulateNetworkRequest().then(() => {

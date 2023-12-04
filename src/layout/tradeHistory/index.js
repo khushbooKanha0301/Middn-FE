@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { Col, Row, Button, Nav } from "react-bootstrap";
 import { TrashIcon } from "../../component/SVGIcon";
 import Select from "react-select";
 import CreateEscrowView from "../escrow/CreateEscrow";
+import { TableLoader } from "../../helper/Loader";
+
 
 const data = [
   {
@@ -21,12 +23,17 @@ const data = [
 
 export const TradeHistory = () => {
   const [selectedOptionStatus, setSelectedOptionStatus] = useState(data[0]);
+  const [escrowLoading, setEscrowLoading] = useState(true);
   const handleChangeStatus = (e) => {
     setSelectedOptionStatus(e);
   };
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const createEscrowModalToggle = () =>
     setCreateEscrowModalShow(!createEscrowModalShow);
+  useEffect(() => {
+    setEscrowLoading(false);
+  }, []);
+
   return (
     <div className="trade-history-view">
       <h1>Trade History</h1>
@@ -65,6 +72,7 @@ export const TradeHistory = () => {
           </Button>
         </Col>
       </Row>
+
       <div className="table-responsive tradeList">
         <div className="flex-table">
           <div className="flex-table-header">
@@ -74,59 +82,55 @@ export const TradeHistory = () => {
             <div className="trade-trader">Trader</div>
             <div className="trade-status">Status</div>
           </div>
-          <div className="flex-table-body tradeListBody">
-            <div className="trade-price">
-              <div className="d-flex align-items-center">
-                <span className="customCheckbox">
-                  <input type="checkbox" />
-                  <span className="check"></span>
-                </span>
-                <div className="content ms-3">
-                  <h6>15.490546893758 ETH</h6>
-                  Buy Limit 0.1-0.6 BTC
+          {escrowLoading ? (
+            <TableLoader />
+          ) : (
+            <div className="flex-table-body tradeListBody">
+              <div className="trade-price">
+                <div className="d-flex align-items-center">
+                  <span className="customCheckbox">
+                    <input type="checkbox" />
+                    <span className="check"></span>
+                  </span>
+                  <div className="content ms-3">
+                    <h6>15.490546893758 ETH</h6>
+                    Buy Limit 0.1-0.6 BTC
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="escrow-payment d-flex justify-content-center align-items-center">
-              <img
-                src={require("../../content/images/ethereum.png")}
-                alt="Gabriel  Erickson"
-              />
-              <span className="ms-2"> Ethereum </span>
-            </div>
-            <div className="trade-time d-flex justify-content-center align-items-center">
-              2 Hours
-            </div>
-            <div className="escrow-trader d-flex align-items-center justify-content-center">
-              <div className="d-flex align-items-center">
-                <div className="chat-image">
-                  <img
-                    src={require("../../content/images/profile-pic.png")}
-                    alt="Gabriel  Erickson"
-                  />
-                  <span className="circle"></span>
-                </div>
-                <div className="content ms-3">
-                  <h6>Gabriel</h6>
-                  <span>(100%, 500+)</span>
+              <div className="escrow-payment d-flex justify-content-center align-items-start">
+                <img
+                  src={require("../../content/images/ethereum.png")}
+                  alt="Gabriel  Erickson"
+                />
+                <span className="ms-2"> Ethereum </span>
+              </div>
+              <div className="trade-time d-flex justify-content-center align-items-center">
+                2 Hours
+              </div>
+              <div className="escrow-trader d-flex align-items-center justify-content-center">
+                <div className="d-flex align-items-center">
+                  <div className="chat-image">
+                    <img
+                      src={require("../../content/images/profile-pic.png")}
+                      alt="Gabriel  Erickson"
+                    />
+                    <span className="circle"></span>
+                  </div>
+                  <div className="content ms-3">
+                    <h6>Gabriel</h6>
+                    <span>(100%, 500+)</span>
+                  </div>
                 </div>
               </div>
+              <div className="trade-status d-flex justify-content-center align-items-center">
+                <span className="statusBtn completebtn">Complete</span>
+              </div>
             </div>
-            <div className="trade-status d-flex justify-content-center align-items-center">
-              <span className="statusBtn completebtn">Complete</span>
-            </div>
-          </div>
-          {/* <div className="flex-table-body no-records justify-content-between">
-            <div className="no-records-text">
-              <div className="no-record-label">No Records</div>
-              <p>You haven't made any transaction</p>
-            </div>
-            <div className="actions profile-action text-center">
-              <Button variant="primary" onClick={createEscrowModalToggle}>Create</Button>
-            </div>
-          </div> */}
+          )}
         </div>
       </div>
+
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}

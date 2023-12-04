@@ -118,13 +118,14 @@ export const Header = (props) => {
           {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
             <span className="user-name d-none d-md-block">
-              {addressLine ? addressLine : "**********"}
+              {addressLine}
             </span>
           )}
+         
           {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
             <span className="login-btn d-flex d-md-none text-white">
-              {addressLine ? addressLine : "**********"}
+              {addressLine}
             </span>
           )}
         </Nav.Item>
