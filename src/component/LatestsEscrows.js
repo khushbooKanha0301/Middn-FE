@@ -4,6 +4,9 @@ import { Escrows } from "./Escrows";
 import { DotedIcon } from "./SVGIcon";
 import { PlusIcon } from "./SVGIcon";
 import CreateEscrowView from "../layout/escrow/CreateEscrow";
+import { userDetails } from "../store/slices/AuthSlice";
+import { useSelector } from "react-redux";
+import LoginView from "../component/Login";
 
 const escrows = [
   {
@@ -110,6 +113,13 @@ export const LatestsEscrows = () => {
   let userDisplayCal = width / 225;
   const [escrowslist, setescrowslist] = React.useState(0);
   const [userDisplayCount, setDisplayCount] = React.useState(userDisplayCal);
+  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
+
+  const acAddress = useSelector(userDetails);
+  const [modalShow, setModalShow] = useState(false);
+  const modalToggle = () => setModalShow(!modalShow);
+  const [isSign, setIsSign] = useState(null);
+
   const [userList, setUserList] = React.useState(
     escrows.filter((item, index) => index < userDisplayCount)
   );
@@ -136,9 +146,17 @@ export const LatestsEscrows = () => {
     }, 500);
   };
 
-  const createEscrowModalToggle = () =>
-    setCreateEscrowModalShow(!createEscrowModalShow);
-  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
+  const createEscrowModalToggle = () => {
+    if (acAddress.authToken) {
+      setCreateEscrowModalShow(!createEscrowModalShow);
+    } else {
+      setModalShow(true);
+    }
+  };
+
+  const handleAccountAddress = (address) => {
+    setIsSign(false);
+  };
 
   React.useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -152,7 +170,7 @@ export const LatestsEscrows = () => {
           </Card.Title>
           <Row>
             <Col className="col-auto">
-              <Button variant="link"onClick={createEscrowModalToggle} >
+              <Button variant="link" onClick={createEscrowModalToggle}>
                 <span className="see-more ms-0">
                   <PlusIcon width="34" height="26" />
                 </span>
@@ -170,8 +188,14 @@ export const LatestsEscrows = () => {
         </Card.Body>
       </Card>
       <CreateEscrowView
-          show={createEscrowModalShow}
-          onHide={() => setCreateEscrowModalShow(false)}
+        show={createEscrowModalShow}
+        onHide={() => setCreateEscrowModalShow(false)}
+      />
+      <LoginView
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        handleaccountaddress={handleAccountAddress}
+        isSign={isSign}
       />
     </>
   );

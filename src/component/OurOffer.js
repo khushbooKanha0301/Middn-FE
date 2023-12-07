@@ -2,10 +2,29 @@ import React, { useState } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import { NotePencilIcon, EscrowIcon, ChartLineUpIcon } from './SVGIcon'
 import CreateEscrowView from '../layout/escrow/CreateEscrow';
+import { userDetails } from "../store/slices/AuthSlice";
+import { useSelector } from "react-redux";
+import LoginView from "../component/Login";
+
 export const OurOffer = () => {
     const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-    const createEscrowModalToggle = () =>
-    setCreateEscrowModalShow(!createEscrowModalShow);
+    const acAddress = useSelector(userDetails);
+    const [modalShow, setModalShow] = useState(false);
+    const modalToggle = () => setModalShow(!modalShow);
+    const [isSign, setIsSign] = useState(null);
+    const createEscrowModalToggle = () => {
+        if(acAddress.authToken) {
+        setCreateEscrowModalShow(!createEscrowModalShow);
+        } else {
+          setModalShow(true);
+        }
+    }
+
+    const handleAccountAddress = (address) => {
+        setIsSign(false);
+      };
+
+
     return (
         <div className="our-offer">
             <Row>
@@ -47,6 +66,12 @@ export const OurOffer = () => {
             <CreateEscrowView
                 show={createEscrowModalShow}
                 onHide={() => setCreateEscrowModalShow(false)}
+            />
+            <LoginView
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                handleaccountaddress={handleAccountAddress}
+                isSign={isSign}
             />
         </div>
     );

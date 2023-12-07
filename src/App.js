@@ -16,9 +16,9 @@ import NotificationComponent from "./layout/NotificationComponent";
 import TraderProfileComponent from "./layout/TraderProfileComponent";
 import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
-// import EscrowDetails from "./layout/escrow/EscrowDetails";
-// import EscrowPay from "./layout/escrow/EscrowPay";
-// import EscrowBuySell from "./layout/escrow/EscrowBuySell";
+import EscrowDetails from "./layout/escrow/EscrowDetails";
+import EscrowPay from "./layout/escrow/EscrowPay";
+import EscrowBuySell from "./layout/escrow/EscrowBuySell";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
 import ProtectedRoute from "./PrivateRoute";
@@ -196,7 +196,12 @@ export const App = () => {
       <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
         <ToastContainer />
         <SnackBar />
-        <Sidebar clickHandler={sidebarToggle} setModalShow={setModalShow} setIsOpen={setIsOpen} isResponsive={isResponsive} />
+        <Sidebar
+          clickHandler={sidebarToggle}
+          setModalShow={setModalShow}
+          setIsOpen={setIsOpen}
+          isResponsive={isResponsive}
+        />
         <div className="wrapper">
           <Header
             clickHandler={sidebarToggle}
@@ -228,20 +233,27 @@ export const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/notification" element={<NotificationComponent />} />
-              {/* <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
-              <Route path="/escrow-buy-sell/:id" element={<EscrowBuySell />} />   */}
-              {/* <Route path="/escrow-offer-buy" element={<EscrowPay />} />   */}
+              <Route
+                path="/notification"
+                element={
+                  <ProtectedRoute>
+                    <NotificationComponent />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
+              <Route path="/escrow-buy-sell/:id" element={<EscrowBuySell />} /> 
+              <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
               <Route
                 path="/profile/:address"
                 element={
-                <>
-                  <TraderProfileComponent isLogin={isLogin} />
-                  {twoFAModal === true &&
+                  <>
+                    <TraderProfileComponent isLogin={isLogin} />
+                    {twoFAModal === true &&
                       userData?.is_2FA_login_verified === false && (
                         <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
                       )}
-                </>
+                  </>
                 }
               />
               <Route
@@ -255,25 +267,25 @@ export const App = () => {
               <Route
                 path="/escrow"
                 element={
-                  <ProtectedRoute>
-                    <EscrowComponent />
-                  </ProtectedRoute>
+                  // <ProtectedRoute>
+                  <EscrowComponent />
+                  // </ProtectedRoute>
                 }
               />
               <Route
                 path="/trade"
                 element={
-                  <ProtectedRoute>
-                    <TradeHistoryComponent />
-                  </ProtectedRoute>
+                  // <ProtectedRoute>
+                  <TradeHistoryComponent />
+                  // </ProtectedRoute>
                 }
               />
               <Route
                 path="/help"
                 element={
-                  <ProtectedRoute>
-                    <HelpCenterComponent />
-                  </ProtectedRoute>
+                  // <ProtectedRoute>
+                  <HelpCenterComponent />
+                  // </ProtectedRoute>
                 }
               />
               <Route path="*" element={<Navigate to="/" />} />

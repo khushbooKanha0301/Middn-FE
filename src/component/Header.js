@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { database, firebaseMessages } from "./../helper/config";
 import { hideAddress } from "../utils";
+import LoginView from "../component/Login";
 import {
   BellIcon,
   LogoutIcon,
@@ -25,6 +26,17 @@ export const Header = (props) => {
   let usergetdata = useSelector(userGetFullDetails);
   const userDetailsAll = useSelector(userGetFullDetails);
 
+  const [modalShow, setModalShow] = useState(false);
+  const modalToggle = () => setModalShow(!modalShow);
+
+  const [modalNotifyShow, setModalNofificationShow] = useState(false);
+  const modalNotifyToggle = () => setModalNofificationShow(!modalShow);
+  const [isSign, setIsSign] = useState(null);
+
+  const handleAccountAddress = (address) => {
+    setIsSign(false);
+  };
+
   useEffect(() => {
     if (acAddress.authToken) {
       findFirebaseUserList();
@@ -32,16 +44,20 @@ export const Header = (props) => {
   }, []);
 
   let addressLine = "";
-  if(acAddress?.account === "Connect Wallet" && userDetailsAll === undefined)
-  {
+  if (acAddress?.account === "Connect Wallet" && userDetailsAll === undefined) {
     addressLine = "Connect Wallet";
-  }else if(acAddress?.account !== "Connect Wallet" && userDetailsAll === undefined)
-  {
+  } else if (
+    acAddress?.account !== "Connect Wallet" &&
+    userDetailsAll === undefined
+  ) {
     addressLine = "";
-  }else if(acAddress?.account !== "Connect Wallet" && userDetailsAll?.is_2FA_login_verified !== false && (acAddress?.account == userDetailsAll?.wallet_address))
-  {
-    addressLine = hideAddress(acAddress?.account,5);
-  }else{
+  } else if (
+    acAddress?.account !== "Connect Wallet" &&
+    userDetailsAll?.is_2FA_login_verified !== false &&
+    acAddress?.account == userDetailsAll?.wallet_address
+  ) {
+    addressLine = hideAddress(acAddress?.account, 5);
+  } else {
     addressLine = "Connect Wallet";
   }
 
@@ -83,6 +99,14 @@ export const Header = (props) => {
     };
   });
 
+  const handleLinkClick = () => {
+    setModalShow(true);
+  };
+
+  const handleNotificationClick = () => {
+    setModalNofificationShow(true);
+  };
+
   const cls = visible ? "visible" : "hidden";
   return (
     <div className={`header d-flex ${cls}`}>
@@ -93,7 +117,8 @@ export const Header = (props) => {
       />
       <Nav className="ms-auto" as="ul">
         {/* {(acAddress.authToken && (addressLine != "" && addressLine != "Connect Wallet")) && ( */}
-        {acAddress?.authToken && (
+
+        {acAddress?.authToken ? (
           <>
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/chat">
@@ -109,6 +134,41 @@ export const Header = (props) => {
               </Nav.Link>
             </Nav.Item>
           </>
+        ) : (
+          <>
+            <Nav.Item as="li">
+              <Nav.Link as={Link} to="/chat" onClick={handleLinkClick}>
+                <NotificationIcon width="26" height="24" />
+                {messageCount > 0 && (
+                  <span className="notification-badge">{messageCount}</span>
+                )}
+              </Nav.Link>
+              {modalShow && (
+                <LoginView
+                  show={modalShow}
+                  onHide={() => setModalShow(false)}
+                  handleaccountaddress={handleAccountAddress}
+                  isSign={isSign}
+                />
+              )}
+            </Nav.Item>
+            <Nav.Item as="li">
+              <Nav.Link as={Link} 
+              //to="/notification" 
+              to={acAddress.authToken && "/notification"}
+              onClick={handleNotificationClick}>
+                <BellIcon width="20" height="22" />
+              </Nav.Link>
+              {modalNotifyShow && (
+                <LoginView
+                  show={modalNotifyShow}
+                  onHide={() => setModalNofificationShow(false)}
+                  handleaccountaddress={handleAccountAddress}
+                  isSign={isSign}
+                />
+              )}
+            </Nav.Item>
+          </>
         )}
         <Nav.Item
           as="li"
@@ -117,11 +177,9 @@ export const Header = (props) => {
         >
           {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
-            <span className="user-name d-none d-md-block">
-              {addressLine}
-            </span>
+            <span className="user-name d-none d-md-block">{addressLine}</span>
           )}
-         
+
           {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
             <span className="login-btn d-flex d-md-none text-white">

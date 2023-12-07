@@ -163,8 +163,9 @@ export const Sidebar = (props) => {
               <Nav.Link
                 as={Link}
                 eventKey="escrow"
-                to={acAddress.authToken && "/escrow"}
-                onClick={!acAddress.authToken ? props.setModalShow :undefined}
+                to={"/escrow"}
+                // to={acAddress.authToken && "/escrow"}
+                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
                 className={activeKey === "/escrow" && "active"}
               >
                 <EscrowIcon width="24" height="24" />{" "}
@@ -175,8 +176,9 @@ export const Sidebar = (props) => {
               <Nav.Link
                 as={Link}
                 eventKey="trade"
-                to={acAddress.authToken && "/trade"}
-                onClick={!acAddress.authToken ? props.setModalShow :undefined}
+                to={"/trade"}
+                // to={acAddress.authToken && "/trade"}
+                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
                 className={activeKey === "/trade" && "active"}
               >
                 <TradeHistoryIcon width="24" height="24" />{" "}
@@ -187,8 +189,9 @@ export const Sidebar = (props) => {
               <Nav.Link
                 as={Link}
                 eventKey="help"
-                to={acAddress.authToken && "/help"}
-                onClick={!acAddress.authToken ? props.setModalShow :undefined}
+                to={"/help"}
+                // to={acAddress.authToken && "/help"}
+                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
                 className={activeKey === "/help" && "active"}
               >
                 <QuestionIcon width="24" height="24" />{" "}

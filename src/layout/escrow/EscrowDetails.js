@@ -10,6 +10,7 @@ import Swal from "sweetalert2/src/sweetalert2.js";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import EditEscrow from "./EditEscrow";
+import { useNavigate } from "react-router-dom";
 
 function EscrowDetails() {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ function EscrowDetails() {
   const [editEscrowModalShow, setEditEscrowModalShow] = useState(false);
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const deleteUserKyc = (id) => {
@@ -38,6 +40,10 @@ function EscrowDetails() {
             .put(`/escrows/deleteEscrows/${id}`)
             .then((res) => {
               Swal.fire("Deleted!", "Escrow deleted...", "danger");
+              if(res){
+                navigate("/");
+              }
+              
             })
             .catch((err) => {
               if (typeof err == "string") {

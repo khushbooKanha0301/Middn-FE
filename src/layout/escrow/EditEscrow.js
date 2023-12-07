@@ -18,15 +18,28 @@ export const EditEscrowView = (props) => {
   const [priceType, setPriceType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [object, setObject] = useState("");
   const [description, setDescription] = useState(null);
-  const [processTime, setProcessTime] = useState("");
   const [escrowNumber, setEscrowNumber] = useState(null);
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // const [category, setCategory] = useState("");
+  // const [object, setObject] = useState("");
+  // const [processTime, setProcessTime] = useState("");
+
+  const [object, setObject] = useState("");
+  const [showObjects, setShowObject] = useState(false);
+  const objects = [{ value: "Jewelery", label: "Jewelery" }];
+
+  const [category, setCategory] = useState("");
+  const [showOptions, setShowOptions] = useState(false);
+  const categories = [{ value: "high_value_items", label: "High-value items" }];
+
+  const [processTime, setProcessTime] = useState("");
+  const [showProcessTime, setShowProcessTime] = useState(false);
+  const processTimes = [{ value: "24 Hours", label: "24 Hours" }];
 
   const handleNext = () => {
     if (step === 1) {
@@ -58,12 +71,97 @@ export const EditEscrowView = (props) => {
     setStep(step - 1);
   };
 
+  // const inputChangeHandler = (e) => {
+  //   let numericRegex = /[^0-9.]/g;
+  //   switch (e.target.name) {
+  //     case "radiooption":
+  //       setEscrowType(e.target.value);
+  //       break;
+  //     case "price":
+  //       if (e.target.value) {
+  //         setPriceType("fixed");
+  //         setMinPrice("");
+  //         setMaxPrice("");
+  //       } else {
+  //         if (minPrice != "" || maxPrice != "") {
+  //           setPriceType("flexible");
+  //         } else {
+  //           setPriceType("");
+  //         }
+  //       }
+  //       e.target.value = e.target.value.replace(numericRegex, "");
+  //       setPrice(e.target.value);
+  //       break;
+  //     case "minPrice":
+  //       if (e.target.value) {
+  //         setPrice("");
+  //         setPriceType("flexible");
+  //       } else {
+  //         if (maxPrice != "") {
+  //           setPriceType("flexible");
+  //         } else {
+  //           if (price != "") {
+  //             setPriceType("fixed");
+  //           } else {
+  //             setPriceType("");
+  //           }
+  //         }
+  //       }
+
+  //       e.target.value = e.target.value.replace(numericRegex, "");
+  //       setMinPrice(e.target.value);
+  //       break;
+  //     case "maxPrice":
+  //       if (e.target.value) {
+  //         setPrice("");
+  //         setPriceType("flexible");
+  //       } else {
+  //         if (minPrice != "") {
+  //           setPriceType("flexible");
+  //         } else {
+  //           if (price != "") {
+  //             setPriceType("fixed");
+  //           } else {
+  //             setPriceType("");
+  //           }
+  //         }
+  //       }
+  //       e.target.value = e.target.value.replace(numericRegex, "");
+  //       setMaxPrice(e.target.value);
+  //       break;
+  //     case "category":
+  //       setCategory(e.target.value);
+  //       break;
+  //     case "object":
+  //       setObject(e.target.value);
+  //       break;
+  //     case "description":
+  //       setDescription(e.target.value);
+  //       break;
+  //     case "processTime":
+  //       setProcessTime(e.target.value);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // };
+
   const inputChangeHandler = (e) => {
     let numericRegex = /[^0-9.]/g;
+    // console.log("----------", e.target.textContent);
+
+    // const customName = e.currentTarget.getAttribute("data-name");
+    // console.log("Custom name:", customName);
+
+    // let updatedContent = e.target.textContent;
+    // console.log("updatedContent ", updatedContent);
+    // const { name: inputName, dataset } = e.target;
+    // const customName = dataset.name;
+
     switch (e.target.name) {
-      case "radiooption":
-        setEscrowType(e.target.value);
-        break;
+      // case "radiooption":
+      //   setEscrowType(e.target.value);
+      //   break;
       case "price":
         if (e.target.value) {
           setPriceType("fixed");
@@ -94,7 +192,6 @@ export const EditEscrowView = (props) => {
             }
           }
         }
-
         e.target.value = e.target.value.replace(numericRegex, "");
         setMinPrice(e.target.value);
         break;
@@ -132,6 +229,22 @@ export const EditEscrowView = (props) => {
         break;
     }
   };
+
+  useEffect(() => {
+    if (props.show) {
+      setEscrowType(escrows?.escrow_type ? escrows?.escrow_type : "");
+      setPrice(escrows?.fixed_price ? escrows?.fixed_price : "");
+      setPriceType("fixed");
+      setMinPrice(escrows?.flex_min_price ? escrows?.flex_min_price : "");
+      setMaxPrice(escrows?.flex_max_price ? escrows?.flex_max_price : "");
+      setCategory(escrows?.category ? escrows?.category : "high_value_items");
+      setObject(escrows?.object ? escrows?.object : "jwellery");
+      setDescription(escrows?.description ? escrows?.description : "");
+      setProcessTime(
+        escrows?.time_constraints ? escrows?.time_constraints : "24 Hours"
+      );
+    }
+  }, [props.show]);
 
   function copyToClipboard(e) {
     escrowLinkRef.current.select();
@@ -188,22 +301,6 @@ export const EditEscrowView = (props) => {
   };
 
   useEffect(() => {
-    if (props.show) {
-      setEscrowType(escrows?.escrow_type ? escrows?.escrow_type : "");
-      setPrice(escrows?.fixed_price ? escrows?.fixed_price : "");
-      setPriceType("fixed");
-      setMinPrice(escrows?.flex_min_price ? escrows?.flex_min_price : "");
-      setMaxPrice(escrows?.flex_max_price ? escrows?.flex_max_price : "");
-      setCategory(escrows?.category ? escrows?.category : "high_value_items");
-      setObject(escrows?.object ? escrows?.object : "jwellery");
-      setDescription(escrows?.description ? escrows?.description : "");
-      setProcessTime(
-        escrows?.time_constraints ? escrows?.time_constraints : "24 Hours"
-      );
-    }
-  }, [props.show]);
-
-  useEffect(() => {
     jwtAxios
       .get(`/escrows/getEscrowsById/${props.id}`)
       .then((res) => {
@@ -213,6 +310,36 @@ export const EditEscrowView = (props) => {
         console.log(err);
       });
   }, [acAddress.authToken]);
+
+  const handleOptionClick = (option) => {
+    setEscrowType(option);
+  };
+
+  const handleSelectedClick = (value) => {
+    setCategory(value);
+    setShowOptions(false);
+  };
+
+  const handleProcessTimeClick = (value) => {
+    setProcessTime(value);
+    setShowProcessTime(false);
+  };
+
+  const handleSelectedObjectClick = (value) => {
+    setObject(value);
+    setShowObject(false);
+  };
+
+  const toggleOptions = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
+  const toggleObjectOptions = () => {
+    setShowObject((prevShowOptions) => !prevShowOptions);
+  };
+
+  const toggleProcessOptions = () => {
+    setShowProcessTime((prevShowOptions) => !prevShowOptions);
+  };
 
   return (
     <Modal
@@ -321,27 +448,76 @@ export const EditEscrowView = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Category</Form.Label>
-                    <Form.Select
+                    {/* <Form.Select
                       name="category"
                       aria-label="High-value items"
                       onChange={inputChangeHandler}
                       value={category}
                     >
                       <option value="high_value_items">High-value items</option>
-                    </Form.Select>
+                    </Form.Select> */}
+                    <div className="customSelectBox">
+                      <div
+                        className="form-select"
+                        onClick={toggleOptions}
+                        aria-label="High-value items"
+                      >
+                        {categories.find((cat) => cat.value === category)
+                          ?.label || category}
+                      </div>
+                      {showOptions && (
+                        <ul className="options">
+                          {categories.map((category) => (
+                            <li
+                              key={category.value}
+                              onClick={() =>
+                                handleSelectedClick(category.value)
+                              }
+                            >
+                              {category.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </Form.Group>
                 </Col>
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Object</Form.Label>
-                    <Form.Select
+                    {/* <Form.Select
                       name="object"
                       aria-label="Jewelery"
                       onChange={inputChangeHandler}
                       value={object}
                     >
                       <option value="Jewelery">Jewelery</option>
-                    </Form.Select>
+                    </Form.Select> */}
+
+                    <div className="customSelectBox">
+                      <div
+                        className="form-select"
+                        onClick={toggleObjectOptions}
+                        aria-label="Jewelery"
+                      >
+                        {objects.find((cat) => cat.value === object)?.label ||
+                          object}
+                      </div>
+                      {showObjects && (
+                        <ul className="options">
+                          {objects.map((obj) => (
+                            <li
+                              key={obj.value}
+                              onClick={() =>
+                                handleSelectedObjectClick(obj.value)
+                              }
+                            >
+                              {obj.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </Form.Group>
                 </Col>
               </Row>
@@ -358,14 +534,38 @@ export const EditEscrowView = (props) => {
               <h5 className="my-4">Time constraints</h5>
               <Form.Group className="form-group">
                 <Form.Label>Process time</Form.Label>
-                <Form.Select
+                {/* <Form.Select
                   aria-label="24 Hours"
                   name="processTime"
                   onChange={inputChangeHandler}
                   value={processTime}
                 >
                   <option value="24 Hours">24 Hours</option>
-                </Form.Select>
+                </Form.Select> */}
+                <div className="customSelectBox">
+                  <div
+                    className="form-select"
+                    onClick={toggleProcessOptions}
+                    aria-label="24 Hours"
+                  >
+                    {processTimes.find((cat) => cat.value === processTime)
+                      ?.label || processTime}
+                  </div>
+                  {showProcessTime && (
+                    <ul className="options">
+                      {processTimes.map((processTime) => (
+                        <li
+                          key={processTime.value}
+                          onClick={() =>
+                            handleProcessTimeClick(processTime.value)
+                          }
+                        >
+                          {processTime.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </Form.Group>
               <div className="form-action-group">
                 <Button variant="primary" onClick={submitHandler}>

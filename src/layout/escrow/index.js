@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Col, Row, Button, Card, Form, Nav } from "react-bootstrap";
 import { UploadIcon } from "../../component/SVGIcon";
+import LoginView from "../../component/Login";
 import Select from "react-select";
 import CreateEscrowView from "./CreateEscrow";
 import jwtAxios from "../../service/jwtAxios";
@@ -74,12 +75,17 @@ export const Escrow = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const acAddress = useSelector(userDetails);
   const userData = useSelector(userDetails);
+  const [isSign, setIsSign] = useState(null);
+  const [twoFAModal, setTwoFAModal] = useState(true);
+
+  const [modalShow, setModalShow] = useState(false);
+  const modalToggle = () => setModalShow(!modalShow);
 
   const getAllEscrow = async () => {
     if (currentPage) {
       try {
         const res = await jwtAxios.get(
-          `/escrows/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
+          `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
         );
         let escrowErr = await Promise.all(
           res.data?.data.map(async (e) => {
@@ -121,7 +127,9 @@ export const Escrow = () => {
   };
 
   useEffect(() => {
-    getAllEscrow();
+    // if(acAddress.authToken) {
+      getAllEscrow();
+    //}
   }, [currentPage, acAddress.authToken]);
 
   const handleChangeAny = (e) => {
@@ -134,8 +142,19 @@ export const Escrow = () => {
     setSelectedOptionAnywhere(e);
   };
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-  const createEscrowModalToggle = () =>
+  const createEscrowModalToggle = () => {
+    if(acAddress.authToken) {
     setCreateEscrowModalShow(!createEscrowModalShow);
+    } else {
+      setModalShow(true);
+    }
+  }
+
+  const handleAccountAddress = (address) => {
+    setIsSign(false);
+  };
+
+
   return (
     <div className="escrow-view">
       <h4>Hi Alex, Welcome back!</h4>
@@ -325,26 +344,26 @@ export const Escrow = () => {
                       <div className="actions profile-action text-center">
                         {userData &&
                         userData?.account === escrow?.user_address ? (
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-details/${escrow?._id}`}
-                          // >
-                          <Button variant="primary">Details</Button>
-                        ) : // </Link>
-                        escrow && escrow?.escrow_type === "buyer" ? (
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-buy-sell/${escrow?._id}`}
-                          // >
-                          <Button variant="primary">Sell</Button>
+                          <Link
+                            className="action"
+                            to={`/escrow-details/${escrow?._id}`}
+                          >
+                            <Button variant="primary">Details</Button>
+                          </Link>
+                        ) : escrow && escrow?.escrow_type === "buyer" ? (
+                          <Link
+                            className="action"
+                            to={`/escrow-buy-sell/${escrow?._id}`}
+                          >
+                            <Button variant="primary">Sell</Button>
+                          </Link>
                         ) : (
-                          // </Link>
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-buy-sell/${escrow?._id}`}
-                          // >
-                          <Button variant="primary">Buy</Button>
-                          // </Link>
+                          <Link
+                            className="action"
+                            to={`/escrow-buy-sell/${escrow?._id}`}
+                          >
+                            <Button variant="primary">Buy</Button>
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -394,6 +413,12 @@ export const Escrow = () => {
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}
+      />
+      <LoginView
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        handleaccountaddress={handleAccountAddress}
+        isSign={isSign}
       />
     </div>
   );

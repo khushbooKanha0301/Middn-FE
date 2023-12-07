@@ -222,23 +222,23 @@ export const LoginView = (props) => {
     }
   };
 
-  const setCoinbaseEvent = async () => {
-    var coinbaseProvider = await window.ethereum.providers.find(
-      (provider) => provider.isCoinbaseWallet
-    );
+  // const setCoinbaseEvent = async () => {
+  //   var coinbaseProvider = await window.ethereum.providers.find(
+  //     (provider) => provider.isCoinbaseWallet
+  //   );
 
-    var handleAccountsChangedOnCoinbase = async (accounts) => {
-      if (accounts.length) {
-        await activateInjectedProvider("coinbaseWallet");
-        await connect({ connector: wagmiConnector[1] });
-        setProvider("coinbaseWallet");
-      }
-    };
-    await coinbaseProvider.on(
-      "accountsChanged",
-      handleAccountsChangedOnCoinbase
-    );
-  };
+  //   var handleAccountsChangedOnCoinbase = async (accounts) => {
+  //     if (accounts.length) {
+  //       await activateInjectedProvider("coinbaseWallet");
+  //       await connect({ connector: wagmiConnector[1] });
+  //       setProvider("coinbaseWallet");
+  //     }
+  //   };
+  //   await coinbaseProvider.on(
+  //     "accountsChanged",
+  //     handleAccountsChangedOnCoinbase
+  //   );
+  // };
 
   useEffect(() => {
     const checkIfWalletIsConnected = async () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Modal, Row, Col, Form, Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   notificationFail,
   notificationSuccess,
@@ -16,13 +16,23 @@ export const CreateEscrowView = (props) => {
   const [priceType, setPriceType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [category, setCategory] = useState("high_value_items");
-  const [object, setObject] = useState("Jewelery");
+  
   const [description, setDescription] = useState(null);
-  const [processTime, setProcessTime] = useState("24 Hours");
   const [escrowNumber, setEscrowNumber] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [object, setObject] = useState("Jewelery");
+  const [showObjects, setShowObject] = useState(false);
+  const objects = [{ value: 'Jewelery', label: 'Jewelery' }];
+
+  const [category, setCategory] = useState("high_value_items");
+  const [showOptions, setShowOptions] = useState(false);
+  const categories = [{ value: 'high_value_items', label: 'High-value items' }];
+  
+  const [processTime, setProcessTime] = useState("24 Hours");
+  const [showProcessTime, setShowProcessTime] = useState(false);
+  const processTimes = [{ value: '24 Hours', label: '24 Hours' }];
 
   const handleNext = () => {
     if (step === 1 && !escrowType) {
@@ -58,10 +68,20 @@ export const CreateEscrowView = (props) => {
 
   const inputChangeHandler = (e) => {
     let numericRegex = /[^0-9.]/g;
+    // console.log("----------", e.target.textContent);
+
+    // const customName = e.currentTarget.getAttribute("data-name");
+    // console.log("Custom name:", customName);
+
+    // let updatedContent = e.target.textContent;
+    // console.log("updatedContent ", updatedContent);
+    // const { name: inputName, dataset } = e.target;
+    // const customName = dataset.name;
+
     switch (e.target.name) {
-      case "radiooption":
-        setEscrowType(e.target.value);
-        break;
+      // case "radiooption":
+      //   setEscrowType(e.target.value);
+      //   break;
       case "price":
         if (e.target.value) {
           setPriceType("fixed");
@@ -92,7 +112,6 @@ export const CreateEscrowView = (props) => {
             }
           }
         }
-
         e.target.value = e.target.value.replace(numericRegex, "");
         setMinPrice(e.target.value);
         break;
@@ -197,6 +216,36 @@ export const CreateEscrowView = (props) => {
     navigate("/");
   };
 
+  const handleOptionClick = (option) => {
+    setEscrowType(option);
+  };
+
+  const handleSelectedClick = (value) => {
+    setCategory(value);
+    setShowOptions(false);
+  };
+
+  const handleProcessTimeClick = (value) => {
+    setProcessTime(value);
+    setShowProcessTime(false);
+  };
+
+  const handleSelectedObjectClick = (value) => {
+    setObject(value);
+    setShowObject(false);
+  };
+
+  const toggleOptions = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
+  const toggleObjectOptions = () => {
+    setShowObject((prevShowOptions) => !prevShowOptions);
+  };
+
+  const toggleProcessOptions = () => {
+    setShowProcessTime((prevShowOptions) => !prevShowOptions);
+  };
+
   return (
     <Modal
       {...props}
@@ -223,7 +272,19 @@ export const CreateEscrowView = (props) => {
               >
                 <Row>
                   <Col md="6">
-                    <Form.Check
+                    <div
+                      className="yourself-option form-check"
+                      onClick={() => handleOptionClick("buyer")}
+                    >
+                      <div
+                        className={`form-check-input check-input ${
+                          escrowType === "buyer" ? "selected" : ""
+                        }`}
+                      />
+                      <label class="form-check-label">Buyer</label>
+                    </div>
+
+                    {/* <Form.Check
                       className="yourself-option"
                       label="Buyer"
                       name="radiooption"
@@ -232,10 +293,21 @@ export const CreateEscrowView = (props) => {
                       checked={escrowType === "buyer"}
                       value={"buyer"}
                       readOnly
-                    />
+                    /> */}
                   </Col>
                   <Col md="6">
-                    <Form.Check
+                    <div
+                      className="yourself-option form-check"
+                      onClick={() => handleOptionClick("seller")}
+                    >
+                      <div
+                        className={`form-check-input check-input ${
+                          escrowType === "seller" ? "selected" : ""
+                        }`}
+                      />
+                      <label class="form-check-label">Seller</label>
+                    </div>
+                    {/* <Form.Check
                       className="yourself-option"
                       label="Seller"
                       name="radiooption"
@@ -244,7 +316,7 @@ export const CreateEscrowView = (props) => {
                       checked={escrowType === "seller"}
                       value={"seller"}
                       readOnly
-                    />
+                    /> */}
                   </Col>
                 </Row>
               </Form.Group>
@@ -284,6 +356,28 @@ export const CreateEscrowView = (props) => {
                         onChange={inputChangeHandler}
                         value={price}
                       />
+
+                      {/* <div
+                      data-name="price"
+                      className="form-control"
+                      contentEditable
+                      placeholder="1"
+                      onInputCapture={inputChangeHandler}
+                      dangerouslySetInnerHTML={{ __html: price }}
+                      // dir="ltr"
+                      /> */}
+
+                      {/* <div
+                        data-name="price"
+                        className="form-control"
+                        contentEditable
+                        placeholder="1"
+                        onInput={inputChangeHandler}
+                        onChange={onChange}
+                      >
+                        {price}
+                      </div> */}
+
                       <div className="currency-type">
                         <span className="currency-flag"></span>USD
                       </div>
@@ -304,6 +398,16 @@ export const CreateEscrowView = (props) => {
                         onChange={inputChangeHandler}
                         value={minPrice}
                       />
+                      {/* <div
+                        data-name="minPrice"
+                        className="form-control"
+                        contentEditable
+                        placeholder="5"
+                        onChange={inputChangeHandler}
+                        //dangerouslySetInnerHTML={{ __html: minPrice }}
+                      >
+                        {minPrice}
+                      </div> */}
                       <div className="currency-type">
                         <span className="currency-flag"></span>USD
                       </div>
@@ -355,25 +459,72 @@ export const CreateEscrowView = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Category</Form.Label>
-                    <Form.Select
+                    {/* <Form.Select
                       name="category"
                       aria-label="High-value items"
                       onChange={inputChangeHandler}
                     >
                       <option value="high_value_items">High-value items</option>
-                    </Form.Select>
+                    </Form.Select> */}
+                    <div className="customSelectBox" >
+                      <div
+                          className="form-select"
+                          onClick={toggleOptions}
+                          aria-label="High-value items"
+                        >
+                          {categories.find(
+                            (cat) => cat.value === category
+                          )?.label || "Select category"}
+                      </div>
+                      {showOptions && (
+                        <ul className="options">
+                          {categories.map((category) => (
+                            <li
+                              key={category.value}
+                              onClick={() => handleSelectedClick(category.value)}
+                            >
+                              {category.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </Form.Group>
                 </Col>
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Object</Form.Label>
-                    <Form.Select
+                    {/* <Form.Select
                       name="object"
                       aria-label="Jewelery"
                       onChange={inputChangeHandler}
                     >
                       <option value="Jewelery">Jewelery</option>
-                    </Form.Select>
+                    </Form.Select> */}
+
+                    <div className="customSelectBox" >
+                      <div
+                          className="form-select"
+                          onClick={toggleObjectOptions}
+                          aria-label="Jewelery"
+                        >
+                          {objects.find(
+                            (cat) => cat.value === object
+                          )?.label || "Select Object"}
+                      </div>
+                      {showObjects && (
+                        <ul className="options">
+                          {objects.map((object) => (
+                            <li
+                              key={object.value}
+                              onClick={() => handleSelectedObjectClick(object.value)}
+                            >
+                              {object.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </Form.Group>
                 </Col>
               </Row>
@@ -390,13 +541,38 @@ export const CreateEscrowView = (props) => {
               <h5 className="my-4">Time constraints</h5>
               <Form.Group className="form-group">
                 <Form.Label>Process time</Form.Label>
-                <Form.Select
+                {/* <Form.Select
                   aria-label="24 Hours"
                   name="processTime"
                   onChange={inputChangeHandler}
                 >
                   <option value="24 Hours">24 Hours</option>
-                </Form.Select>
+                </Form.Select> */}
+
+                  <div className="customSelectBox" >
+                      <div
+                          className="form-select"
+                          onClick={toggleProcessOptions}
+                          aria-label="24 Hours"
+                        >
+                        {processTimes.find(
+                            (cat) => cat.value === processTime
+                          )?.label || "Select Process Time"}
+                      </div>
+                      {showProcessTime && (
+                        <ul className="options">
+                          {processTimes.map((processTime) => (
+                            <li
+                              key={processTime.value}
+                              onClick={() => handleProcessTimeClick(processTime.value)}
+                            >
+                              {processTime.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
               </Form.Group>
               <div className="form-action-group">
                 <Button variant="primary" onClick={submitHandler}>

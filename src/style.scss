@@ -1135,6 +1135,8 @@ body {
                 color: $white;
                 cursor: pointer;
                 display: inline-block;
+                min-width: 140px;
+                height: 50px;
             }
 
             .login-btn {
@@ -4060,6 +4062,9 @@ body {
                         padding: 0;
                         line-height: 42px;
                         box-shadow: none;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        cursor: pointer; /* Change cursor on hover for user interaction */
                     }
                 }
 
@@ -4165,6 +4170,30 @@ body {
                             letter-spacing: -0.03em;
                             border: 1px solid #23262F;
                             transition: all 0.1s ease-in-out;
+                        }
+
+                        .check-input {
+                            position: absolute;
+                            margin: 0;
+                            background: #34363E;
+                            background-repeat: no-repeat;
+                            background-position: center;
+                            width: 18px;
+                            height: 18px;
+                            border: none;
+                            box-shadow: none;
+                            left: calc(50% - 9px);
+                            top: 23px;
+                            transition: all 0.1s ease-in-out;
+                            border-radius: 50%;
+
+                            &.selected {
+                                background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB2aWV3Qm94PSIwIDAgOCA4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8Y2lyY2xlIGN4PSI0IiBjeT0iNCIgcj0iNCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzFfNTY4MSkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8xXzU2ODEiIHgxPSIxMC41MzI0IiB5MT0iLTguOTgzNDZlLTA3IiB4Mj0iLTQuMjUyNTUiIHkyPSIxLjYxNjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM3RkZDOEQiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzZGQTU2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==);
+
+                                &~label {
+                                    border-color: $green-medium;
+                                }
+                            }
                         }
 
                         input {
@@ -5599,4 +5628,47 @@ aside.EmojiPickerReact.epr-main {
     border: 2px solid $white;
     right: -3px;
     top: 0px;
+}
+
+
+
+.custom-div {
+    border: 1px solid #ccc;
+    padding: 8px;
+    min-height: 34px;
+    outline: none; /* Remove the default outline when focused */
+    position: relative;
+  }
+  
+  .custom-div:empty:before {
+    content: attr(placeholder);
+    color: #999;
+  }
+  
+  .custom-div:focus:before {
+    content: '';
+  }
+
+
+//select box 
+  .customSelectBox{
+    position: relative;
+  }
+  .customSelectBox ul.options {
+    position: absolute;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    // background-color: #fff;
+    // color: #000;
+    // padding: 2px 0px;
+}
+.customSelectBox ul.options li{
+    padding: 0 10px;
+}
+.customSelectBox ul.options li:hover {
+    background-color: #1b75d0;
+    color: #fff;
 }
