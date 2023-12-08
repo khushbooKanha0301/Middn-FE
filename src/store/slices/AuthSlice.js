@@ -107,6 +107,7 @@ export const checkAuth = createAsyncThunk(
               },
             }
           )
+        
           .catch((error) => {
             if (error.response.data.message) {
               dispatch(notificationFail(error.response.data.message));

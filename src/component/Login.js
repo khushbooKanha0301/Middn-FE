@@ -18,6 +18,7 @@ import {
 import { useConnect, useSignMessage, useAccount, useDisconnect } from "wagmi";
 
 export const LoginView = (props) => {
+ console.log("props ", props);
   const [checkValue, setCheckValue] = useState(null);
   const [accountAddress, setAccountAddress] = useState("");
   const [userchainId, SetUserChainId] = useState(null);
@@ -457,7 +458,7 @@ export const LoginView = (props) => {
         setProvider("injected");
         break;
       case "coinbase_wallet":
-        await connect({ connector: wagmiConnector[1] });
+        connect({ connector: wagmiConnector[1] });
         setProvider("coinbaseWallet");
         break;
       case "fortmatic":

@@ -76,9 +76,9 @@ export const Escrow = () => {
   const acAddress = useSelector(userDetails);
   const userData = useSelector(userDetails);
   const [isSign, setIsSign] = useState(null);
-  const [twoFAModal, setTwoFAModal] = useState(true);
 
   const [modalShow, setModalShow] = useState(false);
+  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
 
   const getAllEscrow = async () => {
@@ -141,7 +141,7 @@ export const Escrow = () => {
   const handleChangeAnywhere = (e) => {
     setSelectedOptionAnywhere(e);
   };
-  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
+ 
   const createEscrowModalToggle = () => {
     if(acAddress.authToken) {
     setCreateEscrowModalShow(!createEscrowModalShow);
@@ -153,7 +153,6 @@ export const Escrow = () => {
   const handleAccountAddress = (address) => {
     setIsSign(false);
   };
-
 
   return (
     <div className="escrow-view">
@@ -410,16 +409,20 @@ export const Escrow = () => {
           </div>
         </div>
       )}
+       {modalShow && (
+        <LoginView
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          isSign={isSign}
+          handleaccountaddress={handleAccountAddress}
+        />
+      )}
+
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}
       />
-      <LoginView
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        handleaccountaddress={handleAccountAddress}
-        isSign={isSign}
-      />
+      
     </div>
   );
 };

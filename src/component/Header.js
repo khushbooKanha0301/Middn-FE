@@ -87,6 +87,7 @@ export const Header = (props) => {
       });
     }
   };
+  
   useEffect(() => {
     const handleScroll = () => {
       let moving = window.pageYOffset;

@@ -81,6 +81,7 @@ export const App = () => {
   useEffect(() => {
     dispatch(getCountryDetails());
   }, []);
+
   useEffect(() => {
     if (userData?.is_2FA_login_verified === false) {
       setTwoFAModal(true);

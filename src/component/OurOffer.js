@@ -67,12 +67,14 @@ export const OurOffer = () => {
                 show={createEscrowModalShow}
                 onHide={() => setCreateEscrowModalShow(false)}
             />
-            <LoginView
+            {modalShow && (
+                <LoginView
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 handleaccountaddress={handleAccountAddress}
                 isSign={isSign}
             />
+            )}
         </div>
     );
 }

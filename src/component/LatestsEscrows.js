@@ -187,15 +187,17 @@ export const LatestsEscrows = () => {
           </Row>
         </Card.Body>
       </Card>
-      <CreateEscrowView
-        show={createEscrowModalShow}
-        onHide={() => setCreateEscrowModalShow(false)}
-      />
-      <LoginView
+      {modalShow && (
+        <LoginView
         show={modalShow}
         onHide={() => setModalShow(false)}
         handleaccountaddress={handleAccountAddress}
         isSign={isSign}
+        />
+      )}
+      <CreateEscrowView
+        show={createEscrowModalShow}
+        onHide={() => setCreateEscrowModalShow(false)}
       />
     </>
   );
