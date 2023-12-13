@@ -471,8 +471,8 @@ export const LoginView = (props) => {
     props.onHide();
   };
 
-  const onChange = (event) => {
-    const { value } = event.target;
+  const onChange = (value) => {
+    // const { value } = event.target;
     setCheckValue(value);
   };
 
@@ -502,7 +502,7 @@ export const LoginView = (props) => {
             <Form onSubmit={submitHandler}>
               <Row>
                 <Col md="6">
-                  <Form.Check
+                  {/* <Form.Check
                     className="login-option"
                     label={
                       <>
@@ -518,10 +518,29 @@ export const LoginView = (props) => {
                     id="loginoption1"
                     value={"wallet_connect"}
                     onChange={onChange}
-                  />
+                  /> */}
+                   <div
+                    className="login-option form-check"
+                    onClick={() => onChange("wallet_connect")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        checkValue === "wallet_connect" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label">
+                      <>
+                        <img
+                          src={require("../content/images/wallet-connect.png")}
+                          alt="WalletConnect"
+                        />{" "}
+                        WalletConnect
+                      </>
+                    </label>
+                  </div>
                 </Col>
                 <Col md="6">
-                  <Form.Check
+                  {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -537,10 +556,31 @@ export const LoginView = (props) => {
                     type="radio"
                     id="loginoption2"
                     onChange={onChange}
-                  />
+                  /> */}
+                  <div
+                    className="login-option form-check"
+                    onClick={() => onChange("meta_mask")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        checkValue === "meta_mask" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label">
+                      <>
+                        <span>
+                          <img
+                            src={require("../content/images/metamask.png")}
+                            alt="Metamask"
+                          />{" "}
+                          Metamask
+                        </span>
+                      </>
+                    </label>
+                  </div>
                 </Col>
                 <Col md="6">
-                  <Form.Check
+                  {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -556,10 +596,32 @@ export const LoginView = (props) => {
                     name="group1"
                     type="radio"
                     id="loginoption3"
-                  />
+                  /> */}
+
+                  <div
+                    className="login-option form-check"
+                    onClick={() => onChange("coinbase_wallet")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        checkValue === "coinbase_wallet" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label">
+                      <>
+                        <span>
+                          <img
+                            src={require("../content/images/coinbase-wallet.png")}
+                            alt="Coinbase Wallet"
+                          />{" "}
+                          Coinbase Wallet
+                        </span>
+                      </>
+                    </label>
+                  </div>
                 </Col>
                 <Col md="6">
-                  <Form.Check
+                  {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -575,7 +637,28 @@ export const LoginView = (props) => {
                     name="group1"
                     type="radio"
                     id="loginoption4"
-                  />
+                  /> */}
+                  <div
+                    className="login-option form-check"
+                    onClick={() => onChange("fortmatic")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        checkValue === "fortmatic" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label">
+                      <>
+                        <span>
+                          <img
+                            src={require("../content/images/fortmatic.png")}
+                            alt="Fortmatic"
+                          />{" "}
+                          Fortmatic
+                        </span>
+                      </>
+                    </label>
+                  </div>
                 </Col>
               </Row>
               <div className="form-action-group">

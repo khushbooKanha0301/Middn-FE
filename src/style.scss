@@ -5,11 +5,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@500&display=swap');
 @import '@sweetalert2/theme-dark/dark.scss';
 
-$new-breakpoints: (xxl:1366px);
+$new-breakpoints: (
+    xxl:1366px
+);
 
 $grid-breakpoints: map-merge($grid-breakpoints, $new-breakpoints);
 
-$new-container-max-widths: (xxl:1440px);
+$new-container-max-widths: (
+    xxl:1440px
+);
 
 $container-max-widths: map-merge($container-max-widths, $new-container-max-widths);
 @import "../node_modules/bootstrap/scss/bootstrap";
@@ -2507,7 +2511,7 @@ body {
                             width: 62px;
                         }
 
-                        
+
                     }
 
                     .chat-name {
@@ -3009,7 +3013,7 @@ body {
         line-height: 32px;
         color: $white;
         margin-bottom: 0;
-    }        
+    }
 
 
     label {
@@ -3018,7 +3022,7 @@ body {
         color: #FFF;
     }
 
-   
+
 
     &>.row {
         margin-bottom: 16px;
@@ -3743,7 +3747,7 @@ body {
                     right: -3px;
                     top: 0px;
                 }
-            
+
                 .profile-status-offline {
                     position: absolute;
                     width: 16px;
@@ -3754,6 +3758,7 @@ body {
                     right: -3px;
                     top: 0px;
                 }
+
                 .profile-status-absent {
                     position: absolute;
                     width: 24px;
@@ -4064,7 +4069,8 @@ body {
                         box-shadow: none;
                         overflow: hidden;
                         white-space: nowrap;
-                        cursor: pointer; /* Change cursor on hover for user interaction */
+                        cursor: pointer;
+                        /* Change cursor on hover for user interaction */
                     }
                 }
 
@@ -4098,6 +4104,20 @@ body {
                             }
                         }
 
+                        .form-check-input {
+                            opacity: 0;
+                            position: absolute;
+                            width: 0;
+                            height: 0;
+                            margin: 0;
+              
+                            &.checked {
+                              &~label {
+                                background: #3c404e;
+                              }
+                            }
+                          }
+
                         label {
                             background: #23262F;
                             border-radius: 16px;
@@ -4125,26 +4145,29 @@ body {
                             display: flex;
                             align-items: center;
                             justify-content: space-between;
+
                             .currency-type {
-                              font-size: 16px;
-                              line-height: 24px;
-                              color: $white;
-                              display: flex;
-                              align-items: center;
-                              .currency-flag {
-                                width: 32px;
-                                height: 32px;
-                                border-radius: 50%;
-                                background: #f4f4f6;
-                                margin-right: 4px;
-                              }
+                                font-size: 16px;
+                                line-height: 24px;
+                                color: $white;
+                                display: flex;
+                                align-items: center;
+
+                                .currency-flag {
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 50%;
+                                    background: #f4f4f6;
+                                    margin-right: 4px;
+                                }
                             }
+
                             .currency-amount {
-                              font-size: 11px;
-                              line-height: 24px;
-                              color: #afb4c0;
+                                font-size: 11px;
+                                line-height: 24px;
+                                color: #afb4c0;
                             }
-                          }
+                        }
                     }
 
                     &.yourself-option {
@@ -5026,7 +5049,8 @@ aside.EmojiPickerReact.epr-main {
     .form-select {
         color: white;
         border: none;
-        width: 12px !important;
+        // width: 12px !important;
+        width: 50px;
         background-color: #202127;
         background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3e%3cpath fill=%27none%27 stroke=%27%23fff%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27m2 5 6 6 6-6%27/%3e%3c/svg%3e");
         background-position: center right;
@@ -5090,11 +5114,6 @@ aside.EmojiPickerReact.epr-main {
     top: 6px;
     right: -9px;
     font-size: 22px;
-}
-
-
-.country-select .form-select {
-    padding: 0 10px;
 }
 
 .escrowList,
@@ -5236,7 +5255,7 @@ aside.EmojiPickerReact.epr-main {
             .customCheckbox {
                 position: relative;
 
-                input {
+                .custom-checkbox {
                     opacity: 0;
                     position: absolute;
                     width: 21px;
@@ -5327,7 +5346,8 @@ aside.EmojiPickerReact.epr-main {
     padding: 0 0 0px 0;
     border-bottom: 1px solid #23262F;
     margin: 0 0 32px 0;
-    h4{
+
+    h4 {
         margin-bottom: 30px;
     }
 }
@@ -5442,34 +5462,38 @@ aside.EmojiPickerReact.epr-main {
 
 .table-pagination {
     margin-top: 40px;
+
     .pagination {
-      margin-bottom: 0;
-      .page-item {
-        .page-link {
-          border-radius: 6px !important;
-          font-weight: 700;
-          font-size: 13px;
-          line-height: 20px;
-          background: rgba(255, 255, 255, 0.21);
-          border: none;
-          color: rgba($color: $white, $alpha: 0.5);
-          padding: 8px 11px;
-          min-width: 36px;
-          text-align: center;
-          min-height: 36px;
+        margin-bottom: 0;
+
+        .page-item {
+            .page-link {
+                border-radius: 6px !important;
+                font-weight: 700;
+                font-size: 13px;
+                line-height: 20px;
+                background: rgba(255, 255, 255, 0.21);
+                border: none;
+                color: rgba($color: $white, $alpha: 0.5);
+                padding: 8px 11px;
+                min-width: 36px;
+                text-align: center;
+                min-height: 36px;
+            }
+
+            &+.page-item {
+                margin-left: 8px;
+            }
+
+            &.active {
+                .page-link {
+                    background: #99fc79;
+                    color: rgba($color: $black, $alpha: 0.5);
+                }
+            }
         }
-        & + .page-item {
-          margin-left: 8px;
-        }
-        &.active {
-          .page-link {
-            background: #99fc79;
-            color: rgba($color: $black, $alpha: 0.5);
-          }
-        }
-      }
     }
-  }
+}
 
 .table-info {
     font-weight: 700;
@@ -5478,7 +5502,7 @@ aside.EmojiPickerReact.epr-main {
     color: rgba($color: $white, $alpha: 0.5);
 }
 
-.limit-txt-left-amount{
+.limit-txt-left-amount {
     color: #FFF;
     font-size: 15px;
     font-weight: 700;
@@ -5504,10 +5528,11 @@ aside.EmojiPickerReact.epr-main {
     margin-left: auto;
 }
 
-.main-limit{
+.main-limit {
     padding-bottom: 10px;
     flex-wrap: wrap;
-    .checkbox{
+
+    .checkbox {
         position: relative;
 
         label {
@@ -5517,9 +5542,9 @@ aside.EmojiPickerReact.epr-main {
             font-weight: 400;
             line-height: normal;
             letter-spacing: -0.39px;
-            padding-left:23px;
+            padding-left: 23px;
 
-            &:before{
+            &:before {
                 content: "";
                 width: 18px;
                 height: 18px;
@@ -5545,17 +5570,18 @@ aside.EmojiPickerReact.epr-main {
                 visibility: hidden;
             }
         }
-        
+
         input {
             opacity: 0;
             position: absolute;
             width: 21px;
             height: 21px;
             z-index: 1;
-            &:checked ~ label:after{
+
+            &:checked~label:after {
                 opacity: 1;
                 visibility: visible;
-            } 
+            }
         }
     }
 }
@@ -5582,21 +5608,24 @@ aside.EmojiPickerReact.epr-main {
         padding-top: 18px;
         color: rgba($color: $white, $alpha: 0.6);
     }
+
     .card-txt {
         color: #FFF;
         width: 100%;
         text-align: left;
     }
+
     .card-txt-left {
         color: #808191;
         width: 100%;
         text-align: left;
     }
+
     label {
         font-size: 12px;
         color: #FFF;
     }
-    
+
 }
 
 .chat-status {
@@ -5609,6 +5638,7 @@ aside.EmojiPickerReact.epr-main {
     right: -3px;
     top: 0px;
 }
+
 .chat-status-offline {
     position: absolute;
     width: 16px;
@@ -5619,6 +5649,7 @@ aside.EmojiPickerReact.epr-main {
     right: -3px;
     top: 0px;
 }
+
 .chat-status-absent {
     position: absolute;
     width: 16px;
@@ -5636,39 +5667,124 @@ aside.EmojiPickerReact.epr-main {
     border: 1px solid #ccc;
     padding: 8px;
     min-height: 34px;
-    outline: none; /* Remove the default outline when focused */
+    outline: none;
+    /* Remove the default outline when focused */
     position: relative;
-  }
-  
-  .custom-div:empty:before {
+}
+
+.custom-div:empty:before {
     content: attr(placeholder);
     color: #999;
-  }
-  
-  .custom-div:focus:before {
+}
+
+.custom-div:focus:before {
     content: '';
-  }
+}
 
 
 //select box 
-  .customSelectBox{
+.customSelectBox {
     position: relative;
-  }
-  .customSelectBox ul.options {
+    width: 185px;
+    @include media-breakpoint-up(md) {
+        width: 185px;
+    }
+}
+
+.customSelectBox ul.options {
     position: absolute;
-    width: 100%;
+    width: 125px;
     list-style: none;
     margin: 0;
     padding: 0;
     border: 1px solid #ccc;
-    // background-color: #fff;
-    // color: #000;
-    // padding: 2px 0px;
-}
-.customSelectBox ul.options li{
+    z-index: 9;
+    background: #1e1f24;
+    color: #808191;
+    white-space: nowrap;
+    @include media-breakpoint-up(md) {
+      width: 185px;
+    }
+    @include media-breakpoint-up(lg) {
+      width: 185px;
+    }
+    @include media-breakpoint-up(xl) {
+      width: 185px;
+    }
+  }
+.customSelectBox ul.options li {
     padding: 0 10px;
 }
+
 .customSelectBox ul.options li:hover {
     background-color: #1b75d0;
     color: #fff;
+}
+
+// .country-select .form-select {
+//     padding: 0 10px;
+// }
+
+.country-select {
+    position: relative;
+}
+
+.country-select ul.options {
+    overflow-y: auto;
+    max-height: 418px;
+    position: absolute;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    z-index: 9;
+    background: #1e1f24;
+}
+
+.country-select ul.options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.country-select ul.options::-webkit-scrollbar-track {
+    background: #1e1f24;
+    border-radius: 20px;
+}
+
+.country-select ul.options::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 20px;
+}
+
+.country-select ul.options::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    border-radius: 20px;
+}
+
+.country-select ul.options li {
+    padding: 0 10px;
+}
+
+.country-select ul.options li:hover {
+    background-color: #1b75d0;
+    color: #fff;
+}
+
+.personalData {
+    color: white;
+    display: block;
+    padding: 0px 2px 1px;
+    white-space: nowrap;
+}
+
+.personalData li {
+    font-size: 0.875rem;
+}
+
+.dropdownPersonalData {
+    width: auto !important;
+}
+.personalDataLocation {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 58px;
 }

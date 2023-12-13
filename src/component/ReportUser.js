@@ -74,7 +74,7 @@ export const ReportUserView = (props) => {
                 reason === "Test 1" ? "active" : ""
               }`}
             >
-              <Form.Check
+              {/* <Form.Check
                 value="Test 1"
                 label="Test 1"
                 name="group1"
@@ -82,7 +82,18 @@ export const ReportUserView = (props) => {
                 checked={reason == "Test 1"}
                 id="reasonoption1"
                 readOnly
-              />
+              /> */}
+              <div
+                className="form-check"
+                // onClick={() => onChange("Test 1")}
+              >
+                <div
+                  className={`form-check-input ${
+                    reason === "Test 1" ? "checked" : ""
+                  }`}
+                />
+                <label class="form-check-label">Test 1</label>
+              </div>
               <span className="checkmark"></span>
             </div>
             <div
@@ -90,7 +101,7 @@ export const ReportUserView = (props) => {
                 reason === "Test 2" ? "active" : ""
               }`}
             >
-              <Form.Check
+              {/* <Form.Check
                 value="Test 2"
                 readOnly
                 label="Test 2"
@@ -98,7 +109,19 @@ export const ReportUserView = (props) => {
                 type="radio"
                 checked={reason == "Test 2"}
                 id="reasonoption2"
-              />
+              /> */}
+               <div
+                className="form-check"
+                // onClick={() => onChange("Test 1")}
+              >
+                <div
+                  className={`form-check-input ${
+                    reason === "Test 2" ? "checked" : ""
+                  }`}
+                />
+                <label class="form-check-label">Test 2</label>
+              </div>
+
               <span className="checkmark"></span>
             </div>
             <div
@@ -106,7 +129,7 @@ export const ReportUserView = (props) => {
                 reason === "Test 3" ? "active" : ""
               }`}
             >
-              <Form.Check
+              {/* <Form.Check
                 value="Test 3"
                 readOnly
                 label="Test 3"
@@ -114,7 +137,18 @@ export const ReportUserView = (props) => {
                 type="radio"
                 checked={reason == "Test 3"}
                 id="reasonoption3"
-              />
+              /> */}
+              <div
+                className="form-check"
+                // onClick={() => onChange("Test 1")}
+              >
+                <div
+                  className={`form-check-input ${
+                    reason === "Test 3" ? "checked" : ""
+                  }`}
+                />
+                <label class="form-check-label">Test 3</label>
+              </div>
               <span className="checkmark"></span>
             </div>
           </Form.Group>

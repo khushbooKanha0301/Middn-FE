@@ -23,6 +23,7 @@ const data = [
 
 export const TradeHistory = () => {
   const [selectedOptionStatus, setSelectedOptionStatus] = useState(data[0]);
+  const [isChecked, setChecked] = useState(false);
   const [escrowLoading, setEscrowLoading] = useState(true);
   const handleChangeStatus = (e) => {
     setSelectedOptionStatus(e);
@@ -33,6 +34,10 @@ export const TradeHistory = () => {
   useEffect(() => {
     setEscrowLoading(false);
   }, []);
+
+  const toggleCheckbox = () => {
+    setChecked(!isChecked);
+  };
 
   return (
     <div className="trade-history-view">
@@ -89,7 +94,13 @@ export const TradeHistory = () => {
               <div className="trade-price">
                 <div className="d-flex align-items-center">
                   <span className="customCheckbox">
-                    <input type="checkbox" />
+                    {/* <input type="checkbox" /> */}
+                    <div
+                      className={`custom-checkbox ${isChecked ? 'checked' : ''}`}
+                      onClick={toggleCheckbox}
+                    >
+                      {isChecked}
+                    </div>
                     <span className="check"></span>
                   </span>
                   <div className="content ms-3">

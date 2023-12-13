@@ -1,20 +1,60 @@
-import React from "react";
+import React, {  useState } from "react";
 import { Card, Col, Form, Row, ProgressBar } from "react-bootstrap";
 import StatisticsChart from "./StatisticsChart";
 import ThisMonth from "./ThisMonth";
 
 export const Statistics = () => {
+  const categories = [{ value: '1', label: 'January 2022' }, 
+  { value: '2', label: 'March 2022' },
+  { value: '3', label: 'April 2022' }];
+  const [showOptions, setShowOptions] = useState(false);
+  const [category, setCategory] = useState("February 2022");
+
+  const toggleOptions = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
+
+  const handleSelectedClick = (value) => {
+    setCategory(value);
+    setShowOptions(false);
+  };
+  
   return (
     <Card className="cards-dark statistics statisticsGraphs">
       <Card.Body>
         <div className="d-flex justify-content-between align-items-center mb-3">
           <Card.Title as="h3" className="font-family-poppins">Statistics</Card.Title>
-          <Form.Select aria-label="February 2022">
+          {/* <Form.Select aria-label="February 2022">
             <option>February 2022</option>
             <option value="1">January 2022</option>
             <option value="2">March 2022</option>
             <option value="3">April 2022</option>
-          </Form.Select>
+          </Form.Select> */}
+
+          <div className="customSelectBox" >
+            <div
+                className="form-select"
+                onClick={toggleOptions}
+                aria-label="February 2022"
+              >
+                {categories.find(
+                  (cat) => cat.value === category
+                )?.label || "February 2022"}
+            </div>
+            {showOptions && (
+              <ul className="options">
+                {categories.map((category) => (
+                  <li
+                    key={category.value}
+                    onClick={() => handleSelectedClick(category.value)}
+                  >
+                    {category.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
         </div>
         <div className="transaction-view">
           <div className="transaction">

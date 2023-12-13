@@ -30,6 +30,7 @@ import VerifiedInfo from "./verifiedInfo";
 export const AccountSetting = () => {
   const dispatch = useDispatch();
   const [country, setCountry] = useState("");
+ console.log("country ", country);
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [fname, setFname] = useState("");
@@ -46,7 +47,10 @@ export const AccountSetting = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userData = useSelector(userGetFullDetails);
   const [is2FAEnabled, setIs2FAEnabled] = useState(userData?.is_2FA_enabled);
-
+  const [showOptions, setShowOptions] = useState(false);
+  const [showCountryOptions, setShowCountryOptions] = useState(false);
+  const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
+  
   countryInfo.sort(function (a, b) {
     var textA = a.currency.code.toUpperCase();
     var textB = b.currency.code.toUpperCase();
@@ -151,15 +155,13 @@ export const AccountSetting = () => {
           },
         })
         .catch((error) => {
-          if(typeof error == "string")
-          {
+          if (typeof error == "string") {
             dispatch(notificationFail(error));
           }
           if (error?.response?.data?.message === "") {
             dispatch(notificationFail("Invalid "));
           }
-          if(error?.response?.data?.message)
-          {
+          if (error?.response?.data?.message) {
             dispatch(notificationFail(error?.response?.data?.message));
           }
         });
@@ -219,6 +221,16 @@ export const AccountSetting = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const toggleOptions = () => {
+    setShowOptions((prevShowOptions) => !prevShowOptions);
+  };
+  const toggleCountryOptions = () => {
+    setShowCountryOptions((prevShowOptions) => !prevShowOptions);
+  };
+  const toggleCurrencyOptions = () => {
+    setShowCurrencyOptions((prevShowOptions) => !prevShowOptions);
+  }
+
   return (
     <div className="account-setting">
       <h1>Account Setting</h1>
@@ -304,15 +316,9 @@ export const AccountSetting = () => {
                           ) : (
                             "No Flag"
                           )}
-                          <p className="text-white mb-0">
-                            {
-                              listData.find(
-                                (item) => item?.code === countryCallingCode
-                              )?.cca3
-                            }
-                          </p>
+
                           <div className="country-select">
-                            <Form.Select
+                            {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
                                 setCountryCallingCode(e.target.value);
@@ -328,7 +334,35 @@ export const AccountSetting = () => {
                                   {data?.country} ({data?.code})
                                 </option>
                               ))}
-                            </Form.Select>
+                            </Form.Select> */}
+
+                            <div
+                              className="dropdownPersonalData form-select form-select-sm"
+                              onClick={toggleOptions}
+                            >
+                              <p className="text-white mb-0">
+                                {
+                                  listData.find(
+                                    (item) => item?.code === countryCallingCode
+                                  )?.cca3
+                                }
+                              </p>
+                            </div>
+                            {showOptions && (
+                              <ul className="options personalData">
+                                {listData.map((data, key) => (
+                                  <li
+                                    key={`${data?.code}_${data?.country}}`}
+                                    onClick={() => {
+                                      setCountryCallingCode(data?.code);
+                                      dispatch(definePhoneCode(data?.code));
+                                    }}
+                                  >
+                                    {data?.country} ({data?.code})
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                           </div>
                         </div>
                       </Form.Group>
@@ -357,14 +391,14 @@ export const AccountSetting = () => {
                           ) : (
                             "No Flag"
                           )}
-                          <p className="text-white mb-0">
+                          {/* <p className="text-white mb-0">
                             {
                               listData.find((item) => item?.iso === country)
                                 ?.cca3
                             }
-                          </p>
+                          </p> */}
                           <div className="country-select">
-                            <Form.Select
+                            {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
                                 setCountry(e.target.value);
@@ -381,7 +415,33 @@ export const AccountSetting = () => {
                                   {data.country}
                                 </option>
                               ))}
-                            </Form.Select>
+                            </Form.Select> */}
+                            <div
+                              className="dropdownPersonalData form-select form-select-sm"
+                              onClick={toggleCountryOptions}
+                            >
+                              <p className="text-white mb-0 personalDataLocation">
+                              {
+                              listData.find((item) => item?.iso === country)
+                                ?.country
+                            }
+                              </p>
+                            </div>
+                            {showCountryOptions && (
+                             <ul className={`options personalData ${userDetailsAll.location ? 'disabled' : ''}`}>
+                                {listData.map((data, key) => (
+                                  <li
+                                    key={`${data?.iso}`}
+                                    onClick={() => {
+                                      setCountry(data?.iso);
+                                      dispatch(defineCountry(data?.iso));
+                                    }}
+                                  >
+                                    {data?.country}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
                           </div>
                         </div>
                       </Form.Group>
@@ -408,16 +468,16 @@ export const AccountSetting = () => {
                             ) : (
                               "No Flag"
                             )}
-                            <p className="text-white mb-0">
+                            {/* <p className="text-white mb-0">
                               {
                                 countryInfo.find(
                                   (item) => item.currency.code === currentPre
                                 )?.currency.code
-                              }
-                            </p>
+                              } 
+                            </p> */}
                           </div>
                           <div className="country-select">
-                            <Form.Select
+                            {/* <Form.Select
                               size="sm"
                               value={currentPre}
                               onChange={(e) => {
@@ -426,11 +486,43 @@ export const AccountSetting = () => {
                               }}
                             >
                               {countryInfo.map((data) => (
-                                <option value={`${data.currency.code}`} key={`${data.currency.code}`}>
+                                <option
+                                  value={`${data.currency.code}`}
+                                  key={`${data.currency.code}`}
+                                >
                                   {data.currency?.code}
                                 </option>
                               ))}
-                            </Form.Select>
+                            </Form.Select> */}
+
+                            <div
+                              className="dropdownPersonalData form-select form-select-sm"
+                              onClick={toggleCurrencyOptions}
+                            >
+                              <p className="text-white mb-0 ">
+                              {
+                                countryInfo.find(
+                                  (item) => item.currency.code === currentPre
+                                )?.currency.code
+                              } 
+                              </p>
+                            </div>
+                            {showCurrencyOptions && (
+                             <ul className="options personalData">
+                                {countryInfo.map((data) => (
+                                  <li
+                                    key={`${data.currency.code}`}
+                                    onClick={() => {
+                                      setCurrentPre(data?.currency?.code);
+                                      dispatch(defineCurrency(data.currency.code));
+                                    }}
+                                  >
+                                    {data.currency?.code}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+
                           </div>
                         </div>
                       </Form.Group>

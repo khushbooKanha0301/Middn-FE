@@ -32,7 +32,7 @@ export const ReviewTransactionView = (props) => {
           </Form.Group>
           <Form.Group className="custom-input">
             <div className={`top-form-check active`}>
-              <Form.Check
+              {/* <Form.Check
                 value="Hidden your name"
                 label="Hidden your name"
                 name="group1"
@@ -40,7 +40,16 @@ export const ReviewTransactionView = (props) => {
                 checked={true}
                 id="hide_name"
                 readOnly
-              />
+              /> */}
+              <div
+                className="form-check"
+                // onClick={() => onChange("Test 1")}
+              >
+                <div
+                  className={`form-check-input checked`}
+                />
+                <label class="form-check-label">Hidden your name</label>
+              </div>
               <span className="checkmark"></span>
             </div>
           </Form.Group>
