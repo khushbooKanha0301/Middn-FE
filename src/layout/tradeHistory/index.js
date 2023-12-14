@@ -93,16 +93,10 @@ export const TradeHistory = () => {
             <div className="flex-table-body tradeListBody">
               <div className="trade-price">
                 <div className="d-flex align-items-center">
-                  <span className="customCheckbox">
+                  <div className="customCheckbox"  onClick={toggleCheckbox}>
                     {/* <input type="checkbox" /> */}
-                    <div
-                      className={`custom-checkbox ${isChecked ? 'checked' : ''}`}
-                      onClick={toggleCheckbox}
-                    >
-                      {isChecked}
-                    </div>
-                    <span className="check"></span>
-                  </span>
+                     <div className={`check ${isChecked ? "checked" : ""}`} />
+                  </div>
                   <div className="content ms-3">
                     <h6>15.490546893758 ETH</h6>
                     Buy Limit 0.1-0.6 BTC

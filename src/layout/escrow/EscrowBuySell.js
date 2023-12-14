@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 function EscrowDetails() {
   const dispatch = useDispatch();
   const [countryCallingCode, setCountryCallingCode] = useState("");
@@ -16,7 +16,8 @@ function EscrowDetails() {
   const acAddress = useSelector(userDetails);
   const { id } = useParams();
   const navigate = useNavigate();
-  
+  const [typeFilter, setTypeFilter] = useState(null);
+
   const onChange = (e) => {
     // } else if (e.target.name === "currentPre") {
     //   setCurrentPre(e.target.value);
@@ -31,10 +32,13 @@ function EscrowDetails() {
     );
     return result?.flag;
   };
-  
+
   const handleButtonClick = (address) => {
-    navigate('/escrow-offer-buy', { state: {userAddress: address} });
+    navigate("/escrow-offer-buy", { state: { userAddress: address } });
   };
+  const handleFilterTypeChange = (vehicle) => {
+    setTypeFilter(vehicle)
+  }
 
   useEffect(() => {
     jwtAxios
@@ -46,8 +50,6 @@ function EscrowDetails() {
         console.log(err);
       });
   }, [acAddress.authToken]);
-
-
 
   return (
     <div className="escrow-details">
@@ -211,7 +213,8 @@ function EscrowDetails() {
                 <div class="limit-txt-left">105,02 BNB</div>
               </div>
               <div className="d-flex main-limit">
-                <div className="checkbox">
+              <Form.Group className="custom-input">
+                {/* <div className="checkbox">
                   <input
                     type="checkbox"
                     id="vehicle1"
@@ -221,16 +224,29 @@ function EscrowDetails() {
                   <label for="vehicle1">
                     I agree to Middin's escrow terms and conditions.
                   </label>
+                </div> */}
+
+                <div
+                  className="form-check"
+                  onClick={() => handleFilterTypeChange("Bike")}
+                >
+                  <div
+                    className={`form-check-input ${
+                      typeFilter == 'Bike' ? "checked" : ""
+                    }`}
+                  />
+                  <label class="form-check-label" for="vehicle1">I agree to Middin's escrow terms and conditions.</label>
                 </div>
+                </Form.Group>
               </div>
 
               <div className="edit-btn ">
-                  {/* <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
+                {/* <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
                     Submit
                   </Button> */}
-                  <Button className="btn btn-success btn-width" variant="success">
-                    Submit
-                  </Button>
+                <Button className="btn btn-success btn-width" variant="success">
+                  Submit
+                </Button>
               </div>
             </Col>
           </Row>

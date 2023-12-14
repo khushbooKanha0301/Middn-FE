@@ -18,6 +18,7 @@ function EscrowDetails() {
   const [currentPre, setCurrentPre] = useState("USD");
   const [editEscrowModalShow, setEditEscrowModalShow] = useState(false);
   const [escrows, setEscrow] = useState(null);
+  const [typeFilter, setTypeFilter] = useState(null);
   const acAddress = useSelector(userDetails);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -40,10 +41,9 @@ function EscrowDetails() {
             .put(`/escrows/deleteEscrows/${id}`)
             .then((res) => {
               Swal.fire("Deleted!", "Escrow deleted...", "danger");
-              if(res){
+              if (res) {
                 navigate("/");
               }
-              
             })
             .catch((err) => {
               if (typeof err == "string") {
@@ -74,6 +74,10 @@ function EscrowDetails() {
 
   const editEscrowModalToggle = () =>
     setEditEscrowModalShow(!editEscrowModalShow);
+
+  const handleFilterTypeChange = (vehicle) => {
+    setTypeFilter(vehicle);
+  };
 
   useEffect(() => {
     jwtAxios
@@ -301,7 +305,7 @@ function EscrowDetails() {
                 <div class="limit-txt-left">105,02 BNB</div>
               </div>
               <div className="d-flex main-limit">
-                <div className="checkbox">
+                {/* <div className="checkbox">
                   <input
                     type="checkbox"
                     id="vehicle1"
@@ -311,7 +315,34 @@ function EscrowDetails() {
                   <label for="vehicle1">
                     I agree to Middin's escrow terms and conditions.
                   </label>
-                </div>
+                </div> */}
+                <Form.Group className="custom-input">
+                  {/* <div className="checkbox">
+                  <input
+                    type="checkbox"
+                    id="vehicle1"
+                    name="vehicle1"
+                    value="Bike"
+                  />
+                  <label for="vehicle1">
+                    I agree to Middin's escrow terms and conditions.
+                  </label>
+                </div> */}
+
+                  <div
+                    className="form-check"
+                    onClick={() => handleFilterTypeChange("Bike")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        typeFilter == "Bike" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label" for="vehicle1">
+                      I agree to Middin's escrow terms and conditions.
+                    </label>
+                  </div>
+                </Form.Group>
               </div>
             </Col>
           </Row>

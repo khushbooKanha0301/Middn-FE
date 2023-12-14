@@ -5283,15 +5283,13 @@ aside.EmojiPickerReact.epr-main {
                         opacity: 0;
                         visibility: hidden;
                     }
-                }
-
-                input:checked~.check {
-                    &:after {
-                        opacity: 1;
-                        visibility: visible;
+                    &.checked {
+                        &:after {
+                            opacity: 1;
+                            visibility: visible;
+                        }
                     }
                 }
-
             }
 
             .content {
