@@ -5043,33 +5043,6 @@ aside.EmojiPickerReact.epr-main {
     border-radius: 5px;
 }
 
-.country-select {
-    margin-left: 8px;
-
-    .form-select {
-        color: white;
-        border: none;
-        // width: 12px !important;
-        width: 50px;
-        background-color: #202127;
-        background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3e%3cpath fill=%27none%27 stroke=%27%23fff%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27m2 5 6 6 6-6%27/%3e%3c/svg%3e");
-        background-position: center right;
-        padding-left: 0;
-        padding-right: 20px;
-
-        &:focus {
-            border: none;
-            box-shadow: none;
-        }
-
-    }
-
-    &+.text-white {
-        padding-left: 5px;
-        padding-right: 10px;
-    }
-}
-
 .qrcode {
     height: 200px !important;
     width: 200px !important
@@ -5683,15 +5656,11 @@ aside.EmojiPickerReact.epr-main {
 //select box 
 .customSelectBox {
     position: relative;
-    width: 185px;
-    @include media-breakpoint-up(md) {
-        width: 185px;
-    }
 }
 
 .customSelectBox ul.options {
+    width: 100%;
     position: absolute;
-    width: 125px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -5700,15 +5669,7 @@ aside.EmojiPickerReact.epr-main {
     background: #1e1f24;
     color: #808191;
     white-space: nowrap;
-    @include media-breakpoint-up(md) {
-      width: 185px;
-    }
-    @include media-breakpoint-up(lg) {
-      width: 185px;
-    }
-    @include media-breakpoint-up(xl) {
-      width: 185px;
-    }
+    
   }
 .customSelectBox ul.options li {
     padding: 0 10px;
@@ -5719,13 +5680,33 @@ aside.EmojiPickerReact.epr-main {
     color: #fff;
 }
 
-// .country-select .form-select {
-//     padding: 0 10px;
-// }
-
 .country-select {
+    margin-left: 8px;
     position: relative;
+
+    .form-select {
+        color: white;
+        border: none;
+        // width: 50px;
+        background-color: #202127;
+        background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3e%3cpath fill=%27none%27 stroke=%27%23fff%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%272%27 d=%27m2 5 6 6 6-6%27/%3e%3c/svg%3e");
+        background-position: center right;
+        padding-left: 0;
+        padding-right: 20px;
+
+        &:focus {
+            border: none;
+            box-shadow: none;
+        }
+
+    }
+
+    &+.text-white {
+        padding-left: 5px;
+        padding-right: 10px;
+    }
 }
+
 
 .country-select ul.options {
     overflow-y: auto;
@@ -5736,7 +5717,22 @@ aside.EmojiPickerReact.epr-main {
     padding: 0;
     border: 1px solid #ccc;
     z-index: 9;
+    color: white;
+    display: block;
+    padding: 0px 2px 1px;
+    white-space: nowrap;
     background: #1e1f24;
+    @media screen and (max-width:991px) {
+        right: 100%;
+        margin: 0px -42px 0 0px;
+    }
+}
+
+.country-select ul.options.locationPersonalData {
+    @media screen and (max-width:991px) {
+        right: 100%;
+        margin: 0px -72px 0 0px;
+    }
 }
 
 .country-select ul.options::-webkit-scrollbar {
@@ -5760,6 +5756,7 @@ aside.EmojiPickerReact.epr-main {
 
 .country-select ul.options li {
     padding: 0 10px;
+    font-size: 0.875rem;
 }
 
 .country-select ul.options li:hover {
@@ -5767,22 +5764,53 @@ aside.EmojiPickerReact.epr-main {
     color: #fff;
 }
 
-.personalData {
-    color: white;
-    display: block;
-    padding: 0px 2px 1px;
-    white-space: nowrap;
-}
-
-.personalData li {
-    font-size: 0.875rem;
-}
 
 .dropdownPersonalData {
     width: auto !important;
 }
+
 .personalDataLocation {
     overflow: hidden;
     white-space: nowrap;
     width: 58px;
+}
+
+//select box 
+.statisticBox{
+    position: relative;
+    width: 185px;
+    @include media-breakpoint-up(md) {
+        width: 185px;
+    }
+}
+
+.statisticBox ul.options {
+    position: absolute;
+    width: 125px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    z-index: 9;
+    background: #1e1f24;
+    color: #808191;
+    white-space: nowrap;
+    @include media-breakpoint-up(md) {
+      width: 185px;
+    }
+    @include media-breakpoint-up(lg) {
+      width: 185px;
+    }
+    @include media-breakpoint-up(xl) {
+      width: 185px;
+    }
+}
+
+.statisticBox ul.options li {
+    padding: 0 10px;
+}
+
+.statisticBox ul.options li:hover {
+    background-color: #1b75d0;
+    color: #fff;
 }

@@ -141,7 +141,6 @@ export const checkAuth = createAsyncThunk(
           get(
             child(dbRef, firebaseMessages?.CHAT_USERS + userData?.account)
           ).then((snapshot) => {
-            // console.log("snapshot.exists()",snapshot.val())
             // if (snapshot.exists()) {
               update(
                 ref(database, firebaseMessages?.CHAT_USERS + userData?.account),
@@ -187,7 +186,6 @@ export const logoutAuth = createAsyncThunk(
       await get(
         child(dbRef, firebaseMessages?.CHAT_USERS + accountAdrr)
       ).then(async (snapshot) => {
-        console.log(snapshot.exists())
         if (snapshot.exists()) {
           update(
             ref(database, firebaseMessages?.CHAT_USERS + accountAdrr),
@@ -199,7 +197,6 @@ export const logoutAuth = createAsyncThunk(
             database,
             firebaseMessages.CHAT_USERS + accountAdrr
           ));
-          console.log("--------------" , snapshotArr.val())
         }
       });
 

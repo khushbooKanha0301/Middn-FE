@@ -18,7 +18,6 @@ import {
 import { useConnect, useSignMessage, useAccount, useDisconnect } from "wagmi";
 
 export const LoginView = (props) => {
- console.log("props ", props);
   const [checkValue, setCheckValue] = useState(null);
   const [accountAddress, setAccountAddress] = useState("");
   const [userchainId, SetUserChainId] = useState(null);
@@ -41,7 +40,6 @@ export const LoginView = (props) => {
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
-      //console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
@@ -171,8 +169,6 @@ export const LoginView = (props) => {
           await activateInjectedProvider("coinbaseWallet");
           setProvider("coinbaseWallet");
         }
-
-        //console.log(metaAccounts);
 
         if (
           //!metaAccounts ||
@@ -361,7 +357,6 @@ export const LoginView = (props) => {
       userData?.account !== "Connect Wallet" &&
       storageProvider == "coinbaseWallet"
     ) {
-      //console.log("disconnect");
       disonnectWalletConnect();
       disconnect();
       dispatch(notificationSuccess("User logout successfully !"));

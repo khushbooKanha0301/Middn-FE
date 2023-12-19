@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, Form, Button, Placeholder } from "react-bootstrap";
 import {
   CheckmarkIcon,
@@ -30,7 +30,6 @@ import VerifiedInfo from "./verifiedInfo";
 export const AccountSetting = () => {
   const dispatch = useDispatch();
   const [country, setCountry] = useState("");
- console.log("country ", country);
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [fname, setFname] = useState("");
@@ -50,6 +49,36 @@ export const AccountSetting = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [showCountryOptions, setShowCountryOptions] = useState(false);
   const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
+  const countryDropdownRef = useRef(null);
+  const optionsDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
+
+  const handleGlobalClick = (event) => {
+    // Close dropdowns if the click is outside of them
+    if (
+      countryDropdownRef.current &&
+      !countryDropdownRef.current.contains(event.target) &&
+      optionsDropdownRef.current &&
+      !optionsDropdownRef.current.contains(event.target) &&
+      locationDropdownRef.current &&
+      !locationDropdownRef.current.contains(event.target)
+    ) {
+      setShowCurrencyOptions(false);
+      setShowCountryOptions(false);
+      setShowOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    // Add global click event listener
+    document.addEventListener('click', handleGlobalClick);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
+
   
   countryInfo.sort(function (a, b) {
     var textA = a.currency.code.toUpperCase();
@@ -222,13 +251,19 @@ export const AccountSetting = () => {
     setIsModalOpen(false);
   };
   const toggleOptions = () => {
-    setShowOptions((prevShowOptions) => !prevShowOptions);
+    setShowOptions(!showOptions);
+    setShowCountryOptions(false)
+    setShowCurrencyOptions(false)
   };
   const toggleCountryOptions = () => {
-    setShowCountryOptions((prevShowOptions) => !prevShowOptions);
+    setShowCountryOptions(!showCountryOptions);
+    setShowOptions(false)
+    setShowCurrencyOptions(false)
   };
   const toggleCurrencyOptions = () => {
-    setShowCurrencyOptions((prevShowOptions) => !prevShowOptions);
+    setShowCurrencyOptions(!showCurrencyOptions);
+    setShowOptions(false)
+    setShowCountryOptions(false)
   }
 
   return (
@@ -317,7 +352,7 @@ export const AccountSetting = () => {
                             "No Flag"
                           )}
 
-                          <div className="country-select">
+                          <div className="country-select" ref={locationDropdownRef}>
                             {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
@@ -349,7 +384,7 @@ export const AccountSetting = () => {
                               </p>
                             </div>
                             {showOptions && (
-                              <ul className="options personalData">
+                              <ul className="options">
                                 {listData.map((data, key) => (
                                   <li
                                     key={`${data?.code}_${data?.country}}`}
@@ -397,7 +432,7 @@ export const AccountSetting = () => {
                                 ?.cca3
                             }
                           </p> */}
-                          <div className="country-select">
+                          <div className="country-select" ref={countryDropdownRef}>
                             {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
@@ -417,7 +452,7 @@ export const AccountSetting = () => {
                               ))}
                             </Form.Select> */}
                             <div
-                              className="dropdownPersonalData form-select form-select-sm"
+                              className="dropdownPersonalData form-select form-select-sm" 
                               onClick={toggleCountryOptions}
                             >
                               <p className="text-white mb-0 personalDataLocation">
@@ -428,7 +463,7 @@ export const AccountSetting = () => {
                               </p>
                             </div>
                             {showCountryOptions && (
-                             <ul className={`options personalData ${userDetailsAll.location ? 'disabled' : ''}`}>
+                             <ul className={`options locationPersonalData ${userDetailsAll.location ? 'disabled' : ''}`}>
                                 {listData.map((data, key) => (
                                   <li
                                     key={`${data?.iso}`}
@@ -476,7 +511,7 @@ export const AccountSetting = () => {
                               } 
                             </p> */}
                           </div>
-                          <div className="country-select">
+                          <div className="country-select" ref={optionsDropdownRef}>
                             {/* <Form.Select
                               size="sm"
                               value={currentPre}
@@ -508,7 +543,7 @@ export const AccountSetting = () => {
                               </p>
                             </div>
                             {showCurrencyOptions && (
-                             <ul className="options personalData">
+                             <ul className="options">
                                 {countryInfo.map((data) => (
                                   <li
                                     key={`${data.currency.code}`}

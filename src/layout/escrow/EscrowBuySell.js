@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
 import { countryInfo } from "../accountSetting/countryData";
 import { useDispatch } from "react-redux";
@@ -8,6 +8,7 @@ import jwtAxios from "../../service/jwtAxios";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
+
 function EscrowDetails() {
   const dispatch = useDispatch();
   const [countryCallingCode, setCountryCallingCode] = useState("");
@@ -17,6 +18,34 @@ function EscrowDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState(null);
+
+  const optionsDropdownRef = useRef(null);
+  const countryDropdownRef = useRef(null);
+  
+  const handleGlobalClick = (event) => {
+    // Close dropdowns if the click is outside of them
+    if (
+      countryDropdownRef.current &&
+      !countryDropdownRef.current.contains(event.target) &&
+      optionsDropdownRef.current &&
+      !optionsDropdownRef.current.contains(event.target) 
+    ) {
+      setShowCurrencyOptions(false);
+      setShowCountryOptions(false);
+      setShowOptions(false);
+    }
+  };
+  
+  useEffect(() => {
+    // Add global click event listener
+    document.addEventListener('click', handleGlobalClick);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
+
 
   const onChange = (e) => {
     // } else if (e.target.name === "currentPre") {
@@ -101,7 +130,7 @@ function EscrowDetails() {
                       }
                     </p>
                   </div>
-                  <div className="country-select">
+                  <div className="country-select" ref={countryDropdownRef}>
                     <Form.Select
                       size="sm"
                       value={currentPre}
@@ -155,7 +184,7 @@ function EscrowDetails() {
                       }
                     </p>
                   </div>
-                  <div className="country-select">
+                  <div className="country-select"  ref={optionsDropdownRef}>
                     <Form.Select
                       size="sm"
                       value={currentPre}

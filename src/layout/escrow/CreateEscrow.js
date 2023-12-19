@@ -34,6 +34,36 @@ export const CreateEscrowView = (props) => {
   const [showProcessTime, setShowProcessTime] = useState(false);
   const processTimes = [{ value: '24 Hours', label: '24 Hours' }];
 
+  const countryDropdownRef = useRef(null);
+  const optionsDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
+
+  const handleGlobalClick = (event) => {
+    // Close dropdowns if the click is outside of them
+    if (
+      countryDropdownRef.current &&
+      !countryDropdownRef.current.contains(event.target) &&
+      optionsDropdownRef.current &&
+      !optionsDropdownRef.current.contains(event.target) &&
+      locationDropdownRef.current &&
+      !locationDropdownRef.current.contains(event.target)
+    ) {
+      setShowObject(false);
+      setShowProcessTime(false);
+      setShowOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    // Add global click event listener
+    document.addEventListener('click', handleGlobalClick);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
+
   const handleNext = () => {
     if (step === 1 && !escrowType) {
       dispatch(notificationFail("Please select Buyer or Seller."));
@@ -68,16 +98,6 @@ export const CreateEscrowView = (props) => {
 
   const inputChangeHandler = (e) => {
     let numericRegex = /[^0-9.]/g;
-    // console.log("----------", e.target.textContent);
-
-    // const customName = e.currentTarget.getAttribute("data-name");
-    // console.log("Custom name:", customName);
-
-    // let updatedContent = e.target.textContent;
-    // console.log("updatedContent ", updatedContent);
-    // const { name: inputName, dataset } = e.target;
-    // const customName = dataset.name;
-
     switch (e.target.name) {
       // case "radiooption":
       //   setEscrowType(e.target.value);
@@ -236,14 +256,20 @@ export const CreateEscrowView = (props) => {
   };
 
   const toggleOptions = () => {
-    setShowOptions((prevShowOptions) => !prevShowOptions);
+    setShowOptions(!showOptions);
+    setShowObject(false);
+    setShowProcessTime(false);
   };
   const toggleObjectOptions = () => {
-    setShowObject((prevShowOptions) => !prevShowOptions);
+    setShowObject(!showObjects);
+    setShowProcessTime(false);
+    setShowOptions(false);
   };
 
   const toggleProcessOptions = () => {
-    setShowProcessTime((prevShowOptions) => !prevShowOptions);
+    setShowProcessTime(!showProcessTime);
+    setShowObject(false);
+    setShowOptions(false);
   };
 
   return (
@@ -466,7 +492,7 @@ export const CreateEscrowView = (props) => {
                     >
                       <option value="high_value_items">High-value items</option>
                     </Form.Select> */}
-                    <div className="customSelectBox" >
+                    <div className="customSelectBox" ref={countryDropdownRef}>
                       <div
                           className="form-select"
                           onClick={toggleOptions}
@@ -502,7 +528,7 @@ export const CreateEscrowView = (props) => {
                       <option value="Jewelery">Jewelery</option>
                     </Form.Select> */}
 
-                    <div className="customSelectBox" >
+                    <div className="customSelectBox" ref={optionsDropdownRef} >
                       <div
                           className="form-select"
                           onClick={toggleObjectOptions}
@@ -549,7 +575,7 @@ export const CreateEscrowView = (props) => {
                   <option value="24 Hours">24 Hours</option>
                 </Form.Select> */}
 
-                  <div className="customSelectBox" >
+                  <div className="customSelectBox" ref={locationDropdownRef}>
                       <div
                           className="form-select"
                           onClick={toggleProcessOptions}

@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, {  useState, useEffect, useRef } from "react";
 import { Card, Col, Form, Row, ProgressBar } from "react-bootstrap";
 import StatisticsChart from "./StatisticsChart";
 import ThisMonth from "./ThisMonth";
@@ -9,15 +9,36 @@ export const Statistics = () => {
   { value: '3', label: 'April 2022' }];
   const [showOptions, setShowOptions] = useState(false);
   const [category, setCategory] = useState("February 2022");
+  const locationDropdownRef = useRef(null);
 
   const toggleOptions = () => {
-    setShowOptions((prevShowOptions) => !prevShowOptions);
+    setShowOptions(!showOptions);
   };
 
   const handleSelectedClick = (value) => {
     setCategory(value);
     setShowOptions(false);
   };
+
+  const handleGlobalClick = (event) => {
+    // Close dropdowns if the click is outside of them
+    if (
+      locationDropdownRef.current &&
+      !locationDropdownRef.current.contains(event.target)
+    ) {
+      setShowOptions(false);
+    }
+  };
+
+  useEffect(() => {
+    // Add global click event listener
+    document.addEventListener('click', handleGlobalClick);
+
+    // Remove the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleGlobalClick);
+    };
+  }, []);
   
   return (
     <Card className="cards-dark statistics statisticsGraphs">
@@ -31,7 +52,7 @@ export const Statistics = () => {
             <option value="3">April 2022</option>
           </Form.Select> */}
 
-          <div className="customSelectBox" >
+          <div className="statisticBox" ref={locationDropdownRef}>
             <div
                 className="form-select"
                 onClick={toggleOptions}

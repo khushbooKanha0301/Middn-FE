@@ -96,9 +96,7 @@ export const Escrow = () => {
               );
               // Use await to wait for the onValue callback
               const snapshot = await get(starCountRef);
-              //console.log(snapshot.val())
               if (snapshot.val()) {
-
                 if (snapshot.exists()) {
                   // Return the updated object with the new key-value pair
                   return {
@@ -343,26 +341,26 @@ export const Escrow = () => {
                       <div className="actions profile-action text-center">
                         {userData &&
                         userData?.account === escrow?.user_address ? (
-                          <Link
-                            className="action"
-                            to={`/escrow-details/${escrow?._id}`}
-                          >
+                          // <Link
+                          //   className="action"
+                          //   to={`/escrow-details/${escrow?._id}`}
+                          // >
                             <Button variant="primary">Details</Button>
-                          </Link>
+                          // </Link>
                         ) : escrow && escrow?.escrow_type === "buyer" ? (
-                          <Link
-                            className="action"
-                            to={`/escrow-buy-sell/${escrow?._id}`}
-                          >
+                          // <Link
+                          //   className="action"
+                          //   to={`/escrow-buy-sell/${escrow?._id}`}
+                          // >
                             <Button variant="primary">Sell</Button>
-                          </Link>
+                          // </Link>
                         ) : (
-                          <Link
-                            className="action"
-                            to={`/escrow-buy-sell/${escrow?._id}`}
-                          >
+                          // <Link
+                          //   className="action"
+                          //   to={`/escrow-buy-sell/${escrow?._id}`}
+                          // >
                             <Button variant="primary">Buy</Button>
-                          </Link>
+                          // </Link>
                         )}
                       </div>
                     </div>
