@@ -4,6 +4,7 @@ import chatReducer  from "./slices/chatSlice";
 import commonReducer from "./slices/commonSlice";
 import countrySlice from "./slices/countrySettingSlice";
 import notificationReducer from "./slices/notificationSlice";
+import cuurencyReducer from "./slices/currencySlice";
 
 // const store = configureStore({
 //     reducer:{
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   notificationReducer,
   countrySlice,
   chatReducer,
+  cuurencyReducer
 });
 
 const store = configureStore({ reducer: rootReducer });

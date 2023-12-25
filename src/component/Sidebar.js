@@ -12,6 +12,8 @@ import {
 import Highcharts from "highcharts/highstock";
 import { userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
+import CreateEscrowView from "../layout/escrow/CreateEscrow";
+import LoginView from "../component/Login";
 
 const activeTrader = [
   {
@@ -87,6 +89,19 @@ export const Sidebar = (props) => {
     activeTrader.filter((item, index) => index < userDisplayCount)
   );
 
+  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const [isSign, setIsSign] = useState(null);
+
+  
+  const createEscrowModalToggle = () => {
+    if (acAddress.authToken) {
+      setCreateEscrowModalShow(!createEscrowModalShow);
+    } else {
+      setModalShow(true);
+    }
+  };
+
   const handleResize = () => {
     let height = getHeight();
     let userDisplayCal = getCount(height);
@@ -129,6 +144,10 @@ export const Sidebar = (props) => {
       props.setIsOpen(false);
     }
   }, [location,props.isResponsive]);
+
+  const handleAccountAddress = (address) => {
+    setIsSign(false);
+  };
 
   return (
     <div className="sidebar">
@@ -217,11 +236,11 @@ export const Sidebar = (props) => {
             ))}
           </ul> */}
           {/* {activeTrader.length === userList.length ? ( */}
-          <Button variant="link" className="btn-create-escrow">
+          <Button variant="link" className="btn-create-escrow" onClick={createEscrowModalToggle}>
             <span className="create-new">
               <PlusIcon width="14" height="14" />
             </span>{" "}
-            <span className="menu-hide">Create Escrow</span>
+            <span className="menu-hide">Create Escrow</span> 
           </Button>
           {/* ) : (
             <Button variant="link" onClick={loadMoreData}>
@@ -240,6 +259,21 @@ export const Sidebar = (props) => {
           <Button variant="primary">Contact us</Button>
         </Card.Body>
       </Card>
+
+      {modalShow && (
+        <LoginView
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        handleaccountaddress={handleAccountAddress}
+        isSign={isSign}
+        />
+      )}
+
+      <CreateEscrowView
+        show={createEscrowModalShow}
+        onHide={() => setCreateEscrowModalShow(false)}
+      />
+
     </div>
   );
 };

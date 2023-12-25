@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import { debounce } from "lodash";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
 import { countryInfo } from "../accountSetting/countryData";
 import { useDispatch } from "react-redux";
@@ -8,44 +9,68 @@ import jwtAxios from "../../service/jwtAxios";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import { notificationFail } from "../../store/slices/notificationSlice";
+import { convertToCrypto } from "../../store/slices/currencySlice";
+
+// USD , EUR , AUD , GBP
 
 function EscrowDetails() {
   const dispatch = useDispatch();
   const [countryCallingCode, setCountryCallingCode] = useState("");
   const [currentPre, setCurrentPre] = useState("USD");
+  const [currentCurrency, setCurrentCurrencyPre] = useState("BTC");
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
   const { id } = useParams();
   const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState(null);
-
+  const [showOptions, setShowOptions] = useState(false);
+  const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
+  const [cryptos, setCrypto] = useState([]);
   const optionsDropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
-  
+
+  const [amount, setAmount] = useState(0);
+  const [readyForPayment, setReadyForPayment] = useState(true);
+ 
+  const { cryptoAmount } = useSelector((state) => state?.cuurencyReducer);
+ 
+  const getAllEscrow = async () => {
+    try {
+      const res = await jwtAxios.get(`/auth/getCryptoDetails`);
+      setCrypto(res?.data?.data); // Update the state with the new array
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getAllEscrow();
+  }, []);
+
   const handleGlobalClick = (event) => {
     // Close dropdowns if the click is outside of them
     if (
       countryDropdownRef.current &&
       !countryDropdownRef.current.contains(event.target) &&
       optionsDropdownRef.current &&
-      !optionsDropdownRef.current.contains(event.target) 
+      !optionsDropdownRef.current.contains(event.target)
     ) {
-      setShowCurrencyOptions(false);
-      setShowCountryOptions(false);
+       setShowCurrencyOptions(false);
+      // setShowCountryOptions(false);
       setShowOptions(false);
     }
   };
-  
+
   useEffect(() => {
     // Add global click event listener
-    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener("click", handleGlobalClick);
 
     // Remove the event listener when the component unmounts
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
-
 
   const onChange = (e) => {
     // } else if (e.target.name === "currentPre") {
@@ -66,8 +91,9 @@ function EscrowDetails() {
     navigate("/escrow-offer-buy", { state: { userAddress: address } });
   };
   const handleFilterTypeChange = (vehicle) => {
-    setTypeFilter(vehicle)
-  }
+    // setTypeFilter(vehicle);
+    setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
+  };
 
   useEffect(() => {
     jwtAxios
@@ -79,6 +105,52 @@ function EscrowDetails() {
         console.log(err);
       });
   }, [acAddress.authToken]);
+
+  const toggleOptions = () => {
+    setShowOptions(!showOptions);
+    setShowCurrencyOptions(false);
+  };
+  const toggleCurrencyOptions = () => {
+    setShowCurrencyOptions(!showCurrencyOptions);
+    setShowOptions(false);
+  };
+
+  const onChangeAmount = useCallback(
+    debounce((data) => {
+      dispatch(convertToCrypto(data));
+    }, 500),
+    []
+  );
+
+  const handleChangeAmount = (value) => {
+    if (currentCurrency) {
+      setAmount(value);
+      const usdAmount = value;
+      const data = {
+        usdAmount: usdAmount,
+        cryptoSymbol: currentCurrency,
+        cryptoCountry: currentPre,
+      };
+      onChangeAmount(data);
+      if (value) {
+        if (value > 0) {
+          setReadyForPayment(false);
+        } else {
+          setReadyForPayment(true);
+          dispatch(notificationFail("Please Enter Correct Amount"));
+        }
+      } else {
+        setReadyForPayment(true);
+      }
+    }
+  };
+
+  const handledAmountFocus = () => {
+    if (!currentCurrency) {
+      setReadyForPayment(true);
+      dispatch(notificationFail("Please Select Crypto Currency"));
+    }
+  };
 
   return (
     <div className="escrow-details">
@@ -102,7 +174,7 @@ function EscrowDetails() {
               <Form.Group className="form-group">
                 <Form.Label>Amount</Form.Label>
                 <div className="d-flex align-items-center">
-                  <Form.Control
+                  {/* <Form.Control
                     placeholder={countryCallingCode}
                     name="phone"
                     type="text"
@@ -111,27 +183,31 @@ function EscrowDetails() {
                       onChange(e);
                     }}
                     maxLength="10"
+                  /> */}
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter Amount"
+                    onChange={(e) => handleChangeAmount(e.target.value.replace(/\D/g, ""))}
+                    onFocus={handledAmountFocus}
+                    value={amount}
+                    // disabled={!selectedCrypto}
                   />
                   <div className="d-flex align-items-center">
-                    {currentPre ? (
-                      <img
-                        src={currencyCountry()}
-                        alt="Flag"
-                        className="circle-data"
-                      />
+                    {currentCurrency ? (
+                      <div className="token-type">
+                        <span className="token-icon"></span>
+                      </div>
                     ) : (
                       "No Flag"
                     )}
-                    <p className="text-white mb-0">
+                    {/* <p className="text-white mb-0">
                       {
                         countryInfo.find(
                           (item) => item.currency.code === currentPre
                         )?.currency.code
                       }
-                    </p>
-                  </div>
-                  <div className="country-select" ref={countryDropdownRef}>
-                    <Form.Select
+                    </p> */}
+                     {/* <Form.Select
                       size="sm"
                       value={currentPre}
                       onChange={(e) => {
@@ -147,7 +223,39 @@ function EscrowDetails() {
                           {data.currency?.code}
                         </option>
                       ))}
-                    </Form.Select>
+                    </Form.Select> */}
+
+                  </div>
+                  <div className="country-select" ref={countryDropdownRef}>
+                    <div
+                      className="dropdownPersonalData form-select form-select-sm"
+                      onClick={toggleCurrencyOptions}
+                    >
+                      <p className="text-white mb-0">
+                        {
+                          cryptos.find(
+                            (item) => item.symbol === currentCurrency
+                          )?.symbol
+                        }
+                      </p>
+                    </div>
+                    {showCurrencyOptions && (
+                      <ul className="options">
+                        {cryptos.map((data) => (
+                          <li
+                            key={`${data.symbol}`}
+                            onClick={() => {
+                              handleChangeAmount(amount);
+                              setCurrentCurrencyPre(data.symbol);
+                              dispatch(defineCurrency(data.symbol));
+                            }}
+                            onFocus={handledAmountFocus}
+                          >
+                            {data.symbol}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </Form.Group>
@@ -157,35 +265,27 @@ function EscrowDetails() {
                 <Form.Label>Conversation </Form.Label>
                 <div className="d-flex align-items-center">
                   <Form.Control
-                    placeholder={countryCallingCode}
                     name="phone"
                     type="text"
-                    value="1"
-                    onChange={(e) => {
-                      onChange(e);
-                    }}
-                    maxLength="10"
+                    value={cryptoAmount?.amount ? cryptoAmount?.amount : "0"}
+                    disabled
                   />
+                 
                   <div className="d-flex align-items-center">
-                    {currentPre ? (
-                      <img
-                        src={currencyCountry()}
-                        alt="Flag"
-                        className="circle-data"
-                      />
-                    ) : (
-                      "No Flag"
-                    )}
-                    <p className="text-white mb-0">
+                    <img
+                      src={currencyCountry()}
+                      alt="Flag"
+                      className="circle-data"
+                    />
+
+                    {/* <p className="text-white mb-0">
                       {
                         countryInfo.find(
                           (item) => item.currency.code === currentPre
                         )?.currency.code
                       }
-                    </p>
-                  </div>
-                  <div className="country-select"  ref={optionsDropdownRef}>
-                    <Form.Select
+                    </p> */}
+                    {/* <Form.Select
                       size="sm"
                       value={currentPre}
                       onChange={(e) => {
@@ -201,7 +301,38 @@ function EscrowDetails() {
                           {data.currency?.code}
                         </option>
                       ))}
-                    </Form.Select>
+                    </Form.Select> */}
+                  </div>
+                  <div className="country-select" ref={optionsDropdownRef}>
+                    <div
+                      className="dropdownPersonalData form-select form-select-sm"
+                      onClick={toggleOptions}
+                    >
+                      <p className="text-white mb-0">
+                        {
+                          countryInfo.find(
+                            (item) => item.currency.code === currentPre
+                          )?.currency.code
+                        }
+                      </p>
+                    </div>
+                    {showOptions && (
+                      <ul className="options">
+                        {countryInfo.map((data) => (
+                          <li
+                            key={`${data.currency.code}`}
+                            onClick={() => {
+                              handleChangeAmount(amount)
+                              setCurrentPre(data.currency.code);
+                              dispatch(defineCurrency(data.currency.code));
+                            }}
+                            onFocus={handledAmountFocus}
+                          >
+                            {data.currency?.code}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </Form.Group>
@@ -224,26 +355,26 @@ function EscrowDetails() {
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Amount to transfer to Middn </div>
-                <div class="limit-txt-left-amount">105,02 BNB</div>
+                <div class="limit-txt-left-amount">{cryptoAmount?.amount ? (cryptoAmount?.amount + 0.02) : "0"} BNB</div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Invoice Amount</div>
-                <div class="limit-txt-left">105,00 BNB</div>
+                <div class="limit-txt-left">{cryptoAmount?.amount ? cryptoAmount?.amount : "0"} BNB</div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Escrow fees </div>
-                <div class="limit-txt-left">0,02 BNB</div>
+                <div class="limit-txt-left">0.02 BNB</div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Total</div>
-                <div class="limit-txt-left">105,02 BNB</div>
+                <div class="limit-txt-left">{cryptoAmount?.amount ? (cryptoAmount?.amount + 0.02) : "0"} BNB</div>
               </div>
               <div className="d-flex main-limit">
-              <Form.Group className="custom-input">
-                {/* <div className="checkbox">
+                <Form.Group className="custom-input-seller">
+                  {/* <div className="checkbox">
                   <input
                     type="checkbox"
                     id="vehicle1"
@@ -255,17 +386,19 @@ function EscrowDetails() {
                   </label>
                 </div> */}
 
-                <div
-                  className="form-check"
-                  onClick={() => handleFilterTypeChange("Bike")}
-                >
                   <div
-                    className={`form-check-input ${
-                      typeFilter == 'Bike' ? "checked" : ""
-                    }`}
-                  />
-                  <label class="form-check-label" for="vehicle1">I agree to Middin's escrow terms and conditions.</label>
-                </div>
+                    className="form-check"
+                    onClick={() => handleFilterTypeChange("Bike")}
+                  >
+                    <div
+                      className={`form-check-input ${
+                        typeFilter === "Bike" ? "checked" : ""
+                      }`}
+                    />
+                    <label class="form-check-label" for="vehicle1">
+                      I agree to Middin's escrow terms and conditions.
+                    </label>
+                  </div>
                 </Form.Group>
               </div>
 

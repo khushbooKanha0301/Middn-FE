@@ -3062,13 +3062,13 @@ body {
         .chat-image {
             height: 62px;
             width: 62px;
-            border-radius: 50%;
             position: relative;
 
             img {
                 height: 100%;
                 width: 100%;
                 object-fit: cover;
+                border-radius: 50%;
             }
 
             span.circle {
@@ -5113,13 +5113,13 @@ aside.EmojiPickerReact.epr-main {
             .chat-image {
                 height: 62px;
                 width: 62px;
-                border-radius: 50%;
                 position: relative;
 
                 img {
                     height: 100%;
                     width: 100%;
                     object-fit: cover;
+                    border-radius: 50%;
                 }
 
                 span.circle {
@@ -5172,13 +5172,13 @@ aside.EmojiPickerReact.epr-main {
             .chat-image {
                 height: 62px;
                 width: 62px;
-                border-radius: 50%;
                 position: relative;
 
                 img {
                     height: 100%;
                     width: 100%;
                     object-fit: cover;
+                    border-radius: 50%;
                 }
 
                 span.circle {
@@ -5813,4 +5813,60 @@ aside.EmojiPickerReact.epr-main {
 .statisticBox ul.options li:hover {
     background-color: #1b75d0;
     color: #fff;
+}
+
+.token-type {
+    margin-left: 8px;
+    font-size: 16px;
+    line-height: 24px;
+    color: $white;
+    display: flex;
+    align-items: center;
+
+    .token-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f4f4f6;
+      margin-right: 4px;
+    }
+  }
+
+
+.custom-input-seller {
+    .form-check {
+        margin-bottom: 10px;
+    
+        input {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          background-color: #c4c4c4;
+          border: none;
+          box-shadow: none;
+    
+          &:checked {
+            background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+          }
+        }
+    
+        .form-check-input {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          background-color: #c4c4c4;
+          border: none;
+          box-shadow: none;
+    
+          &.checked {
+            background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+          }
+        }
+    
+        label {
+          font-size: 13px;
+          line-height: 16px;
+          letter-spacing: -0.03em;
+        }
+      }
 }

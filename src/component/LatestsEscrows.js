@@ -101,7 +101,6 @@ function getWidth() {
   if (width > 1200) {
     width = 1440;
   }
-
   return width;
 }
 

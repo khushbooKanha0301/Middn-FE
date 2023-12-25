@@ -76,7 +76,8 @@ function EscrowDetails() {
     setEditEscrowModalShow(!editEscrowModalShow);
 
   const handleFilterTypeChange = (vehicle) => {
-    setTypeFilter(vehicle);
+    // setTypeFilter(vehicle);
+    setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
   };
 
   useEffect(() => {
@@ -316,7 +317,7 @@ function EscrowDetails() {
                     I agree to Middin's escrow terms and conditions.
                   </label>
                 </div> */}
-                <Form.Group className="custom-input">
+                <Form.Group className="custom-input-seller">
                   {/* <div className="checkbox">
                   <input
                     type="checkbox"

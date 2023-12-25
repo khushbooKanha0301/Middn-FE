@@ -16,9 +16,9 @@ import NotificationComponent from "./layout/NotificationComponent";
 import TraderProfileComponent from "./layout/TraderProfileComponent";
 import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
-// import EscrowDetails from "./layout/escrow/EscrowDetails";
-// import EscrowPay from "./layout/escrow/EscrowPay";
-// import EscrowBuySell from "./layout/escrow/EscrowBuySell";
+import EscrowDetails from "./layout/escrow/EscrowDetails";
+import EscrowPay from "./layout/escrow/EscrowPay";
+import EscrowBuySell from "./layout/escrow/EscrowBuySell";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
 import ProtectedRoute from "./PrivateRoute";
@@ -242,9 +242,9 @@ export const App = () => {
                   </ProtectedRoute>
                 }
               />
-              {/* <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
+              <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
               <Route path="/escrow-buy-sell/:id" element={<EscrowBuySell />} /> 
-              <Route path="/escrow-offer-buy" element={<EscrowPay />} />   */}
+              <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
               <Route
                 path="/profile/:address"
                 element={

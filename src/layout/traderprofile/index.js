@@ -105,11 +105,12 @@ export const TraderProfile = (props) => {
             return e; // Return the original object if no update is needed
           })
         );
+        setEscrowLoading(false);
         setActiveEscrows(escrowErr); // Update the state with the new array
         setTotalActiveEscrowCount(res.data?.escrowsCount);
-        setEscrowLoading(false);
+       
       } catch (err) {
-        setEscrowLoading(false);
+        setEscrowLoading(true);
         console.error(err);
       }
     }

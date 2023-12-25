@@ -72,6 +72,7 @@ export const Escrow = () => {
   const [escrows, setEscrow] = useState([]);
   const [totalEscrowCount, setTotalEscrowCount] = useState(0);
   const [escrowLoading, setEscrowLoading] = useState(true);
+ console.log("escrowLoading ", escrowLoading);
   const [currentPage, setCurrentPage] = useState(1);
   const acAddress = useSelector(userDetails);
   const userData = useSelector(userDetails);
@@ -86,7 +87,7 @@ export const Escrow = () => {
       try {
         const res = await jwtAxios.get(
           `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
-        );
+        )
         let escrowErr = await Promise.all(
           res.data?.data.map(async (e) => {
             if (e.user_address) {
@@ -125,10 +126,8 @@ export const Escrow = () => {
   };
 
   useEffect(() => {
-    // if(acAddress.authToken) {
       getAllEscrow();
-    //}
-  }, [currentPage, acAddress.authToken]);
+  }, []);
 
   const handleChangeAny = (e) => {
     setSelectedOptionAny(e);
@@ -341,26 +340,26 @@ export const Escrow = () => {
                       <div className="actions profile-action text-center">
                         {userData &&
                         userData?.account === escrow?.user_address ? (
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-details/${escrow?._id}`}
-                          // >
+                          <Link
+                            className="action"
+                            to={`/escrow-details/${escrow?._id}`}
+                          >
                             <Button variant="primary">Details</Button>
-                          // </Link>
+                          </Link>
                         ) : escrow && escrow?.escrow_type === "buyer" ? (
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-buy-sell/${escrow?._id}`}
-                          // >
+                          <Link
+                            className="action"
+                            to={`/escrow-buy-sell/${escrow?._id}`}
+                          >
                             <Button variant="primary">Sell</Button>
-                          // </Link>
+                          </Link>
                         ) : (
-                          // <Link
-                          //   className="action"
-                          //   to={`/escrow-buy-sell/${escrow?._id}`}
-                          // >
+                          <Link
+                            className="action"
+                            to={`/escrow-buy-sell/${escrow?._id}`}
+                          >
                             <Button variant="primary">Buy</Button>
-                          // </Link>
+                          </Link>
                         )}
                       </div>
                     </div>
