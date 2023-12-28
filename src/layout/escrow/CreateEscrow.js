@@ -16,7 +16,7 @@ export const CreateEscrowView = (props) => {
   const [priceType, setPriceType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  
+
   const [description, setDescription] = useState(null);
   const [escrowNumber, setEscrowNumber] = useState(null);
   const dispatch = useDispatch();
@@ -24,16 +24,18 @@ export const CreateEscrowView = (props) => {
 
   const [object, setObject] = useState("Jewelery");
   const [showObjects, setShowObject] = useState(false);
-  const objects = [{ value: 'Jewelery', label: 'Jewelery' }];
+  const objects = [{ value: "Jewelery", label: "Jewelery" }];
 
   const [category, setCategory] = useState("high_value_items");
   const [showOptions, setShowOptions] = useState(false);
-  const categories = [{ value: 'high_value_items', label: 'High-value items' }];
-  
+  const categories = [{ value: "high_value_items", label: "High-value items" }];
+
   const [processTime, setProcessTime] = useState("24 Hours");
   const [showProcessTime, setShowProcessTime] = useState(false);
-  const processTimes = [{ value: '24 Hours', label: '24 Hours' }];
+  const processTimes = [{ value: "24 Hours", label: "24 Hours" }];
 
+  const [loader, setLoader] = useState(false);
+  
   const countryDropdownRef = useRef(null);
   const optionsDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
@@ -56,11 +58,11 @@ export const CreateEscrowView = (props) => {
 
   useEffect(() => {
     // Add global click event listener
-    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener("click", handleGlobalClick);
 
     // Remove the event listener when the component unmounts
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
 
@@ -207,8 +209,12 @@ export const CreateEscrowView = (props) => {
       .post(`/escrows/createEscrow`, reqData)
       .then((escrowResult) => {
         if (escrowResult?.data?.data?.escrow_number) {
-          setEscrowNumber(escrowResult?.data?.data?.escrow_number);
-          dispatch(notificationSuccess(escrowResult?.data?.message));
+          setTimeout(() => {
+            setLoader(true);
+            setEscrowNumber(escrowResult?.data?.data?.escrow_number);
+            dispatch(notificationSuccess(escrowResult?.data?.message));
+          }, 1000);
+          
           setStep(step + 1);
         } else {
           dispatch(notificationFail("Something went wrong"));
@@ -233,6 +239,7 @@ export const CreateEscrowView = (props) => {
 
   const homeBtnHandler = async () => {
     props.onHide();
+    setStep(1);
     navigate("/");
   };
 
@@ -494,20 +501,21 @@ export const CreateEscrowView = (props) => {
                     </Form.Select> */}
                     <div className="customSelectBox" ref={countryDropdownRef}>
                       <div
-                          className="form-select"
-                          onClick={toggleOptions}
-                          aria-label="High-value items"
-                        >
-                          {categories.find(
-                            (cat) => cat.value === category
-                          )?.label || "Select category"}
+                        className="form-select"
+                        onClick={toggleOptions}
+                        aria-label="High-value items"
+                      >
+                        {categories.find((cat) => cat.value === category)
+                          ?.label || "Select category"}
                       </div>
                       {showOptions && (
                         <ul className="options">
                           {categories.map((category) => (
                             <li
                               key={category.value}
-                              onClick={() => handleSelectedClick(category.value)}
+                              onClick={() =>
+                                handleSelectedClick(category.value)
+                              }
                             >
                               {category.label}
                             </li>
@@ -528,22 +536,23 @@ export const CreateEscrowView = (props) => {
                       <option value="Jewelery">Jewelery</option>
                     </Form.Select> */}
 
-                    <div className="customSelectBox" ref={optionsDropdownRef} >
+                    <div className="customSelectBox" ref={optionsDropdownRef}>
                       <div
-                          className="form-select"
-                          onClick={toggleObjectOptions}
-                          aria-label="Jewelery"
-                        >
-                          {objects.find(
-                            (cat) => cat.value === object
-                          )?.label || "Select Object"}
+                        className="form-select"
+                        onClick={toggleObjectOptions}
+                        aria-label="Jewelery"
+                      >
+                        {objects.find((cat) => cat.value === object)?.label ||
+                          "Select Object"}
                       </div>
                       {showObjects && (
                         <ul className="options">
                           {objects.map((object) => (
                             <li
                               key={object.value}
-                              onClick={() => handleSelectedObjectClick(object.value)}
+                              onClick={() =>
+                                handleSelectedObjectClick(object.value)
+                              }
                             >
                               {object.label}
                             </li>
@@ -575,30 +584,30 @@ export const CreateEscrowView = (props) => {
                   <option value="24 Hours">24 Hours</option>
                 </Form.Select> */}
 
-                  <div className="customSelectBox" ref={locationDropdownRef}>
-                      <div
-                          className="form-select"
-                          onClick={toggleProcessOptions}
-                          aria-label="24 Hours"
+                <div className="customSelectBox" ref={locationDropdownRef}>
+                  <div
+                    className="form-select"
+                    onClick={toggleProcessOptions}
+                    aria-label="24 Hours"
+                  >
+                    {processTimes.find((cat) => cat.value === processTime)
+                      ?.label || "Select Process Time"}
+                  </div>
+                  {showProcessTime && (
+                    <ul className="options">
+                      {processTimes.map((processTime) => (
+                        <li
+                          key={processTime.value}
+                          onClick={() =>
+                            handleProcessTimeClick(processTime.value)
+                          }
                         >
-                        {processTimes.find(
-                            (cat) => cat.value === processTime
-                          )?.label || "Select Process Time"}
-                      </div>
-                      {showProcessTime && (
-                        <ul className="options">
-                          {processTimes.map((processTime) => (
-                            <li
-                              key={processTime.value}
-                              onClick={() => handleProcessTimeClick(processTime.value)}
-                            >
-                              {processTime.label}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-
+                          {processTime.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </Form.Group>
               <div className="form-action-group">
                 <Button variant="primary" onClick={submitHandler}>
@@ -613,32 +622,46 @@ export const CreateEscrowView = (props) => {
         )}
         {step === 4 && (
           <>
-            <Modal.Header>
-              <Modal.Title>Escrow has been created</Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="pt-2">
-              <p className="mb-4">
-                Your secure link has been created, share it with your buyer to
-                start trading with the decentralized escrow.
-              </p>
-              <Form.Group className="form-group">
-                <Form.Label>Your Escrow Link</Form.Label>
-                <Form.Control
-                  ref={escrowLinkRef}
-                  type="text"
-                  value={`app.middn.com/join-transaction/${escrowNumber}`}
-                  readOnly
-                />
-              </Form.Group>
-              <div className="form-action-group">
-                <Button variant="primary" onClick={copyToClipboard}>
-                  Copy link
-                </Button>
-                <Button variant="secondary" onClick={homeBtnHandler}>
-                  Back home
-                </Button>
+            {loader ? (
+              <>
+                <Modal.Header>
+                  <Modal.Title>Escrow has been created</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="pt-2">
+                  <p className="mb-4">
+                    Your secure link has been created, share it with your buyer
+                    to start trading with the decentralized escrow.
+                  </p>
+                  <Form.Group className="form-group">
+                    <Form.Label>Your Escrow Link</Form.Label>
+                    <Form.Control
+                      ref={escrowLinkRef}
+                      type="text"
+                      value={`app.middn.com/join-transaction/${escrowNumber}`}
+                      readOnly
+                    />
+                  </Form.Group>
+                  <div className="form-action-group">
+                    <Button variant="primary" onClick={copyToClipboard}>
+                      Copy link
+                    </Button>
+                    <Button variant="secondary" onClick={homeBtnHandler}>
+                      Back home
+                    </Button>
+                  </div>
+                </Modal.Body>
+              </>
+            ) : (
+              <div className="middenLoader">
+                <img src={require("../../content/images/logo.png")} />
+                <p>welcome</p>
+                <div class="snippet" data-title="dot-flashing">
+                  <div class="stage">
+                    <div class="dot-flashing"></div>
+                  </div>
+                </div>
               </div>
-            </Modal.Body>
+            )}
           </>
         )}
       </Form>

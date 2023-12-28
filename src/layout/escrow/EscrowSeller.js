@@ -12,8 +12,8 @@ import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes, database, firebaseMessages } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useLocation } from "react-router-dom";
-//const CHAT_ROOM = "chat/escrow_room/";
-export const EscrowPay = () => {
+
+export const EscrowSeller = () => {
   const location = useLocation();
   const { state } = location;
 
@@ -197,7 +197,7 @@ export const EscrowPay = () => {
             <Card.Body>
               <div className="d-flex justify-content-between buyerBottom">
                 <h3 className="text-white text-lg">
-                  Contract : <span className="font-bold">Buyer</span>{" "}
+                  Contract : <span className="font-bold">Seller</span>{" "}
                 </h3>
                 <span className="px-4 rounded-deposite">Depositing</span>
               </div>
@@ -358,4 +358,4 @@ export const EscrowPay = () => {
   );
 };
 
-export default EscrowPay;
+export default EscrowSeller;

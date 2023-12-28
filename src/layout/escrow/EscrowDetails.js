@@ -134,14 +134,11 @@ function EscrowDetails() {
                     name="phone"
                     type="text"
                     value="1"
-                    // onChange={(e) => {
-                    //   onChange(e);
-                    // }}
                     maxLength="10"
                   />
 
                   <div className="d-flex align-items-center currency-info">
-                    <div className="currency-type">
+                    {/* <div className="currency-type">
                       <span className="currency-flag">
                         <img
                           className="currency-flag"
@@ -150,7 +147,14 @@ function EscrowDetails() {
                         />
                       </span>
                       BTC
+                    </div> */}
+
+                    <div className="token-type">
+                      <span className="token-icon"></span>
                     </div>
+
+                    <p className="text-white mb-0">BTC</p>
+
                     {/* <div className="text-white mb-0 currency-amount">
                       USD
                     </div> */}
@@ -175,23 +179,24 @@ function EscrowDetails() {
                     </p>
                   </div> */}
                   <div className="country-select">
-                    <Form.Select
+                    <div class="form-select form-select-sm" />
+                    {/* <Form.Select
                       size="sm"
                       value={currentPre}
-                      // onChange={(e) => {
-                      //   setCurrentPre(e.target.value);
-                      //   dispatch(defineCurrency(e.target.value));
-                      // }}
+                      onChange={(e) => {
+                        setCurrentPre(e.target.value);
+                        dispatch(defineCurrency(e.target.value));
+                      }}
                     >
-                      {/* {countryInfo.map((data) => (
+                      {countryInfo.map((data) => (
                         <option
                           value={`${data.currency.code}`}
                           key={`${data.currency.code}`}
                         >
                           {data.currency?.code}
                         </option>
-                      ))} */}
-                    </Form.Select>
+                      ))}
+                    </Form.Select> */}
                   </div>
                 </div>
               </Form.Group>
@@ -216,10 +221,7 @@ function EscrowDetails() {
                       //   src={currencyCountry()}
                       //   alt="Flag"
                       //   className="circle-data"
-                      // />
-
-                      
-                      
+                      // />   
                     ) : (
                       "No Flag"
                     )}
@@ -233,7 +235,12 @@ function EscrowDetails() {
                   </div> */}
 
                   <div className="d-flex align-items-center currency-info">
-                    <div className="currency-type">
+                    <div className="token-type">
+                      <span className="token-icon"></span>
+                    </div>
+
+                    <p className="text-white mb-0">USD</p>
+                    {/* <div className="currency-type">
                       <span className="currency-flag">
                         <img
                           className="currency-flag"
@@ -242,30 +249,31 @@ function EscrowDetails() {
                         />
                       </span>
                       USD
-                    </div>
+                    </div> */}
                     {/* <div className="text-white mb-0 currency-amount">
                       USD
                     </div> */}
                   </div>
 
                   <div className="country-select">
-                    <Form.Select
+                    <div class="form-select form-select-sm" />
+                    {/* <Form.Select
                       size="sm"
                       value={currentPre}
-                      // onChange={(e) => {
-                      //   setCurrentPre(e.target.value);
-                      //   dispatch(defineCurrency(e.target.value));
-                      // }}
+                      onChange={(e) => {
+                        setCurrentPre(e.target.value);
+                        dispatch(defineCurrency(e.target.value));
+                      }}
                     >
-                      {/* {countryInfo.map((data) => (
+                      {countryInfo.map((data) => (
                         <option
                           value={`${data.currency.code}`}
                           key={`${data.currency.code}`}
                         >
                           {data.currency?.code}
                         </option>
-                      ))} */}
-                    </Form.Select>
+                      ))}
+                    </Form.Select> */}
                   </div>
                 </div>
               </Form.Group>
@@ -352,7 +360,7 @@ function EscrowDetails() {
           <Card className="cards-dark mb-4">
             <Card.Body>
               <Card.Title as="h2">Information</Card.Title>
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center buyerDetails">
                 <div className="chat-image">
                   <img
                     src={
@@ -372,27 +380,29 @@ function EscrowDetails() {
                 </div>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Location</div>
-                <div class="card-txt">🇺🇸 United States</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Location</span>
+                <strong class="card-txt">🇺🇸 United States</strong>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Trades</div>
-                <div class="card-txt">1029</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Trades</span>
+                <strong class="card-txt">1029</strong>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Trading partners</div>
-                <div class="card-txt">720</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Trading partners</span>
+                <strong class="card-txt">720</strong>
               </div>
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Feedback score</div>
-                <div class="card-txt">99%</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Feedback score</span>
+                <strong class="card-txt">99%</strong>
               </div>
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Typical finalization time</div>
-                <div class="card-txt">20 minutes</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Typical finalization time</span>
+                <strong class="card-txt">20 minutes</strong>
               </div>
             </Card.Body>
           </Card>
@@ -400,27 +410,29 @@ function EscrowDetails() {
           <Card className="cards-dark">
             <Card.Body>
               <Card.Title as="h2">Summary</Card.Title>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Price</div>
-                <div class="card-txt">15.4905468 ETH</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Price</span>
+                <strong class="summery-txt">15.4905468 ETH</strong>
               </div>
 
-              <div className="d-flex expired">
-                <div class="card-txt-left">Limit</div>
-                <div class="card-txt">0.1-0.6 BTC</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Limit</span>
+                <strong class="summery-txt">0.1-0.6 BTC</strong>
               </div>
 
-              <div className="d-flex expired">
-                <div class="card-txt-left">Payment methods</div>
-                <div class="card-txt">Ethereum</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Payment methods</span>
+                <strong class="summery-txt">Ethereum</strong>
               </div>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Network</div>
-                <div class="card-txt"> Binance Smart Chain</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Network</span>
+                <strong class="summery-txt"> Binance Smart Chain</strong>
               </div>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Time constraints</div>
-                <div class="card-txt">09:00 AM - 00:00 AM</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Time constraints</span>
+                <strong class="summery-txt">09:00 AM - 00:00 AM</strong>
               </div>
             </Card.Body>
           </Card>

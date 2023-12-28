@@ -268,7 +268,7 @@ export const Sidebar = (props) => {
         isSign={isSign}
         />
       )}
-
+      
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}

@@ -18,6 +18,7 @@ import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
 import EscrowDetails from "./layout/escrow/EscrowDetails";
 import EscrowPay from "./layout/escrow/EscrowPay";
+import EscrowSeller from "./layout/escrow/EscrowSeller";
 import EscrowBuySell from "./layout/escrow/EscrowBuySell";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
@@ -245,6 +246,7 @@ export const App = () => {
               <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
               <Route path="/escrow-buy-sell/:id" element={<EscrowBuySell />} /> 
               <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
+              <Route path="/escrow-seller" element={<EscrowSeller />} />  
               <Route
                 path="/profile/:address"
                 element={

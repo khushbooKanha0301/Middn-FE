@@ -87,9 +87,43 @@ function EscrowDetails() {
     return result?.flag;
   };
 
-  const handleButtonClick = (address) => {
+  const handleButtonClick = async (address) => {
     navigate("/escrow-offer-buy", { state: { userAddress: address } });
+    const conversationRate = cryptoAmount?.amount ? cryptoAmount?.amount : "0";
+    const reqData = {
+     amount,
+     currentPre,
+     currentCurrency,
+     conversationRate
+    };
+    // await jwtAxios
+    //   .post(`/escrows/createEscrow`, reqData)
+    //   .then((escrowResult) => {
+    //     if (escrowResult?.data?.data?.escrow_number) {
+    //       setTimeout(() => {
+    //         setLoader(true);
+    //         setEscrowNumber(escrowResult?.data?.data?.escrow_number);
+    //         dispatch(notificationSuccess(escrowResult?.data?.message));
+    //       }, 1000);
+          
+    //       setStep(step + 1);
+    //     } else {
+    //       dispatch(notificationFail("Something went wrong"));
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     if (typeof error == "string") {
+    //       dispatch(notificationFail(error));
+    //     }
+    //     if (error?.response?.data?.message === "") {
+    //       dispatch(notificationFail("Invalid "));
+    //     }
+    //     if (error?.response?.data?.message) {
+    //       dispatch(notificationFail(error?.response?.data?.message));
+    //     }
+    //   });
   };
+
   const handleFilterTypeChange = (vehicle) => {
     // setTypeFilter(vehicle);
     setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
@@ -110,6 +144,7 @@ function EscrowDetails() {
     setShowOptions(!showOptions);
     setShowCurrencyOptions(false);
   };
+  
   const toggleCurrencyOptions = () => {
     setShowCurrencyOptions(!showCurrencyOptions);
     setShowOptions(false);
@@ -403,12 +438,13 @@ function EscrowDetails() {
               </div>
 
               <div className="edit-btn ">
-                {/* <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
+                  <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
                     Submit
-                  </Button> */}
-                <Button className="btn btn-success btn-width" variant="success">
+                  </Button> 
+
+                {/* <Button className="btn btn-success btn-width" variant="success">
                   Submit
-                </Button>
+                </Button> */}
               </div>
             </Col>
           </Row>
@@ -417,7 +453,7 @@ function EscrowDetails() {
           <Card className="cards-dark mb-4">
             <Card.Body>
               <Card.Title as="h2">Information</Card.Title>
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center buyerDetails">
                 <div className="chat-image">
                   <img
                     src={
@@ -437,27 +473,29 @@ function EscrowDetails() {
                 </div>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Location</div>
-                <div class="card-txt">🇺🇸 United States</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Location</span>
+                <strong class="card-txt">🇺🇸 United States</strong>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Trades</div>
-                <div class="card-txt">1029</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Trades</span>
+                <strong class="card-txt">1029</strong>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Trading partners</div>
-                <div class="card-txt">720</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Trading partners</span>
+                <strong class="card-txt">720</strong>
               </div>
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Feedback score</div>
-                <div class="card-txt">99%</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Feedback score</span>
+                <strong class="card-txt">99%</strong>
               </div>
-              <div className="d-flex justify-content-between align-items-center expired">
-                <div class="card-txt-left">Typical finalization time</div>
-                <div class="card-txt">20 minutes</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="card-txt-left">Typical finalization time</span>
+                <strong class="card-txt">20 minutes</strong>
               </div>
             </Card.Body>
           </Card>
@@ -465,27 +503,29 @@ function EscrowDetails() {
           <Card className="cards-dark">
             <Card.Body>
               <Card.Title as="h2">Summary</Card.Title>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Price</div>
-                <div class="card-txt">15.4905468 ETH</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Price</span>
+                <strong class="summery-txt">15.4905468 ETH</strong>
               </div>
 
-              <div className="d-flex expired">
-                <div class="card-txt-left">Limit</div>
-                <div class="card-txt">0.1-0.6 BTC</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Limit</span>
+                <strong class="summery-txt">0.1-0.6 BTC</strong>
               </div>
 
-              <div className="d-flex expired">
-                <div class="card-txt-left">Payment methods</div>
-                <div class="card-txt">Ethereum</div>
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Payment methods</span>
+                <strong class="summery-txt">Ethereum</strong>
               </div>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Network</div>
-                <div class="card-txt"> Binance Smart Chain</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Network</span>
+                <strong class="summery-txt"> Binance Smart Chain</strong>
               </div>
-              <div className="d-flex expired">
-                <div class="card-txt-left">Time constraints</div>
-                <div class="card-txt">09:00 AM - 00:00 AM</div>
+
+              <div className="d-flex justify-content-between align-items-center buyerDetails">
+                <span class="summery-txt-left">Time constraints</span>
+                <strong class="summery-txt">09:00 AM - 00:00 AM</strong>
               </div>
             </Card.Body>
           </Card>

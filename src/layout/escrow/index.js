@@ -72,7 +72,7 @@ export const Escrow = () => {
   const [escrows, setEscrow] = useState([]);
   const [totalEscrowCount, setTotalEscrowCount] = useState(0);
   const [escrowLoading, setEscrowLoading] = useState(true);
- console.log("escrowLoading ", escrowLoading);
+  const [loader, setLoader] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const acAddress = useSelector(userDetails);
   const userData = useSelector(userDetails);
@@ -82,42 +82,29 @@ export const Escrow = () => {
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
 
+  const [userStatuses, setUserStatuses] = useState([]);
+  
   const getAllEscrow = async () => {
     if (currentPage) {
       try {
         const res = await jwtAxios.get(
           `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
-        )
-        let escrowErr = await Promise.all(
-          res.data?.data.map(async (e) => {
-            if (e.user_address) {
-              const starCountRef = ref(
-                database,
-                firebaseMessages.CHAT_USERS + e.user_address
-              );
-              // Use await to wait for the onValue callback
-              const snapshot = await get(starCountRef);
-              if (snapshot.val()) {
-                if (snapshot.exists()) {
-                  // Return the updated object with the new key-value pair
-                  return {
-                    ...e,
-                    status: snapshot.val()?.isOnline,
-                  };
-                }
-              } else {
-                return {
-                  ...e,
-                  status: 0,
-                };
-              }
-            }
-            return e; // Return the original object if no update is needed
-          })
         );
-        setEscrow(escrowErr); // Update the state with the new array
+        setEscrow(res.data?.data); // Update the state with the new array
         setTotalEscrowCount(res.data?.escrowsCount);
         setEscrowLoading(false);
+        let statuses = await Promise.all(
+          res.data?.data.map(async (e) => {
+            const starCountRef = ref(
+              database,
+              firebaseMessages.CHAT_USERS + e.user_address
+            );
+            // Use await to wait for the onValue callback
+            const snapshot = await get(starCountRef);
+            return snapshot.exists() ? snapshot.val()?.isOnline : 0;
+          })
+        );
+        setUserStatuses(statuses);
       } catch (err) {
         setEscrowLoading(false);
         console.error(err);
@@ -126,8 +113,11 @@ export const Escrow = () => {
   };
 
   useEffect(() => {
+    setTimeout(() => {
+      setLoader(true);
       getAllEscrow();
-  }, []);
+    }, 1000);
+  }, [currentPage]);
 
   const handleChangeAny = (e) => {
     setSelectedOptionAny(e);
@@ -138,14 +128,14 @@ export const Escrow = () => {
   const handleChangeAnywhere = (e) => {
     setSelectedOptionAnywhere(e);
   };
- 
+
   const createEscrowModalToggle = () => {
-    if(acAddress.authToken) {
-    setCreateEscrowModalShow(!createEscrowModalShow);
+    if (acAddress.authToken) {
+      setCreateEscrowModalShow(!createEscrowModalShow);
     } else {
       setModalShow(true);
     }
-  }
+  };
 
   const handleAccountAddress = (address) => {
     setIsSign(false);
@@ -268,122 +258,142 @@ export const Escrow = () => {
               <div className="escrow-actions">Actions</div>
               <div className="escrow-network">Network</div>
             </div>
-            {escrowLoading ? (
-              <TableLoader />
-            ) : (
+            {loader ? (
               <>
-                {escrows?.map((escrow) => (
-                  <div
-                    className="flex-table-body escrowListBody"
-                    key={escrow?._id}
-                  >
-                    {escrow && escrow?.price_type === "fixed" && (
-                      <div className="escrow-price">
-                        {escrow?.fixed_price} USD
-                        <span>Buy Limit 0.1-0.6 BTC</span>{" "}
-                      </div>
-                    )}
-                    {escrow && escrow?.price_type === "flexible" && (
-                      <div className="escrow-price">
-                        {capitalizeFirstLetter(escrow?.price_type)}
-                        <span>Buy Limit 0.1-0.6 BTC</span>{" "}
-                      </div>
-                    )}
-                    <div className="escrow-title d-flex justify-content-center align-items-center">
-                      {escrow?.object}
-                    </div>
-                    <div className="escrow-payment d-flex justify-content-center align-items-center">
-                      <img
-                        src={require("../../content/images/ethereum.png")}
-                        alt="Gabriel  Erickson"
-                      />
-                      <span className="ms-2"> Ethereum </span>
-                    </div>
-                    <div className="escrow-time d-flex justify-content-center">
-                      {escrow?.time_constraints}
-                    </div>
-                    <div className="escrow-trader d-flex align-items-center justify-content-start">
-                      <div className="d-flex align-items-center">
-                        <div className="chat-image">
-                          <img
-                            src={
-                              escrow?.newImage
-                                ? escrow?.newImage
-                                : require("../../content/images/avatar.png")
-                            }
-                            alt={
-                              escrow?.newImage ? escrow?.newImage : "No Profile"
-                            }
-                          />
-                          {/* <span className="circle"></span> */}
-                          {(escrow?.status === 0 ||
-                            escrow?.status === false) && (
-                            <div className="chat-status-offline"></div>
-                          )}
-                          {(escrow?.status === 1 ||
-                            escrow?.status === true) && (
-                            <div className="chat-status"></div>
-                          )}
-                          {escrow?.status === 2 && (
-                            <div className="chat-status-absent"></div>
-                          )}
-                        </div>
-                        <div className="content ms-3">
-                          <h6>
-                            {escrow?.user_name ? escrow?.user_name : "John doe"}
-                          </h6>
-                          <span>(100%, 500+)</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="escrow-actions text-center d-flex justify-content-center">
-                      <div className="actions profile-action text-center">
-                        {userData &&
-                        userData?.account === escrow?.user_address ? (
-                          <Link
-                            className="action"
-                            to={`/escrow-details/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Details</Button>
-                          </Link>
-                        ) : escrow && escrow?.escrow_type === "buyer" ? (
-                          <Link
-                            className="action"
-                            to={`/escrow-buy-sell/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Sell</Button>
-                          </Link>
-                        ) : (
-                          <Link
-                            className="action"
-                            to={`/escrow-buy-sell/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Buy</Button>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                    <div className="escrow-network">Binance Smart Chain</div>
-                  </div>
-                ))}
-                {totalEscrowCount === 0 && escrowLoading === false && (
-                  <div className="flex-table-body no-records justify-content-between">
-                    <div className="no-records-text">
-                      <div className="no-record-label">No Records</div>
-                      <p>You haven't made any transaction</p>
-                    </div>
-                    <div className="actions profile-action text-center">
-                      <Button
-                        variant="primary"
-                        onClick={createEscrowModalToggle}
-                        type="button"
+                {escrowLoading ? (
+                  <TableLoader />
+                ) : (
+                  <>
+                    {escrows?.map((escrow, index) => (
+                      <div
+                        className="flex-table-body escrowListBody"
+                        key={escrow?._id}
                       >
-                        Create
-                      </Button>
-                    </div>
-                  </div>
+                        {escrow && escrow?.price_type === "fixed" && (
+                          <div className="escrow-price">
+                            {escrow?.fixed_price} USD
+                            <span>Buy Limit 0.1-0.6 BTC</span>{" "}
+                          </div>
+                        )}
+                        {escrow && escrow?.price_type === "flexible" && (
+                          <div className="escrow-price">
+                            {capitalizeFirstLetter(escrow?.price_type)}
+                            <span>Buy Limit 0.1-0.6 BTC</span>{" "}
+                          </div>
+                        )}
+                        <div className="escrow-title d-flex justify-content-center align-items-center">
+                          {escrow?.object}
+                        </div>
+                        <div className="escrow-payment d-flex justify-content-center align-items-center">
+                          <img
+                            src={require("../../content/images/ethereum.png")}
+                            alt="Gabriel  Erickson"
+                          />
+                          <span className="ms-2"> Ethereum </span>
+                        </div>
+                        <div className="escrow-time d-flex justify-content-center">
+                          {escrow?.time_constraints}
+                        </div>
+                        <div className="escrow-trader d-flex align-items-center justify-content-start">
+                          <div className="d-flex align-items-center">
+                            <div className="chat-image">
+                              <img
+                                src={
+                                  escrow?.newImage
+                                    ? escrow?.newImage
+                                    : require("../../content/images/avatar.png")
+                                }
+                                alt={
+                                  escrow?.newImage
+                                    ? escrow?.newImage
+                                    : "No Profile"
+                                }
+                              />
+                              {/* <span className="circle"></span> */}
+                              {(userStatuses[index] === 0 ||
+                                userStatuses[index] === false) && (
+                                <div className="chat-status-offline"></div>
+                              )}
+                              {(userStatuses[index] === 1 ||
+                                userStatuses[index] === true) && (
+                                <div className="chat-status"></div>
+                              )}
+                              {userStatuses[index] === 2 && (
+                                <div className="chat-status-absent"></div>
+                              )}
+                            </div>
+                            <div className="content ms-3">
+                              <h6>
+                                {escrow?.user_name
+                                  ? escrow?.user_name
+                                  : "John doe"}
+                              </h6>
+                              <span>(100%, 500+)</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="escrow-actions text-center d-flex justify-content-center">
+                          <div className="actions profile-action text-center">
+                            {userData &&
+                            userData?.account === escrow?.user_address ? (
+                              <Link
+                                className="action"
+                                to={`/escrow-details/${escrow?._id}`}
+                              >
+                                <Button variant="primary">Details</Button>
+                              </Link>
+                            ) : escrow && escrow?.escrow_type === "buyer" ? (
+                              <Link
+                                className="action"
+                                to={`/escrow-buy-sell/${escrow?._id}`}
+                              >
+                                <Button variant="primary">Sell</Button>
+                              </Link>
+                            ) : (
+                              <Link
+                                className="action"
+                                to={`/escrow-buy-sell/${escrow?._id}`}
+                              >
+                                <Button variant="primary">Buy</Button>
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                        <div className="escrow-network">
+                          Binance Smart Chain
+                        </div>
+                      </div>
+                    ))}
+                    {totalEscrowCount === 0 && escrowLoading === false && (
+                      <div className="flex-table-body no-records justify-content-between">
+                        <div className="no-records-text">
+                          <div className="no-record-label">No Records</div>
+                          <p>You haven't made any transaction</p>
+                        </div>
+                        <div className="actions profile-action text-center">
+                          <Button
+                            variant="primary"
+                            onClick={createEscrowModalToggle}
+                            type="button"
+                          >
+                            Create
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
+            ) : (
+              <div className="middenLoader">
+                <img src={require("../../content/images/logo.png")} />
+                <p>welcome</p>
+                <div class="snippet" data-title="dot-flashing">
+                  <div class="stage">
+                    <div class="dot-flashing"></div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -406,7 +416,7 @@ export const Escrow = () => {
           </div>
         </div>
       )}
-       {modalShow && (
+      {modalShow && (
         <LoginView
           show={modalShow}
           onHide={() => setModalShow(false)}
@@ -414,12 +424,10 @@ export const Escrow = () => {
           handleaccountaddress={handleAccountAddress}
         />
       )}
-
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}
       />
-      
     </div>
   );
 };
