@@ -15,7 +15,6 @@ export const convertToCrypto = createAsyncThunk(
       const res = await jwtAxios
         .post(`auth/getCryptoAmountDetails`, action)
         .then((response) => {
-            console.log(response?.data)
           return response?.data;
         });
       return res;

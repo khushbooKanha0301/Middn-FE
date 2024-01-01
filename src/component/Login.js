@@ -31,7 +31,8 @@ export const LoginView = (props) => {
   const { library, chainId, account, activate, deactivate } = useWeb3React();
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
-  const { disconnect: disonnectWalletConnect } = useDisconnect();
+  const { disconnect: disonnectWalletConnect } = useDisconnect()
+  const [loader, setLoader] = useState(true);;
 
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
@@ -40,6 +41,7 @@ export const LoginView = (props) => {
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
+ console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
@@ -347,7 +349,11 @@ export const LoginView = (props) => {
       signMessage: signMessage,
     };
     dispatch(checkAuth(checkAuthParams)).unwrap();
-    setAccountAddress(address);
+    setTimeout(() => {
+      console.log("loader----------------")
+      setLoader(false);
+      setAccountAddress(address);
+    }, 10000);
   };
 
   useEffect(() => {
@@ -371,6 +377,9 @@ export const LoginView = (props) => {
         signature: data,
       };
       dispatch(checkAuth(checkAuthParams)).unwrap();
+      setTimeout(() => {
+        setLoader(false);
+      }, 1000);
       props.onHide();
     }
   }, [data]);

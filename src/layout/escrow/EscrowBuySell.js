@@ -13,28 +13,26 @@ import { notificationFail } from "../../store/slices/notificationSlice";
 import { convertToCrypto } from "../../store/slices/currencySlice";
 
 // USD , EUR , AUD , GBP
-
 function EscrowDetails() {
   const dispatch = useDispatch();
-  const [countryCallingCode, setCountryCallingCode] = useState("");
   const [currentPre, setCurrentPre] = useState("USD");
   const [currentCurrency, setCurrentCurrencyPre] = useState("BTC");
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
   const { id } = useParams();
   const navigate = useNavigate();
-  const [typeFilter, setTypeFilter] = useState(null);
+  const [typeFilter, setTypeFilter] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
   const [cryptos, setCrypto] = useState([]);
   const optionsDropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
-
   const [amount, setAmount] = useState(0);
+  const [loaderOffer, setLoaderOffer] = useState(true);
+  const [loader, setLoader] = useState(true);
   const [readyForPayment, setReadyForPayment] = useState(true);
- 
   const { cryptoAmount } = useSelector((state) => state?.cuurencyReducer);
- 
+
   const getAllEscrow = async () => {
     try {
       const res = await jwtAxios.get(`/auth/getCryptoDetails`);
@@ -56,8 +54,7 @@ function EscrowDetails() {
       optionsDropdownRef.current &&
       !optionsDropdownRef.current.contains(event.target)
     ) {
-       setShowCurrencyOptions(false);
-      // setShowCountryOptions(false);
+      setShowCurrencyOptions(false);
       setShowOptions(false);
     }
   };
@@ -72,14 +69,6 @@ function EscrowDetails() {
     };
   }, []);
 
-  const onChange = (e) => {
-    // } else if (e.target.name === "currentPre") {
-    //   setCurrentPre(e.target.value);
-    // } else if (e.target.name === "city") {
-    //   setCity(e.target.value);
-    // }
-  };
-
   const currencyCountry = () => {
     const result = countryInfo.find(
       (item) => item.currency.code === currentPre
@@ -88,45 +77,57 @@ function EscrowDetails() {
   };
 
   const handleButtonClick = async (address) => {
-    navigate("/escrow-offer-buy", { state: { userAddress: address } });
-    const conversationRate = cryptoAmount?.amount ? cryptoAmount?.amount : "0";
+    if (!amount) {
+      dispatch(notificationFail("Please Enter Correct Amount."));
+      return false;
+    }
+    if (!typeFilter) {
+      dispatch(
+        notificationFail(
+          "Please Select I agree to Middin's escrow terms and conditions."
+        )
+      );
+      return false;
+    }
+    const conversationRate = cryptoAmount?.amount || "0";
     const reqData = {
-     amount,
-     currentPre,
-     currentCurrency,
-     conversationRate
+      user_address: address,
+      escrow_id: id,
+      amount: amount,
+      country_currency: currentPre,
+      crypto_currency: currentCurrency,
+      conversation_amount: String(conversationRate),
     };
-    // await jwtAxios
-    //   .post(`/escrows/createEscrow`, reqData)
-    //   .then((escrowResult) => {
-    //     if (escrowResult?.data?.data?.escrow_number) {
-    //       setTimeout(() => {
-    //         setLoader(true);
-    //         setEscrowNumber(escrowResult?.data?.data?.escrow_number);
-    //         dispatch(notificationSuccess(escrowResult?.data?.message));
-    //       }, 1000);
+
+    await jwtAxios
+      .post(`/trade/createTrade`, reqData)
+      .then((escrowResult) => {
+        if (escrowResult?.data?.newTrade) {
+          setTimeout(() => {
+            setLoaderOffer(false);
+            navigate("/escrow-offer-buy", { state: { userAddress: address } });
+          }, 1000);
           
-    //       setStep(step + 1);
-    //     } else {
-    //       dispatch(notificationFail("Something went wrong"));
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     if (typeof error == "string") {
-    //       dispatch(notificationFail(error));
-    //     }
-    //     if (error?.response?.data?.message === "") {
-    //       dispatch(notificationFail("Invalid "));
-    //     }
-    //     if (error?.response?.data?.message) {
-    //       dispatch(notificationFail(error?.response?.data?.message));
-    //     }
-    //   });
+        } else {
+          dispatch(notificationFail("Something went wrong"));
+        }
+      })
+      .catch((error) => {
+        if (typeof error == "string") {
+          dispatch(notificationFail(error));
+        }
+        if (error?.response?.data?.message === "") {
+          dispatch(notificationFail("Invalid "));
+        }
+        if (error?.response?.data?.message) {
+          dispatch(notificationFail(error?.response?.data?.message));
+        }
+      });
   };
 
-  const handleFilterTypeChange = (vehicle) => {
+  const handleFilterTypeChange = (value) => {
     // setTypeFilter(vehicle);
-    setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
+    setTypeFilter((prevType) => (prevType === value ? null : value));
   };
 
   useEffect(() => {
@@ -144,7 +145,7 @@ function EscrowDetails() {
     setShowOptions(!showOptions);
     setShowCurrencyOptions(false);
   };
-  
+
   const toggleCurrencyOptions = () => {
     setShowCurrencyOptions(!showCurrencyOptions);
     setShowOptions(false);
@@ -153,12 +154,13 @@ function EscrowDetails() {
   const onChangeAmount = useCallback(
     debounce((data) => {
       dispatch(convertToCrypto(data));
+      setLoader(true);
     }, 500),
     []
   );
 
   const handleChangeAmount = (value) => {
-    if (currentCurrency) {
+    if (currentCurrency && currentPre) {
       setAmount(value);
       const usdAmount = value;
       const data = {
@@ -166,7 +168,11 @@ function EscrowDetails() {
         cryptoSymbol: currentCurrency,
         cryptoCountry: currentPre,
       };
-      onChangeAmount(data);
+      setTimeout(() => {
+        setLoader(false);
+        onChangeAmount(data);
+      }, 800);
+
       if (value) {
         if (value > 0) {
           setReadyForPayment(false);
@@ -209,20 +215,12 @@ function EscrowDetails() {
               <Form.Group className="form-group">
                 <Form.Label>Amount</Form.Label>
                 <div className="d-flex align-items-center">
-                  {/* <Form.Control
-                    placeholder={countryCallingCode}
-                    name="phone"
-                    type="text"
-                    value="1"
-                    onChange={(e) => {
-                      onChange(e);
-                    }}
-                    maxLength="10"
-                  /> */}
                   <Form.Control
                     type="text"
                     placeholder="Enter Amount"
-                    onChange={(e) => handleChangeAmount(e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) =>
+                      handleChangeAmount(e.target.value.replace(/\D/g, ""))
+                    }
                     onFocus={handledAmountFocus}
                     value={amount}
                     // disabled={!selectedCrypto}
@@ -235,31 +233,6 @@ function EscrowDetails() {
                     ) : (
                       "No Flag"
                     )}
-                    {/* <p className="text-white mb-0">
-                      {
-                        countryInfo.find(
-                          (item) => item.currency.code === currentPre
-                        )?.currency.code
-                      }
-                    </p> */}
-                     {/* <Form.Select
-                      size="sm"
-                      value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
-                    >
-                      {countryInfo.map((data) => (
-                        <option
-                          value={`${data.currency.code}`}
-                          key={`${data.currency.code}`}
-                        >
-                          {data.currency?.code}
-                        </option>
-                      ))}
-                    </Form.Select> */}
-
                   </div>
                   <div className="country-select" ref={countryDropdownRef}>
                     <div
@@ -267,11 +240,8 @@ function EscrowDetails() {
                       onClick={toggleCurrencyOptions}
                     >
                       <p className="text-white mb-0">
-                        {
-                          cryptos.find(
-                            (item) => item.symbol === currentCurrency
-                          )?.symbol
-                        }
+                        {cryptos.find((item) => item.symbol === currentCurrency)
+                          ?.symbol || "BTC"}
                       </p>
                     </div>
                     {showCurrencyOptions && (
@@ -299,44 +269,48 @@ function EscrowDetails() {
               <Form.Group className="form-group">
                 <Form.Label>Conversation </Form.Label>
                 <div className="d-flex align-items-center">
-                  <Form.Control
-                    name="phone"
-                    type="text"
-                    value={cryptoAmount?.amount ? cryptoAmount?.amount : "0"}
-                    disabled
-                  />
-                 
+                  {!cryptoAmount?.amount ? (
+                    <>
+                      <Form.Control
+                        name="phone"
+                        type="text"
+                        value="0"
+                        disabled
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {loaderOffer ? (
+                        <>
+                          <Form.Control
+                            name="phone"
+                            type="text"
+                            value={
+                              cryptoAmount?.amount ? cryptoAmount?.amount : "0"
+                            }
+                            disabled
+                          />
+                        </>
+                      ) : (
+                        <div className="middenLoader">
+                          <img src={require("../../content/images/logo.png")} />
+                          <p>welcome</p>
+                          <div class="snippet" data-title="dot-flashing">
+                            <div class="stage">
+                              <div class="dot-flashing"></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
                   <div className="d-flex align-items-center">
                     <img
                       src={currencyCountry()}
                       alt="Flag"
                       className="circle-data"
                     />
-
-                    {/* <p className="text-white mb-0">
-                      {
-                        countryInfo.find(
-                          (item) => item.currency.code === currentPre
-                        )?.currency.code
-                      }
-                    </p> */}
-                    {/* <Form.Select
-                      size="sm"
-                      value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
-                    >
-                      {countryInfo.map((data) => (
-                        <option
-                          value={`${data.currency.code}`}
-                          key={`${data.currency.code}`}
-                        >
-                          {data.currency?.code}
-                        </option>
-                      ))}
-                    </Form.Select> */}
                   </div>
                   <div className="country-select" ref={optionsDropdownRef}>
                     <div
@@ -344,11 +318,9 @@ function EscrowDetails() {
                       onClick={toggleOptions}
                     >
                       <p className="text-white mb-0">
-                        {
-                          countryInfo.find(
-                            (item) => item.currency.code === currentPre
-                          )?.currency.code
-                        }
+                        {countryInfo.find(
+                          (item) => item.currency.code === currentPre
+                        )?.currency.code || "USD"}
                       </p>
                     </div>
                     {showOptions && (
@@ -357,7 +329,7 @@ function EscrowDetails() {
                           <li
                             key={`${data.currency.code}`}
                             onClick={() => {
-                              handleChangeAmount(amount)
+                              handleChangeAmount(amount);
                               setCurrentPre(data.currency.code);
                               dispatch(defineCurrency(data.currency.code));
                             }}
@@ -390,12 +362,16 @@ function EscrowDetails() {
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Amount to transfer to Middn </div>
-                <div class="limit-txt-left-amount">{cryptoAmount?.amount ? (cryptoAmount?.amount + 0.02) : "0"} BNB</div>
+                <div class="limit-txt-left-amount">
+                  {cryptoAmount?.amount ? cryptoAmount?.amount + 0.02 : "0"} BNB
+                </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Invoice Amount</div>
-                <div class="limit-txt-left">{cryptoAmount?.amount ? cryptoAmount?.amount : "0"} BNB</div>
+                <div class="limit-txt-left">
+                  {cryptoAmount?.amount ? cryptoAmount?.amount : "0"} BNB
+                </div>
               </div>
 
               <div className="d-flex main-limit">
@@ -405,29 +381,19 @@ function EscrowDetails() {
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Total</div>
-                <div class="limit-txt-left">{cryptoAmount?.amount ? (cryptoAmount?.amount + 0.02) : "0"} BNB</div>
+                <div class="limit-txt-left">
+                  {cryptoAmount?.amount ? cryptoAmount?.amount + 0.02 : "0"} BNB
+                </div>
               </div>
               <div className="d-flex main-limit">
                 <Form.Group className="custom-input-seller">
-                  {/* <div className="checkbox">
-                  <input
-                    type="checkbox"
-                    id="vehicle1"
-                    name="vehicle1"
-                    value="Bike"
-                  />
-                  <label for="vehicle1">
-                    I agree to Middin's escrow terms and conditions.
-                  </label>
-                </div> */}
-
                   <div
                     className="form-check"
-                    onClick={() => handleFilterTypeChange("Bike")}
+                    onClick={() => handleFilterTypeChange(true)}
                   >
                     <div
                       className={`form-check-input ${
-                        typeFilter === "Bike" ? "checked" : ""
+                        typeFilter === true ? "checked" : ""
                       }`}
                     />
                     <label class="form-check-label" for="vehicle1">
@@ -438,13 +404,27 @@ function EscrowDetails() {
               </div>
 
               <div className="edit-btn ">
-                  <Button className="btn btn-success btn-width" variant="success" onClick={() => handleButtonClick(escrows?.user_address)}>
-                    Submit
-                  </Button> 
-
-                {/* <Button className="btn btn-success btn-width" variant="success">
-                  Submit
-                </Button> */}
+                {loader ? (
+                  <>
+                    <Button
+                      className="btn btn-success btn-width"
+                      variant="success"
+                      onClick={() => handleButtonClick(escrows?.user_address)}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                ) : (
+                  <div className="middenLoader">
+                    <img src={require("../../content/images/logo.png")} />
+                    <p>welcome</p>
+                    <div class="snippet" data-title="dot-flashing">
+                      <div class="stage">
+                        <div class="dot-flashing"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </Col>
           </Row>

@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { database, firebaseMessages } from "../../helper/config";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
+import { useNavigate } from "react-router-dom";
+
 let PageSize = 5;
 
 function capitalizeFirstLetter(str) {
@@ -77,6 +79,7 @@ export const Escrow = () => {
   const acAddress = useSelector(userDetails);
   const userData = useSelector(userDetails);
   const [isSign, setIsSign] = useState(null);
+  const navigate = useNavigate();
 
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
@@ -140,6 +143,22 @@ export const Escrow = () => {
   const handleAccountAddress = (address) => {
     setIsSign(false);
   };
+
+  const onSellerClick = (escrow_id) => {
+    if (acAddress.authToken) {
+      navigate(`/escrow-seller/${escrow_id}`);
+    } else {
+      setModalShow(true);
+    }
+  }
+
+  const onBuyerClick = (escrow_id) => {
+    if (acAddress.authToken) {
+      navigate(`/escrow-buyer/${escrow_id}`);
+    } else {
+      setModalShow(true);
+    }
+  }
 
   return (
     <div className="escrow-view">
@@ -343,19 +362,21 @@ export const Escrow = () => {
                                 <Button variant="primary">Details</Button>
                               </Link>
                             ) : escrow && escrow?.escrow_type === "buyer" ? (
-                              <Link
-                                className="action"
-                                to={`/escrow-buy-sell/${escrow?._id}`}
-                              >
-                                <Button variant="primary">Sell</Button>
-                              </Link>
+                              <Button variant="primary" onClick={() => {onSellerClick(escrow?._id)}} >Sell</Button>
+                              // <Link
+                              //   className="action"
+                              //   to={`/escrow-buy-sell/${escrow?._id}`}
+                              // >
+                              //   <Button variant="primary">Sell</Button>
+                              // </Link>
                             ) : (
-                              <Link
-                                className="action"
-                                to={`/escrow-buy-sell/${escrow?._id}`}
-                              >
-                                <Button variant="primary">Buy</Button>
-                              </Link>
+                              <Button variant="primary" onClick={() => {onBuyerClick(escrow?._id)}} >Buy</Button>
+                              // <Link
+                              //   className="action"
+                              //   to={`/escrow-buy-sell/${escrow?._id}`}
+                              // >
+                              //   <Button variant="primary">Buy</Button>
+                              // </Link>
                             )}
                           </div>
                         </div>
