@@ -7,8 +7,8 @@ import {
 } from "./config";
 
 import {
-  firebaseMessages
-} from "./chatMessage";
+    firebaseMessagesEscrow
+} from "./configEscrow";
 
 // function setFirebaseChatage(
 export const setFirebaseChatMessage = async (
@@ -23,10 +23,10 @@ export const setFirebaseChatMessage = async (
 ) => {
   // firebase database successfully inserted record callback
   var childKey =
-  firebaseMessages.CHAT_ROOM +
+  firebaseMessagesEscrow.CHAT_ROOM +
     firebaseRootKey +
     "/" +
-    firebaseMessages.MESSAGES +
+    firebaseMessagesEscrow.MESSAGES +
     serverTime;
   set(
     ref(database, childKey),
@@ -78,7 +78,7 @@ function convertMessageObj(
 export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   let unreadCount = 0;
   var childKey =
-  firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
+  firebaseMessagesEscrow.CHAT_ROOM + child + "/" + firebaseMessagesEscrow.UN_READ_COUNT;
   const setReciverReadCountNode = ref(database, childKey);
 
   if (setReciverReadCountNode) {
@@ -114,7 +114,7 @@ export const sendMessage = async (
 ) => {
  
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
-  get(child(ref(database), firebaseMessages.CHAT_ROOM + firebaseRootKey))
+  get(child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey))
     .then((snapshot) => {
       if (snapshot.val()) {
       } else {
@@ -164,7 +164,7 @@ export function getBase64(file) {
 export const setUnReadCountZero = async (senderID, reciverID) => {
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
   await get(
-    child(ref(database), firebaseMessages.CHAT_ROOM + firebaseRootKey)
+    child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey)
   ).then((snapshot) => {
     if (snapshot.val()) {
     } else {
@@ -173,10 +173,10 @@ export const setUnReadCountZero = async (senderID, reciverID) => {
   });
 
   var childKey =
-  firebaseMessages.CHAT_ROOM +
+  firebaseMessagesEscrow.CHAT_ROOM +
     firebaseRootKey +
     "/" +
-    firebaseMessages.UN_READ_COUNT;
+    firebaseMessagesEscrow.UN_READ_COUNT;
 
   await update(ref(database, childKey), {
     [senderID]: 0,

@@ -4,7 +4,6 @@ import jwtAxios from "../../service/jwtAxios";
 import { countryInfo } from "../accountSetting/countryData";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { defineCurrency } from "../../store/slices/countrySettingSlice";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import Swal from "sweetalert2/src/sweetalert2.js";
 import { useSelector } from "react-redux";
@@ -19,6 +18,7 @@ function EscrowDetails() {
   const [editEscrowModalShow, setEditEscrowModalShow] = useState(false);
   const [escrows, setEscrow] = useState(null);
   const [typeFilter, setTypeFilter] = useState(null);
+  const [loader, setLoader] = useState(true);
   const acAddress = useSelector(userDetails);
   const navigate = useNavigate();
   const { id } = useParams();

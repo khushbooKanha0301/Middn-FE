@@ -1,4 +1,3 @@
-import { onValue, ref } from "firebase/database";
 import Picker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { Card, Col, Row, Button, Form } from "react-bootstrap";
@@ -7,9 +6,9 @@ import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import { LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
-import { converImageToBase64, sendMessage } from "../../helper/firebaseConfig";
-import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
-import { messageTypes, database, firebaseMessages } from "../../helper/config";
+import { converImageToBase64, sendMessage } from "../../helper/firebaseConfigEscrow";
+import { userGetFullDetails } from "../../store/slices/AuthSlice";
+import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useLocation } from "react-router-dom";
 

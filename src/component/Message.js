@@ -3,12 +3,8 @@ import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-
-import {
-  database,
-  firebaseMessages,
-  messageTypes,
-} from "./../helper/config";
+import { database, messageTypes } from "./../helper/config";
+import { firebaseMessages } from "./../helper/chatMessage";
 import { sendMessage } from "./../helper/firebaseConfig";
 import { userGetFullDetails } from "../store/slices/AuthSlice";
 import {

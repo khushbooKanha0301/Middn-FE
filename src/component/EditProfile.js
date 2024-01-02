@@ -25,7 +25,9 @@ import {
   get,
   child,
 } from "firebase/database";
-import { database, firebaseMessages } from "./../helper/config";
+import { database } from "./../helper/config";
+import { firebaseMessages } from "./../helper/chatMessage";
+
 import {
   converImageToBase64,
 } from "./../helper/firebaseConfig";

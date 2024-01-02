@@ -6,10 +6,13 @@ import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
 import {
   database,
-  firebaseMessages,
   generateFirebaseChatRootKey
 } from "../../helper/config";
-import { setUnReadCountZero } from "../../helper/firebaseConfig";
+
+import {
+  firebaseMessagesEscrow
+} from "../../helper/configEscrow";
+import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 //const CHAT_ROOM = "chat/escrow_room/";
 
@@ -28,7 +31,7 @@ export const MessageList = (props) => {
         ReciverId
       );
       await get(
-        child(ref(database), firebaseMessages.CHAT_ROOM + firebaseRootKey)
+        child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey)
       ).then((snapshot) => {
         if (snapshot.val()) {
         } else {
@@ -40,10 +43,10 @@ export const MessageList = (props) => {
       });
 
       var childKey =
-      firebaseMessages.CHAT_ROOM +
+      firebaseMessagesEscrow.CHAT_ROOM +
         firebaseRootKey +
         "/" +
-        firebaseMessages.MESSAGES;
+        firebaseMessagesEscrow.MESSAGES;
 
       const setReciverReadCountNode = ref(database, childKey);
       if (setReciverReadCountNode) {

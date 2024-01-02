@@ -31,8 +31,9 @@ export const LoginView = (props) => {
   const { library, chainId, account, activate, deactivate } = useWeb3React();
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
-  const { disconnect: disonnectWalletConnect } = useDisconnect()
-  const [loader, setLoader] = useState(true);;
+  const { disconnect: disonnectWalletConnect } = useDisconnect();
+  const [loader, setLoader] = useState(true);
+ console.log("loader ", loader);
 
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
@@ -41,7 +42,6 @@ export const LoginView = (props) => {
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
- console.log("storageProvider ", storageProvider);
       let provider = null;
       let metaAccounts;
 
@@ -193,7 +193,16 @@ export const LoginView = (props) => {
         };
         props.setTwoFAModal(false);
         props.onHide();
-        dispatch(checkAuth(checkAuthParams)).unwrap();
+        const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
+        console.log("response ", response);
+
+        if (response.authToken) {
+          setLoader(false);
+          setTimeout(() => {
+            setLoader(true);
+            //dispatch(notificationSuccess("user login successfully"));
+          }, 10000);
+        }
       }
     };
     checkMetaAcc();
@@ -325,7 +334,7 @@ export const LoginView = (props) => {
   const fortmatic = async () => {
     const fm = await new Fortmatic(apiConfig.FORTMATIC_KEY);
     window.web3 = await new Web3(fm.getProvider());
-    await window.web3.eth.getAccounts((error, accounts) => {
+    await window.web3.eth.getAccounts(async (error, accounts) => {
       if (error) {
         throw error;
       }
@@ -335,7 +344,16 @@ export const LoginView = (props) => {
         checkValue: checkValue,
       };
 
-      dispatch(checkAuth(checkAuthParams)).unwrap();
+      const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
+
+      if (response.authToken) {
+        setLoader(false);
+        //dispatch(notificationSuccess("user login successfully"))
+        setTimeout(() => {
+          setLoader(true);
+          dispatch(notificationSuccess("user login successfully"));
+        }, 2000);
+      }
       props.onHide();
       setAccountAddress(accounts[0]);
     });
@@ -348,12 +366,17 @@ export const LoginView = (props) => {
       checkValue: checkValue,
       signMessage: signMessage,
     };
-    dispatch(checkAuth(checkAuthParams)).unwrap();
-    setTimeout(() => {
-      console.log("loader----------------")
+    const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
+
+    if (response.authToken) {
       setLoader(false);
-      setAccountAddress(address);
-    }, 10000);
+      //dispatch(notificationSuccess("user login successfully"))
+      setTimeout(() => {
+        setLoader(true);
+        dispatch(notificationSuccess("user login successfully"));
+      }, 6000);
+    }
+    setAccountAddress(address);
   };
 
   useEffect(() => {
@@ -370,18 +393,34 @@ export const LoginView = (props) => {
   }, [isConnected, userData?.account]);
 
   useEffect(() => {
-    if (data) {
-      let checkAuthParams = {
-        account: address,
-        checkValue: checkValue,
-        signature: data,
-      };
-      dispatch(checkAuth(checkAuthParams)).unwrap();
-      setTimeout(() => {
-        setLoader(false);
-      }, 1000);
-      props.onHide();
-    }
+    const fetchData = async () => {
+      if (data) {
+        try {
+          let checkAuthParams = {
+            account: address,
+            checkValue: checkValue,
+            signature: data,
+          };
+          props.onHide();
+          const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
+
+          // Your additional logic here based on the response
+          if (response.authToken) {
+            setLoader(false);
+            //dispatch(notificationSuccess("user login successfully"))
+            setTimeout(() => {
+              setLoader(true);
+              dispatch(notificationSuccess("user login successfully"));
+            }, 2000);
+          }
+        } catch (error) {
+          // Handle errors if necessary
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
+    fetchData(); // Immediately invoke the async function
   }, [data]);
 
   useEffect(() => {
@@ -487,26 +526,40 @@ export const LoginView = (props) => {
 
   return (
     <>
-      {props.show && (
-        <Modal
-          {...props}
-          dialogClassName="login-modal"
-          backdropClassName="login-modal-backdrop"
-          aria-labelledby="contained-modal"
-          backdrop="static"
-          keyboard={false}
-          centered
-        >
-          <Modal.Body>
-            <h4>Connect Wallet</h4>
-            <p>
-              Connect with one of our available wallet providers or create a new
-              one.
-            </p>
-            <Form onSubmit={submitHandler}>
-              <Row>
-                <Col md="6">
-                  {/* <Form.Check
+      {!loader ? (
+        <>
+          <div className="middenLoader calling">
+            <img src={require("../content/images/logo.png")} />
+            <p>welcome</p>
+            <div class="snippet" data-title="dot-flashing">
+              <div class="stage">
+                <div class="dot-flashing"></div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {props.show && (
+            <Modal
+              {...props}
+              dialogClassName="login-modal"
+              backdropClassName="login-modal-backdrop"
+              aria-labelledby="contained-modal"
+              backdrop="static"
+              keyboard={false}
+              centered
+            >
+              <Modal.Body>
+                <h4>Connect Wallet</h4>
+                <p>
+                  Connect with one of our available wallet providers or create a
+                  new one.
+                </p>
+                <Form onSubmit={submitHandler}>
+                  <Row>
+                    <Col md="6">
+                      {/* <Form.Check
                     className="login-option"
                     label={
                       <>
@@ -523,28 +576,28 @@ export const LoginView = (props) => {
                     value={"wallet_connect"}
                     onChange={onChange}
                   /> */}
-                   <div
-                    className="login-option form-check"
-                    onClick={() => onChange("wallet_connect")}
-                  >
-                    <div
-                      className={`form-check-input ${
-                        checkValue === "wallet_connect" ? "checked" : ""
-                      }`}
-                    />
-                    <label class="form-check-label">
-                      <>
-                        <img
-                          src={require("../content/images/wallet-connect.png")}
-                          alt="WalletConnect"
-                        />{" "}
-                        WalletConnect
-                      </>
-                    </label>
-                  </div>
-                </Col>
-                <Col md="6">
-                  {/* <Form.Check
+                      <div
+                        className="login-option form-check"
+                        onClick={() => onChange("wallet_connect")}
+                      >
+                        <div
+                          className={`form-check-input ${
+                            checkValue === "wallet_connect" ? "checked" : ""
+                          }`}
+                        />
+                        <label class="form-check-label">
+                          <>
+                            <img
+                              src={require("../content/images/wallet-connect.png")}
+                              alt="WalletConnect"
+                            />{" "}
+                            WalletConnect
+                          </>
+                        </label>
+                      </div>
+                    </Col>
+                    <Col md="6">
+                      {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -561,30 +614,30 @@ export const LoginView = (props) => {
                     id="loginoption2"
                     onChange={onChange}
                   /> */}
-                  <div
-                    className="login-option form-check"
-                    onClick={() => onChange("meta_mask")}
-                  >
-                    <div
-                      className={`form-check-input ${
-                        checkValue === "meta_mask" ? "checked" : ""
-                      }`}
-                    />
-                    <label class="form-check-label">
-                      <>
-                        <span>
-                          <img
-                            src={require("../content/images/metamask.png")}
-                            alt="Metamask"
-                          />{" "}
-                          Metamask
-                        </span>
-                      </>
-                    </label>
-                  </div>
-                </Col>
-                <Col md="6">
-                  {/* <Form.Check
+                      <div
+                        className="login-option form-check"
+                        onClick={() => onChange("meta_mask")}
+                      >
+                        <div
+                          className={`form-check-input ${
+                            checkValue === "meta_mask" ? "checked" : ""
+                          }`}
+                        />
+                        <label class="form-check-label">
+                          <>
+                            <span>
+                              <img
+                                src={require("../content/images/metamask.png")}
+                                alt="Metamask"
+                              />{" "}
+                              Metamask
+                            </span>
+                          </>
+                        </label>
+                      </div>
+                    </Col>
+                    <Col md="6">
+                      {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -602,30 +655,30 @@ export const LoginView = (props) => {
                     id="loginoption3"
                   /> */}
 
-                  <div
-                    className="login-option form-check"
-                    onClick={() => onChange("coinbase_wallet")}
-                  >
-                    <div
-                      className={`form-check-input ${
-                        checkValue === "coinbase_wallet" ? "checked" : ""
-                      }`}
-                    />
-                    <label class="form-check-label">
-                      <>
-                        <span>
-                          <img
-                            src={require("../content/images/coinbase-wallet.png")}
-                            alt="Coinbase Wallet"
-                          />{" "}
-                          Coinbase Wallet
-                        </span>
-                      </>
-                    </label>
-                  </div>
-                </Col>
-                <Col md="6">
-                  {/* <Form.Check
+                      <div
+                        className="login-option form-check"
+                        onClick={() => onChange("coinbase_wallet")}
+                      >
+                        <div
+                          className={`form-check-input ${
+                            checkValue === "coinbase_wallet" ? "checked" : ""
+                          }`}
+                        />
+                        <label class="form-check-label">
+                          <>
+                            <span>
+                              <img
+                                src={require("../content/images/coinbase-wallet.png")}
+                                alt="Coinbase Wallet"
+                              />{" "}
+                              Coinbase Wallet
+                            </span>
+                          </>
+                        </label>
+                      </div>
+                    </Col>
+                    <Col md="6">
+                      {/* <Form.Check
                     className="login-option"
                     label={
                       <span>
@@ -642,40 +695,46 @@ export const LoginView = (props) => {
                     type="radio"
                     id="loginoption4"
                   /> */}
-                  <div
-                    className="login-option form-check"
-                    onClick={() => onChange("fortmatic")}
-                  >
-                    <div
-                      className={`form-check-input ${
-                        checkValue === "fortmatic" ? "checked" : ""
-                      }`}
-                    />
-                    <label class="form-check-label">
-                      <>
-                        <span>
-                          <img
-                            src={require("../content/images/fortmatic.png")}
-                            alt="Fortmatic"
-                          />{" "}
-                          Fortmatic
-                        </span>
-                      </>
-                    </label>
+                      <div
+                        className="login-option form-check"
+                        onClick={() => onChange("fortmatic")}
+                      >
+                        <div
+                          className={`form-check-input ${
+                            checkValue === "fortmatic" ? "checked" : ""
+                          }`}
+                        />
+                        <label class="form-check-label">
+                          <>
+                            <span>
+                              <img
+                                src={require("../content/images/fortmatic.png")}
+                                alt="Fortmatic"
+                              />{" "}
+                              Fortmatic
+                            </span>
+                          </>
+                        </label>
+                      </div>
+                    </Col>
+                  </Row>
+                  <div className="form-action-group">
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      disabled={!checkValue}
+                    >
+                      Connect Wallet
+                    </Button>
+                    <Button variant="secondary" onClick={cancelButtonHandler}>
+                      Cancel
+                    </Button>
                   </div>
-                </Col>
-              </Row>
-              <div className="form-action-group">
-                <Button variant="primary" type="submit" disabled={!checkValue}>
-                  Connect Wallet
-                </Button>
-                <Button variant="secondary" onClick={cancelButtonHandler}>
-                  Cancel
-                </Button>
-              </div>
-            </Form>
-          </Modal.Body>
-        </Modal>
+                </Form>
+              </Modal.Body>
+            </Modal>
+          )}
+        </>
       )}
     </>
   );

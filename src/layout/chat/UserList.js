@@ -5,7 +5,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { useDispatch, useSelector } from "react-redux";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
-import { database, firebaseMessages } from "../../helper/config";
+import { database } from "../../helper/config";
+import { firebaseMessages } from "../../helper/chatMessage";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 //const CHAT_ROOM = "chat/chat_room/";
 

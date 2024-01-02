@@ -34,7 +34,8 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { child, get, ref, update } from "firebase/database";
-import { database, firebaseMessages } from "./helper/config";
+import { database } from "./helper/config";
+import { firebaseMessages } from "./helper/chatMessage";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";

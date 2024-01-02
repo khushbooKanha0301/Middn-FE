@@ -1,13 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
-export const firebaseMessages = {
-  CHAT_ROOM: "chat/chat_room/",
-  CHAT_USERS: "chat/users/",
-  MESSAGES: "messages/",
-  UN_READ_COUNT: "unreadcount",
-};
-
 export const messageTypes = {
   TEXT: "text",
   ATTACHMENT: "attachment",

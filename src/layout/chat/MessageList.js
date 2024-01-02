@@ -6,9 +6,11 @@ import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
 import {
   database,
-  firebaseMessages,
   generateFirebaseChatRootKey
 } from "../../helper/config";
+
+import { firebaseMessages } from "../../helper/chatMessage";
+
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 

@@ -9,7 +9,8 @@ import PaginationComponent from "../../component/Pagination";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { Link } from "react-router-dom";
-import { database, firebaseMessages } from "../../helper/config";
+import { database } from "../../helper/config";
+import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
 import { useNavigate } from "react-router-dom";
@@ -100,7 +101,7 @@ export const Escrow = () => {
           res.data?.data.map(async (e) => {
             const starCountRef = ref(
               database,
-              firebaseMessages.CHAT_USERS + e.user_address
+              firebaseMessagesEscrow.CHAT_USERS + e.user_address
             );
             // Use await to wait for the onValue callback
             const snapshot = await get(starCountRef);

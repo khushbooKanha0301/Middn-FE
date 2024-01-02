@@ -8,7 +8,8 @@ import { notificationFail, notificationSuccess } from "./notificationSlice";
 import axios from "axios";
 import apiConfigs from "../../config/config";
 import listData from "../../layout/accountSetting/countryData";
-import { database, firebaseMessages } from "../../helper/config";
+import { database } from "../../helper/config";
+import { firebaseMessages } from "../../helper/chatMessage";
 import { child, get, ref, set, update } from "firebase/database";
 
 const authTokenData = JSON.parse(window?.localStorage?.getItem("userData"))
@@ -158,7 +159,8 @@ export const checkAuth = createAsyncThunk(
               undefined ||
             verifyTokenData.data?.userInfo?.is_2FA_login_verified === true
           ) {
-            dispatch(notificationSuccess("user login successfully"));
+            //dispatch(notificationSuccess("user login successfully"));
+            return userData;
           }
 
           return userData;

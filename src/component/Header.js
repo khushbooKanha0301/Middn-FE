@@ -5,7 +5,9 @@ import { userDetails, userGetFullDetails } from "../store/slices/AuthSlice";
 import { onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { database, firebaseMessages } from "./../helper/config";
+import { database } from "./../helper/config";
+import { firebaseMessages } from "./../helper/chatMessage";
+
 import { hideAddress } from "../utils";
 import LoginView from "../component/Login";
 import {
