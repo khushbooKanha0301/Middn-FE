@@ -28,6 +28,7 @@ export const setFirebaseChatMessage = async (
     "/" +
     firebaseMessages.MESSAGES +
     serverTime;
+    console.log("childKey ", childKey);
   set(
     ref(database, childKey),
     convertMessageObj(
@@ -62,6 +63,7 @@ function convertMessageObj(
       reciverID: reciverID,
       file: file,
     };
+    console.log("99999999", firebaseInsertRecordObject)
     return firebaseInsertRecordObject;
   } else {
     var firebaseInsertRecordObject = {
@@ -79,7 +81,9 @@ export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   let unreadCount = 0;
   var childKey =
   firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
+  console.log("childKey ", childKey);
   const setReciverReadCountNode = ref(database, childKey);
+ console.log("setReciverReadCountNode ", setReciverReadCountNode);
 
   if (setReciverReadCountNode) {
     onValue(
@@ -114,16 +118,20 @@ export const sendMessage = async (
 ) => {
  
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
+ console.log("firebaseRootKey ", firebaseRootKey);
   get(child(ref(database), firebaseMessages.CHAT_ROOM + firebaseRootKey))
     .then((snapshot) => {
       if (snapshot.val()) {
       } else {
         firebaseRootKey = generateFirebaseChatRootKey(reciverID, senderID);
+ console.log("firebaseRootKey ", firebaseRootKey);
       }
 
       fetch("https://worldtimeapi.org/api/ip")
         .then((response) => response.json())
         .then((data) => {
+          console.log("caling");
+
           setFirebaseChatMessage(
             moment(data.datetime).utc().format("X"),
             message,

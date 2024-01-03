@@ -27,6 +27,7 @@ export const Chat = () => {
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
   const [ReciverId, setReciverId] = useState(null);
+ console.log("setReciverId ", ReciverId);
 
   var scrollBottom = document.getElementById("scrollBottom");
 
@@ -120,6 +121,7 @@ export const Chat = () => {
       setShowSmily(false);
     }
   };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
@@ -190,13 +192,13 @@ export const Chat = () => {
     if (messageText !== "" || messageFile !== "" || !file) {
       if (
         userDetailsAll?.wallet_address &&
-        receiverData?.wallet_address &&
+        receiverData?.id &&
         noError == true
       ) {
         sendMessage(
           messageText,
           userDetailsAll?.wallet_address,
-          receiverData?.wallet_address,
+          receiverData?.id,
           messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
           file
         );
@@ -235,7 +237,7 @@ export const Chat = () => {
                   </Card.Title>
                   <p className="text-white">
                     {receiverData &&
-                      `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
+                      `${receiverData?.fname_alias || "John"}  ${receiverData?.lname_alias || "Doe"}`}
                   </p>
                 </div>
                 <div className="chat-box-list">
