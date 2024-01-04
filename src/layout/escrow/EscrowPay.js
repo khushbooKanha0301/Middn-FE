@@ -1,4 +1,5 @@
 import Picker from "emoji-picker-react";
+import { get, ref, set, update} from "firebase/database";
 import { useEffect, useRef, useState } from "react";
 import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,17 +12,22 @@ import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useLocation } from "react-router-dom";
+import { database } from "../../helper/config";
+import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import jwtAxios from "../../service/jwtAxios";
 //const CHAT_ROOM = "chat/escrow_room/";
 export const EscrowPay = () => {
   const location = useLocation();
   const { state } = location;
+  const dbRef = ref(database);
 
   const receiverAddress = state?.userAddress;
+ console.log("receiverAddress ", receiverAddress);
 
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
-
+ 
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
 
@@ -171,6 +177,9 @@ export const EscrowPay = () => {
         receiverAddress &&
         noError == true
       ) {
+        await addUserInFirebase(userDetailsAll?.wallet_address);
+        await addUserInFirebase(receiverAddress);
+
         sendMessage(
           //CHAT_ROOM,
           messageText,
@@ -186,6 +195,44 @@ export const EscrowPay = () => {
         ///token check
       }
     }
+  };
+
+
+  const addUserInFirebase = (address) => {
+    jwtAxios
+    .get(`/users/getUserByAddress/${address}`)
+    .then((res) => {
+      const user = res.data?.data
+      
+      const userRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + user.wallet_address);
+      get(userRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          // User exists, update the data
+          update(userRef, {
+            fname_alias: user.fname_alias,
+            lname_alias: user.lname_alias,
+            imageUrl: user?.imageUrl ? user?.imageUrl : "",
+          });
+        } else {
+          // User doesn't exist, add new data
+          set(userRef, {
+            wallet_address: user?.wallet_address,
+            fname_alias: user.fname_alias,
+            lname_alias: user.lname_alias,
+            imageUrl: user?.imageUrl ? user?.imageUrl : "",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding/updating user in Firebase:", error);
+        dispatch(notificationFail("Something went wrong!"));
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    
   };
 
   return (

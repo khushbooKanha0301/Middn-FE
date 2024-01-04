@@ -17,16 +17,14 @@ import {
   notificationSuccess,
 } from "../store/slices/notificationSlice";
 import {
-  getDatabase,
   ref,
-  set,
-  onValue,
   update,
   get,
   child,
 } from "firebase/database";
 import { database } from "./../helper/config";
 import { firebaseMessages } from "./../helper/chatMessage";
+import { firebaseMessagesEscrow } from "./../helper/configEscrow";
 
 import {
   converImageToBase64,
@@ -160,21 +158,33 @@ export const EditProfileView = (props) => {
             if (lname) {
               updateArr.lname_alias = lname;
             }
-
-            const dbRef = ref(database);
-            get(
-              child(dbRef, firebaseMessages?.CHAT_USERS + userData?.account)
-            ).then((snapshot) => {
-              const data = snapshot.val();
-              if (snapshot.exists()) {
+            const userRef = ref(database, firebaseMessages?.CHAT_USERS + userData?.account);
+            const userEscrowRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + userData?.account);
+          
+            await get(userRef)
+            .then((snapshot) => {
+               if (snapshot.exists()) {
                 update(
-                  ref(
-                    database,
-                    firebaseMessages.CHAT_USERS + userData?.account
-                  ),
+                  userRef,
                   updateArr
                 );
-              }
+              } 
+            })
+            .catch((error) => {
+              dispatch(notificationFail("Something went wrong!"));
+            });
+
+            await get(userEscrowRef)
+            .then((snapshot) => {
+               if (snapshot.exists()) {
+                update(
+                  userEscrowRef,
+                  updateArr
+                );
+              } 
+            })
+            .catch((error) => {
+              dispatch(notificationFail("Something went wrong!"));
             });
 
             dispatch(notificationSuccess(response?.data.message));
@@ -193,6 +203,7 @@ export const EditProfileView = (props) => {
         });
     }
   };
+
 
   useEffect(() => {
     if (isLoading) {

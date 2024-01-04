@@ -22,7 +22,7 @@ export const MessageList = (props) => {
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
-  const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
+  const receiverData = useSelector((state) => state.chatEscrowReducer?.MessageUser);
 
   const mainFunction = async () => {
     if (userData?.account) {

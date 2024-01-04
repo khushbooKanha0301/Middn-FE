@@ -181,11 +181,11 @@ export const App = () => {
         });
       };
 
-      window.addEventListener("beforeunload", updateOffline);
-      window.addEventListener("mousemove", updateLastActive);
-      window.addEventListener("keydown", updateLastActive);
-      window.addEventListener("scroll", updateLastActive);
-      window.addEventListener("click", updateLastActive);
+      // window.addEventListener("beforeunload", updateOffline);
+      // window.addEventListener("mousemove", updateLastActive);
+      // window.addEventListener("keydown", updateLastActive);
+      // window.addEventListener("scroll", updateLastActive);
+      // window.addEventListener("click", updateLastActive);
 
       // Clean up the timer and event listeners when the component unmounts
       return () => {

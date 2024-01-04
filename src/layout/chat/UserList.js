@@ -14,8 +14,11 @@ export const UserList = (props) => {
   const { setLoader, setReciverId } = props;
   const dispatch = useDispatch();
   const [allusers, setAllUsers] = useState([]);
+ console.log("allusers ", allusers);
   const userData = useSelector(userDetails);
+ console.log("userData ", userData);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
+ console.log("receiverData ", receiverData);
   const usergetdata = useSelector(userGetFullDetails);
 
   const getChatUser = (user) => {
@@ -26,7 +29,8 @@ export const UserList = (props) => {
       setUnReadCountZero(userData?.account, user?.id);
       //setUnReadCountZero(CHAT_ROOM, userData?.account, user?.id);
     }
-  };
+  }
+
   useEffect(() => {
     if (receiverData) {
       const latestChanges = allusers.filter(function (e) {
@@ -49,15 +53,20 @@ export const UserList = (props) => {
   }, [userData.authToken]);
 
   const getAllFirebaseUser = (userIds) => {
+    console.log("userIds ", userIds);
     if (userIds) {
       const starCountRef = ref(database, firebaseMessages.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
         if (snapshot && snapshot.val()) {
+         
+          console.log("========",Object.keys(snapshot.val()));
           let rootKey = Object.keys(snapshot.val())
             .filter(function (item) {
+ console.log("item ", item);
               return (
                 item !== userData?.account &&
                 userIds.find(function (ele) {
+ console.log("ele ", ele);
                   return ele.id === item;
                 })
               );

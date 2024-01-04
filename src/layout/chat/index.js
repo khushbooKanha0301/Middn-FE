@@ -26,6 +26,7 @@ export const Chat = () => {
   const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
+ console.log("receiverData ", receiverData);
   const [ReciverId, setReciverId] = useState(null);
  console.log("setReciverId ", ReciverId);
 

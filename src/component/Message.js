@@ -25,25 +25,25 @@ export const MessageView = (props) => {
   };
 
   const addUserInFirebase = (user) => {
-    get(child(dbRef, firebaseMessages?.CHAT_USERS + user.wallet_address))
-      .then((snapshot) => {
-        const data = snapshot.val();
-        if (snapshot.exists()) {
-        } else {
-          set(
-            ref(database, firebaseMessages?.CHAT_USERS + user.wallet_address),
-            {
-              wallet_address: user?.wallet_address,
-              fname_alias: user.fname_alias,
-              lname_alias: user.lname_alias,
-              imageUrl: user?.imageUrl ? user?.imageUrl : "",
-            }
-          );
-        }
-      })
-      .catch((error) => {
-        dispatch(notificationFail("Something went Wrong !"));
-      });
+    const userRef = ref(database, firebaseMessages?.CHAT_USERS + user.wallet_address);
+    get(userRef)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        // User exists, update the data
+      } else {
+        // User doesn't exist, add new data
+        set(userRef, {
+          wallet_address: user?.wallet_address,
+          fname_alias: user.fname_alias || "John",
+          lname_alias: user.lname_alias || "Doe",
+          imageUrl: user?.imageUrl ? user?.imageUrl : "",
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error adding/updating user in Firebase:", error);
+      dispatch(notificationFail("Something went wrong!"));
+    });
   };
 
   const onSubmit = async () => {

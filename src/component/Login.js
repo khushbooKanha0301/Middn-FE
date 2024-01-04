@@ -33,7 +33,6 @@ export const LoginView = (props) => {
   const { connect, connectors: wagmiConnector } = useConnect();
   const { disconnect: disonnectWalletConnect } = useDisconnect();
   const [loader, setLoader] = useState(true);
- console.log("loader ", loader);
 
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
@@ -194,8 +193,7 @@ export const LoginView = (props) => {
         props.setTwoFAModal(false);
         props.onHide();
         const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
-        console.log("response ", response);
-
+       
         if (response.authToken) {
           setLoader(false);
           setTimeout(() => {

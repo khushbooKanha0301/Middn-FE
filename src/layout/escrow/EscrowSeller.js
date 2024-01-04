@@ -17,10 +17,12 @@ export const EscrowSeller = () => {
   const { state } = location;
 
   const receiverAddress = state?.userAddress;
+ console.log("receiverAddress ", receiverAddress);
 
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
+ console.log("userDetailsAll ", userDetailsAll);
 
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
@@ -114,6 +116,7 @@ export const EscrowSeller = () => {
     e.preventDefault();
 
     const messageText = e.target.elements?.content.value;
+ console.log("messageText ", messageText);
     let noError = true;
     const array_of_allowed_files = [
       "jpg",

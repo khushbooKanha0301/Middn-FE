@@ -5,6 +5,7 @@ import commonReducer from "./slices/commonSlice";
 import countrySlice from "./slices/countrySettingSlice";
 import notificationReducer from "./slices/notificationSlice";
 import cuurencyReducer from "./slices/currencySlice";
+import chatEscrowReducer from "./slices/chatEscrowSlice";
 
 // const store = configureStore({
 //     reducer:{
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   notificationReducer,
   countrySlice,
   chatReducer,
-  cuurencyReducer
+  cuurencyReducer,
+  chatEscrowReducer
 });
 
 const store = configureStore({ reducer: rootReducer });
