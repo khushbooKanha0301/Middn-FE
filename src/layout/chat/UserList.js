@@ -16,7 +16,6 @@ export const UserList = (props) => {
   const [allusers, setAllUsers] = useState([]);
  console.log("allusers ", allusers);
   const userData = useSelector(userDetails);
- console.log("userData ", userData);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
  console.log("receiverData ", receiverData);
   const usergetdata = useSelector(userGetFullDetails);
@@ -53,20 +52,15 @@ export const UserList = (props) => {
   }, [userData.authToken]);
 
   const getAllFirebaseUser = (userIds) => {
-    console.log("userIds ", userIds);
     if (userIds) {
       const starCountRef = ref(database, firebaseMessages.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
         if (snapshot && snapshot.val()) {
-         
-          console.log("========",Object.keys(snapshot.val()));
           let rootKey = Object.keys(snapshot.val())
             .filter(function (item) {
- console.log("item ", item);
               return (
                 item !== userData?.account &&
                 userIds.find(function (ele) {
- console.log("ele ", ele);
                   return ele.id === item;
                 })
               );
@@ -155,9 +149,9 @@ export const UserList = (props) => {
 
                   <li
                     key={index}
-                    className={`${user?.id === receiverData?.wallet_address
+                    className={`${user?.id === receiverData?.id
                       ? "active"
-                      : ""
+                      : "deactive"
                       }${user?.unreadCount > 0
                         ? "unreaded-msg"
                         : ""

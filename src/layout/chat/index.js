@@ -26,9 +26,7 @@ export const Chat = () => {
   const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
- console.log("receiverData ", receiverData);
   const [ReciverId, setReciverId] = useState(null);
- console.log("setReciverId ", ReciverId);
 
   var scrollBottom = document.getElementById("scrollBottom");
 
@@ -42,9 +40,11 @@ export const Chat = () => {
       setMessageText("");
     }
   }, [ReciverId]);
+
   const smilyOpen = () => {
     setShowSmily(!showSmily);
   };
+
   const ref = useRef(null);
   const { onClickOutside } = <Picker />;
 
@@ -210,7 +210,8 @@ export const Chat = () => {
         ///token check
       }
     }
-  };
+  }
+  
   return (
     <div className="chat-view">
       {loader ? (

@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { database } from "./../helper/config";
 import { firebaseMessages } from "./../helper/chatMessage";
+import { firebaseMessagesEscrow } from "./../helper/configEscrow";
 
 import { hideAddress } from "../utils";
 import LoginView from "../component/Login";
@@ -24,6 +25,7 @@ export const Header = (props) => {
   const [position, setPosition] = useState(window.pageYOffset);
   const [visible, setVisible] = useState(true);
   const [messageCount, setMessageCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
   const acAddress = useSelector(userDetails);
   let usergetdata = useSelector(userGetFullDetails);
   const userDetailsAll = useSelector(userGetFullDetails);
@@ -42,6 +44,7 @@ export const Header = (props) => {
   useEffect(() => {
     if (acAddress.authToken) {
       findFirebaseUserList();
+      findFirebaseUserListNotification();
     }
   }, []);
 
@@ -85,6 +88,33 @@ export const Header = (props) => {
             });
 
           setMessageCount(allunreadCount.length);
+        }
+      });
+    }
+  };
+
+  const findFirebaseUserListNotification = async () => {
+    if (acAddress?.authToken) {
+      const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
+      onValue(starCountRef, (snapshot) => {
+        if (snapshot.val()) {
+          const allunreadCount = Object.keys(snapshot.val())
+            .filter((element) => {
+              return element.includes(acAddress?.account);
+            })
+            ?.filter((object) => {
+              var name = acAddress?.account;
+              return (
+                name &&
+                snapshot &&
+                snapshot.val() &&
+                snapshot.val()[object] &&
+                snapshot.val()[object]?.unreadcount &&
+                snapshot.val()[object]?.unreadcount[name] > 0
+              );
+            });
+
+            setNotificationCount(allunreadCount.length);
         }
       });
     }
@@ -134,6 +164,9 @@ export const Header = (props) => {
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/notification">
                 <BellIcon width="20" height="22" />
+                {notificationCount > 0 && (
+                  <span className="notification-badge">{notificationCount}</span>
+                )}
               </Nav.Link>
             </Nav.Item>
           </>
@@ -157,10 +190,12 @@ export const Header = (props) => {
             </Nav.Item>
             <Nav.Item as="li">
               <Nav.Link as={Link} 
-              //to="/notification" 
               to={acAddress.authToken && "/notification"}
               onClick={handleNotificationClick}>
                 <BellIcon width="20" height="22" />
+                {notificationCount > 0 && (
+                  <span className="notification-badge">{notificationCount}</span>
+                )}
               </Nav.Link>
               {modalNotifyShow && (
                 <LoginView

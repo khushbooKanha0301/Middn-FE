@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
 import { onValue, ref } from "firebase/database";
+import PerfectScrollbar from "react-perfect-scrollbar";
+import { useDispatch, useSelector } from "react-redux";
+import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
+import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
+import { database } from "../../helper/config";
+import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import {
   Col,
   Row,
@@ -17,13 +24,6 @@ import {
   SimpleTrashIcon,
   TrashIcon,
 } from "../../component/SVGIcon";
-import PerfectScrollbar from "react-perfect-scrollbar";
-import { useDispatch, useSelector } from "react-redux";
-import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
-import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
-import { database } from "../../helper/config";
-import { firebaseMessagesEscrow } from "../../helper/configEscrow";
-import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 
 export const AccountSetting = () => {
   const [loader, setLoader] = useState(false);
@@ -68,36 +68,32 @@ export const AccountSetting = () => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
         if (snapshot && snapshot.val()) {
+          
           let rootKey = Object.keys(snapshot.val())
             .filter(function (item) {
               return (
                 item !== userData?.account &&
                 userIds.find(function (ele) {
-                  return ele.id === item;
+                  return ele.senderId === item;
                 })
               );
             })
             .map((object) => {
-              console.log("object ", object);
               let finduser = userIds.find(function (ele) {
-                return ele.id === object;
+                return ele.senderId === object;
               });
-
               return {
                 ...snapshot.val()[object],
                 ...finduser,
               };
             });
-            console.log("000000", rootKey)
           const latestUser = rootKey
             .sort(function (x, y) {
               return x.lastUpdateAt - y.lastUpdateAt;
             })
             .reverse();
-
-            console.log("latestUser ", latestUser);
           setAllUsers(latestUser);
-
+ 
           setLoader(false);
         } else {
           setLoader(false);
@@ -109,7 +105,6 @@ export const AccountSetting = () => {
   const findFirebaseUserList = async () => {
     if (userData.authToken) {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
-
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
           const userIds = Object.keys(snapshot.val())
@@ -117,33 +112,44 @@ export const AccountSetting = () => {
               return element.includes(userData?.account);
             })
             .map((object) => {
-              var name = userData?.account;
-              const messages = snapshot.val()[object]?.messages;
+              let name = userData?.account;
+              const senderId = object.split("_")[1];
+              const ReciverId = object.split("_")[0];
 
-              const unreadCount = name
+              let messages = snapshot.val()[object]?.messages;
+              let unreadCount = name
                 ? snapshot.val()[object]?.unreadcount
                   ? snapshot.val()[object]?.unreadcount[name]
                   : 0
                 : 0;
 
-              const id = object
+              let id = object
                 .replace(userData?.account + "_", "")
                 .replace("_" + userData?.account, "");
+                console.log(id)
 
               let messageNode = messages[Object.keys(messages).pop()];
-              const lastUpdateAt = Object.keys(messages).pop();
-              return {
-                id: id,
-                unreadCount: unreadCount,
-                last_message:
-                  messageNode && messageNode.file
-                    ? messageNode.file?.name
-                    : messageNode.message
-                    ? messageNode.message
-                    : "",
-                lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
-              };
+              let lastUpdateAt = Object.keys(messages).pop();
+
+              if (senderId === name) {
+                return {};
+              } else if (ReciverId === name) {
+                return {
+                  id: id,
+                  senderId: senderId,
+                  ReciverId: ReciverId,
+                  unreadCount: unreadCount,
+                  last_message:
+                    messageNode && messageNode.file
+                      ? messageNode.file?.name
+                      : messageNode.message
+                      ? messageNode.message
+                      : "",
+                  lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
+                };
+              }
             });
+
           if (userIds) {
             getAllFirebaseUser(userIds);
           }
@@ -246,23 +252,17 @@ export const AccountSetting = () => {
             </Accordion>
           </div>
 
-          <Col
-            lg="9"
-            className={`${receiverData !== null ? "hide-mobile" : ""}`}
-          >
-            <Card className="cards-dark">
+          <div className={`${receiverData !== null ? "hide-mobile" : ""}`}>
+            <Card className="cards-dark messageEscrow">
               <Card.Body>
-                <Card.Title as="h2">Messages</Card.Title>
+                <Card.Title as="h2"> Escrow Messages</Card.Title>
                 <ul className="chat-list alluser-chat">
                   <PerfectScrollbar options={{ suppressScrollX: true }}>
                     {allusers &&
                       allusers?.map((user, index) => (
                         <li
                           key={index}
-                          className={`${
-                            user?.id === receiverData?.wallet_address
-                              ? "active"
-                              : ""
+                          className={`active
                           }${user?.unreadCount > 0 ? "unreaded-msg" : ""}`}
                           onClick={() => getChatUser(user)}
                         >
@@ -319,7 +319,7 @@ export const AccountSetting = () => {
                 </ul>
               </Card.Body>
             </Card>
-          </Col>
+          </div>
         </Col>
       </Row>
     </div>
