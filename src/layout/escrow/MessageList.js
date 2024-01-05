@@ -23,7 +23,7 @@ export const MessageList = (props) => {
   var scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatEscrowReducer?.MessageUser);
-
+ 
   const mainFunction = async () => {
     if (userData?.account) {
       let firebaseRootKey = generateFirebaseChatRootKey(
@@ -53,7 +53,7 @@ export const MessageList = (props) => {
         onValue(setReciverReadCountNode, (snapshot) => {
           if (
             ReciverId &&
-            window.location.pathname === "/escrow-offer-buy"
+            window.location.pathname === "/escrow-offer-buy" ||  window.location.pathname === `/escrow-seller/${ReciverId}`
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();
@@ -74,7 +74,7 @@ export const MessageList = (props) => {
               }
             }
           } else {
-            if (window.location.pathname !== "/chat") {
+            if (window.location.pathname !== "/escrow") {
               window.localStorage.removeItem("user")
             }
           }

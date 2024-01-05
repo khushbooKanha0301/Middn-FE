@@ -526,7 +526,7 @@ export const LoginView = (props) => {
     <>
       {!loader ? (
         <>
-          <div className="middenLoader calling">
+          <div className="middenLoader">
             <img src={require("../content/images/logo.png")} />
             <p>welcome</p>
             <div class="snippet" data-title="dot-flashing">

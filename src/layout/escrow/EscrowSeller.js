@@ -10,20 +10,14 @@ import { converImageToBase64, sendMessage } from "../../helper/firebaseConfigEsc
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export const EscrowSeller = () => {
-  const location = useLocation();
-  const { state } = location;
-
-  const receiverAddress = state?.userAddress;
- console.log("receiverAddress ", receiverAddress);
-
+  const { address } = useParams();
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
- console.log("userDetailsAll ", userDetailsAll);
-
+ 
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
 
@@ -116,7 +110,6 @@ export const EscrowSeller = () => {
     e.preventDefault();
 
     const messageText = e.target.elements?.content.value;
- console.log("messageText ", messageText);
     let noError = true;
     const array_of_allowed_files = [
       "jpg",
@@ -171,22 +164,25 @@ export const EscrowSeller = () => {
       if (
         userDetailsAll?.wallet_address &&
         //receiverData?.wallet_address &&
-        receiverAddress &&
+        address &&
         noError == true
       ) {
+        console.log("-----------", messageText,
+        userDetailsAll?.wallet_address,
+        address,
+        messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
+        file)
         sendMessage(
           //CHAT_ROOM,
           messageText,
           userDetailsAll?.wallet_address,
-          receiverAddress,
+          address,
           messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
           file
         );
         // e.target.elements.content.value = "";
         setMessageFile("");
         setMessageText("");
-      } else {
-        ///token check
       }
     }
   };
@@ -261,7 +257,7 @@ export const EscrowSeller = () => {
               <div className="chat-box-list">
                 <ul>
                   <MessageList
-                    ReciverId={receiverAddress}
+                    ReciverId={address}
                     EscrowPay={"escrow-offer"}
                   />
                   {/* {receiverData ? (

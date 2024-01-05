@@ -28,7 +28,6 @@ function EscrowDetails() {
   const optionsDropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
   const [amount, setAmount] = useState(0);
-  const [loaderOffer, setLoaderOffer] = useState(true);
   const [loader, setLoader] = useState(true);
   const [readyForPayment, setReadyForPayment] = useState(true);
   const { cryptoAmount } = useSelector((state) => state?.cuurencyReducer);
@@ -104,10 +103,9 @@ function EscrowDetails() {
       .then((escrowResult) => {
         if (escrowResult?.data?.newTrade) {
           setTimeout(() => {
-            setLoaderOffer(false);
+            setLoader(false);
             navigate("/escrow-offer-buy", { state: { userAddress: address } });
           }, 1000);
-          
         } else {
           dispatch(notificationFail("Something went wrong"));
         }
@@ -280,7 +278,7 @@ function EscrowDetails() {
                     </>
                   ) : (
                     <>
-                      {loaderOffer ? (
+                      {loader ? (
                         <>
                           <Form.Control
                             name="phone"
@@ -404,16 +402,18 @@ function EscrowDetails() {
               </div>
 
               <div className="edit-btn ">
-                {loader ? (
-                  <>
-                    <Button
-                      className="btn btn-success btn-width"
-                      variant="success"
-                      onClick={() => handleButtonClick(escrows?.user_address)}
-                    >
-                      Submit
-                    </Button>
-                  </>
+                <>
+                  <Button
+                    className="btn btn-success btn-width"
+                    variant="success"
+                    onClick={() => handleButtonClick(escrows?.user_address)}
+                  >
+                    Submit
+                  </Button>
+                </>
+
+                {/* {loader ? (
+                 
                 ) : (
                   <div className="middenLoader">
                     <img src={require("../../content/images/logo.png")} />
@@ -424,7 +424,7 @@ function EscrowDetails() {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             </Col>
           </Row>

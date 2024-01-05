@@ -2,11 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { onValue, ref } from "firebase/database";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useDispatch, useSelector } from "react-redux";
-import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
-import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
+import { userDetails } from "../../store/slices/AuthSlice";
 import { database } from "../../helper/config";
 import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
+import { useNavigate } from "react-router-dom";
 import {
   Col,
   Row,
@@ -16,7 +16,6 @@ import {
   Tooltip,
   Button,
   Accordion,
-  Form,
 } from "react-bootstrap";
 import {
   CheckIcon,
@@ -27,20 +26,15 @@ import {
 
 export const AccountSetting = () => {
   const [loader, setLoader] = useState(false);
-  const [ReciverId, setReciverId] = useState(null);
   const userRef = useRef(null);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
   const dispatch = useDispatch();
   const [allusers, setAllUsers] = useState([]);
   const userData = useSelector(userDetails);
+  const navigate = useNavigate();
 
   const getChatUser = (user) => {
-    dispatch(setIsChatEscrowPage({ user: user, isChatOpen: true }));
-    window.localStorage.setItem("user", user?.id);
-    setReciverId(user?.id);
-    if (userData?.account && user?.id) {
-      setUnReadCountZero(userData?.account, user?.id);
-    }
+    navigate(`/escrow-seller/${user.senderId}`);
   };
 
   useEffect(() => {
@@ -126,8 +120,7 @@ export const AccountSetting = () => {
               let id = object
                 .replace(userData?.account + "_", "")
                 .replace("_" + userData?.account, "");
-                console.log(id)
-
+              
               let messageNode = messages[Object.keys(messages).pop()];
               let lastUpdateAt = Object.keys(messages).pop();
 

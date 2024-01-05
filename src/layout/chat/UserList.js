@@ -14,10 +14,8 @@ export const UserList = (props) => {
   const { setLoader, setReciverId } = props;
   const dispatch = useDispatch();
   const [allusers, setAllUsers] = useState([]);
- console.log("allusers ", allusers);
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
- console.log("receiverData ", receiverData);
   const usergetdata = useSelector(userGetFullDetails);
 
   const getChatUser = (user) => {
@@ -26,7 +24,6 @@ export const UserList = (props) => {
     setReciverId(user?.id);
     if (userData?.account && user?.id) {
       setUnReadCountZero(userData?.account, user?.id);
-      //setUnReadCountZero(CHAT_ROOM, userData?.account, user?.id);
     }
   }
 

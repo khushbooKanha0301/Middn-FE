@@ -100,21 +100,35 @@ export const Header = (props) => {
         if (snapshot.val()) {
           const allunreadCount = Object.keys(snapshot.val())
             .filter((element) => {
-              return element.includes(acAddress?.account);
+                return element.includes(acAddress?.account);
             })
-            ?.filter((object) => {
-              var name = acAddress?.account;
-              return (
-                name &&
-                snapshot &&
-                snapshot.val() &&
-                snapshot.val()[object] &&
-                snapshot.val()[object]?.unreadcount &&
-                snapshot.val()[object]?.unreadcount[name] > 0
-              );
+            ?.map((object) => {
+              console.log("object ", object);
+              const ReciverId = object.split("_")[0];
+              const name = acAddress?.account;
+              if (ReciverId === name) {
+                return (
+                  name &&
+                  snapshot &&
+                  snapshot.val() &&
+                  snapshot.val()[object] &&
+                  snapshot.val()[object]?.unreadcount &&
+                  snapshot.val()[object]?.unreadcount[name] > 0
+                )
+              } 
+              return false;
+              // const name = acAddress?.account;
+            
             });
-
-            setNotificationCount(allunreadCount.length);
+           
+            if (allunreadCount.some(Boolean)) {
+              // If at least one element is true, indicating not empty
+              
+              setNotificationCount(allunreadCount.filter(Boolean).length);
+            } else {
+              // If all elements are false, indicating empty
+              setNotificationCount(0);
+            }
         }
       });
     }
@@ -175,9 +189,6 @@ export const Header = (props) => {
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/chat" onClick={handleLinkClick}>
                 <NotificationIcon width="26" height="24" />
-                {messageCount > 0 && (
-                  <span className="notification-badge">{messageCount}</span>
-                )}
               </Nav.Link>
               {modalShow && (
                 <LoginView
@@ -193,9 +204,6 @@ export const Header = (props) => {
               to={acAddress.authToken && "/notification"}
               onClick={handleNotificationClick}>
                 <BellIcon width="20" height="22" />
-                {notificationCount > 0 && (
-                  <span className="notification-badge">{notificationCount}</span>
-                )}
               </Nav.Link>
               {modalNotifyShow && (
                 <LoginView

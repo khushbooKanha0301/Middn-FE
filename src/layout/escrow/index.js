@@ -81,11 +81,9 @@ export const Escrow = () => {
   const userData = useSelector(userDetails);
   const [isSign, setIsSign] = useState(null);
   const navigate = useNavigate();
-
+  const modalToggle = () => setModalShow(!modalShow);
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-  const modalToggle = () => setModalShow(!modalShow);
-
   const [userStatuses, setUserStatuses] = useState([]);
   
   const getAllEscrow = async () => {
@@ -145,9 +143,9 @@ export const Escrow = () => {
     setIsSign(false);
   };
 
-  const onSellerClick = (escrow_id) => {
+  const onSellerClick = (user_address) => {
     if (acAddress.authToken) {
-      navigate(`/escrow-seller/${escrow_id}`);
+      navigate(`/escrow-seller/${user_address}`);
     } else {
       setModalShow(true);
     }
@@ -363,7 +361,7 @@ export const Escrow = () => {
                                 <Button variant="primary">Details</Button>
                               </Link>
                             ) : escrow && escrow?.escrow_type === "buyer" ? (
-                              <Button variant="primary" onClick={() => {onSellerClick(escrow?._id)}} >Sell</Button>
+                              <Button variant="primary" onClick={() => {onSellerClick(escrow?.user_address)}} >Sell</Button>
                               // <Link
                               //   className="action"
                               //   to={`/escrow-buy-sell/${escrow?._id}`}

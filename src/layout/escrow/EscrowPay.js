@@ -197,7 +197,6 @@ export const EscrowPay = () => {
     }
   };
 
-
   const addUserInFirebase = (address) => {
     jwtAxios
     .get(`/users/getUserByAddress/${address}`)

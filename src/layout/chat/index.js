@@ -206,9 +206,7 @@ export const Chat = () => {
         // e.target.elements.content.value = "";
         setMessageFile("");
         setMessageText("");
-      } else {
-        ///token check
-      }
+      } 
     }
   }
   

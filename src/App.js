@@ -247,7 +247,7 @@ export const App = () => {
               <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
               <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} /> 
               <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
-              <Route path="/escrow-seller/:id" element={<EscrowSeller />} />  
+              <Route path="/escrow-seller/:address" element={<EscrowSeller />} />  
               <Route
                 path="/profile/:address"
                 element={
