@@ -33,9 +33,6 @@ export const CreateEscrowView = (props) => {
   const [processTime, setProcessTime] = useState("24 Hours");
   const [showProcessTime, setShowProcessTime] = useState(false);
   const processTimes = [{ value: "24 Hours", label: "24 Hours" }];
-
-  const [loader, setLoader] = useState(false);
-  
   const countryDropdownRef = useRef(null);
   const optionsDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
@@ -209,12 +206,9 @@ export const CreateEscrowView = (props) => {
       .post(`/escrows/createEscrow`, reqData)
       .then((escrowResult) => {
         if (escrowResult?.data?.data?.escrow_number) {
-          setTimeout(() => {
-            setLoader(true);
-            setEscrowNumber(escrowResult?.data?.data?.escrow_number);
-            dispatch(notificationSuccess(escrowResult?.data?.message));
-          }, 1000);
-          
+          setEscrowNumber(escrowResult?.data?.data?.escrow_number);
+          dispatch(notificationSuccess(escrowResult?.data?.message));
+
           setStep(step + 1);
         } else {
           dispatch(notificationFail("Something went wrong"));
@@ -622,46 +616,32 @@ export const CreateEscrowView = (props) => {
         )}
         {step === 4 && (
           <>
-            {loader ? (
-              <>
-                <Modal.Header>
-                  <Modal.Title>Escrow has been created</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="pt-2">
-                  <p className="mb-4">
-                    Your secure link has been created, share it with your buyer
-                    to start trading with the decentralized escrow.
-                  </p>
-                  <Form.Group className="form-group">
-                    <Form.Label>Your Escrow Link</Form.Label>
-                    <Form.Control
-                      ref={escrowLinkRef}
-                      type="text"
-                      value={`app.middn.com/join-transaction/${escrowNumber}`}
-                      readOnly
-                    />
-                  </Form.Group>
-                  <div className="form-action-group">
-                    <Button variant="primary" onClick={copyToClipboard}>
-                      Copy link
-                    </Button>
-                    <Button variant="secondary" onClick={homeBtnHandler}>
-                      Back home
-                    </Button>
-                  </div>
-                </Modal.Body>
-              </>
-            ) : (
-              <div className="middenLoader">
-                <img src={require("../../content/images/logo.png")} />
-                <p>welcome</p>
-                <div class="snippet" data-title="dot-flashing">
-                  <div class="stage">
-                    <div class="dot-flashing"></div>
-                  </div>
-                </div>
+            <Modal.Header>
+              <Modal.Title>Escrow has been created</Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="pt-2">
+              <p className="mb-4">
+                Your secure link has been created, share it with your buyer to
+                start trading with the decentralized escrow.
+              </p>
+              <Form.Group className="form-group">
+                <Form.Label>Your Escrow Link</Form.Label>
+                <Form.Control
+                  ref={escrowLinkRef}
+                  type="text"
+                  value={`app.middn.com/join-transaction/${escrowNumber}`}
+                  readOnly
+                />
+              </Form.Group>
+              <div className="form-action-group">
+                <Button variant="primary" onClick={copyToClipboard}>
+                  Copy link
+                </Button>
+                <Button variant="secondary" onClick={homeBtnHandler}>
+                  Back home
+                </Button>
               </div>
-            )}
+            </Modal.Body>
           </>
         )}
       </Form>

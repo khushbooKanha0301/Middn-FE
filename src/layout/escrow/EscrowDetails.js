@@ -18,7 +18,6 @@ function EscrowDetails() {
   const [editEscrowModalShow, setEditEscrowModalShow] = useState(false);
   const [escrows, setEscrow] = useState(null);
   const [typeFilter, setTypeFilter] = useState(null);
-  const [loader, setLoader] = useState(true);
   const acAddress = useSelector(userDetails);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -57,14 +56,6 @@ function EscrowDetails() {
     });
   };
 
-  const onChange = (e) => {
-    // } else if (e.target.name === "currentPre") {
-    //   setCurrentPre(e.target.value);
-    // } else if (e.target.name === "city") {
-    //   setCity(e.target.value);
-    // }
-  };
-
   const currencyCountry = () => {
     const result = countryInfo.find(
       (item) => item.currency.code === currentPre
@@ -76,7 +67,6 @@ function EscrowDetails() {
     setEditEscrowModalShow(!editEscrowModalShow);
 
   const handleFilterTypeChange = (vehicle) => {
-    // setTypeFilter(vehicle);
     setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
   };
 

@@ -41,7 +41,7 @@ export const AccountSetting = () => {
   const [currentPre, setCurrentPre] = useState("USD");
   const [countryCallingCode, setCountryCallingCode] = useState("");
   const userDetailsAll = useSelector(userGetFullDetails);
-  const [loader, setLoader] = useState(true);
+  const [loaderUpdate, setLoaderUpdate] = useState(true);
   const [city, setCity] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userData = useSelector(userGetFullDetails);
@@ -71,15 +71,14 @@ export const AccountSetting = () => {
 
   useEffect(() => {
     // Add global click event listener
-    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener("click", handleGlobalClick);
 
     // Remove the event listener when the component unmounts
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
 
-  
   countryInfo.sort(function (a, b) {
     var textA = a.currency.code.toUpperCase();
     var textB = b.currency.code.toUpperCase();
@@ -116,7 +115,7 @@ export const AccountSetting = () => {
     }
 
     if (userDetailsAll) {
-      setLoader(false);
+      setLoaderUpdate(false);
     }
   }, [userDetailsAll]);
 
@@ -150,7 +149,7 @@ export const AccountSetting = () => {
     }
 
     if (userDetailsAll) {
-      setLoader(false);
+      setLoaderUpdate(false);
     }
   }, []);
 
@@ -252,24 +251,24 @@ export const AccountSetting = () => {
   };
   const toggleOptions = () => {
     setShowOptions(!showOptions);
-    setShowCountryOptions(false)
-    setShowCurrencyOptions(false)
+    setShowCountryOptions(false);
+    setShowCurrencyOptions(false);
   };
   const toggleCountryOptions = () => {
     setShowCountryOptions(!showCountryOptions);
-    setShowOptions(false)
-    setShowCurrencyOptions(false)
+    setShowOptions(false);
+    setShowCurrencyOptions(false);
   };
   const toggleCurrencyOptions = () => {
     setShowCurrencyOptions(!showCurrencyOptions);
-    setShowOptions(false)
-    setShowCountryOptions(false)
-  }
+    setShowOptions(false);
+    setShowCountryOptions(false);
+  };
 
   return (
     <div className="account-setting">
       <h1>Account Setting</h1>
-      {!loader && userDetailsAll ? (
+      {!loaderUpdate && userDetailsAll ? (
         <Row>
           <Col lg="8">
             <Card className="cards-dark mb-32">
@@ -352,7 +351,10 @@ export const AccountSetting = () => {
                             "No Flag"
                           )}
 
-                          <div className="country-select" ref={locationDropdownRef}>
+                          <div
+                            className="country-select"
+                            ref={locationDropdownRef}
+                          >
                             {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
@@ -432,7 +434,10 @@ export const AccountSetting = () => {
                                 ?.cca3
                             }
                           </p> */}
-                          <div className="country-select" ref={countryDropdownRef}>
+                          <div
+                            className="country-select"
+                            ref={countryDropdownRef}
+                          >
                             {/* <Form.Select
                               size="sm"
                               onChange={(e) => {
@@ -452,18 +457,22 @@ export const AccountSetting = () => {
                               ))}
                             </Form.Select> */}
                             <div
-                              className="dropdownPersonalData form-select form-select-sm" 
+                              className="dropdownPersonalData form-select form-select-sm"
                               onClick={toggleCountryOptions}
                             >
                               <p className="text-white mb-0 personalDataLocation">
-                              {
-                              listData.find((item) => item?.iso === country)
-                                ?.country
-                            }
+                                {
+                                  listData.find((item) => item?.iso === country)
+                                    ?.country
+                                }
                               </p>
                             </div>
                             {showCountryOptions && (
-                             <ul className={`options locationPersonalData ${userDetailsAll.location ? 'disabled' : ''}`}>
+                              <ul
+                                className={`options locationPersonalData ${
+                                  userDetailsAll.location ? "disabled" : ""
+                                }`}
+                              >
                                 {listData.map((data, key) => (
                                   <li
                                     key={`${data?.iso}`}
@@ -511,7 +520,10 @@ export const AccountSetting = () => {
                               } 
                             </p> */}
                           </div>
-                          <div className="country-select" ref={optionsDropdownRef}>
+                          <div
+                            className="country-select"
+                            ref={optionsDropdownRef}
+                          >
                             {/* <Form.Select
                               size="sm"
                               value={currentPre}
@@ -535,21 +547,23 @@ export const AccountSetting = () => {
                               onClick={toggleCurrencyOptions}
                             >
                               <p className="text-white mb-0 ">
-                              {
-                                countryInfo.find(
-                                  (item) => item.currency.code === currentPre
-                                )?.currency.code
-                              } 
+                                {
+                                  countryInfo.find(
+                                    (item) => item.currency.code === currentPre
+                                  )?.currency.code
+                                }
                               </p>
                             </div>
                             {showCurrencyOptions && (
-                             <ul className="options">
+                              <ul className="options">
                                 {countryInfo.map((data) => (
                                   <li
                                     key={`${data.currency.code}`}
                                     onClick={() => {
                                       setCurrentPre(data?.currency?.code);
-                                      dispatch(defineCurrency(data.currency.code));
+                                      dispatch(
+                                        defineCurrency(data.currency.code)
+                                      );
                                     }}
                                   >
                                     {data.currency?.code}
@@ -557,7 +571,6 @@ export const AccountSetting = () => {
                                 ))}
                               </ul>
                             )}
-
                           </div>
                         </div>
                       </Form.Group>

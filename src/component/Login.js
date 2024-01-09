@@ -32,8 +32,8 @@ export const LoginView = (props) => {
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
   const { disconnect: disonnectWalletConnect } = useDisconnect();
-  const [loader, setLoader] = useState(true);
-
+  const { loading } = useSelector((state) => state?.loginLoderReducer);
+  
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
   };
@@ -183,6 +183,7 @@ export const LoginView = (props) => {
       }
 
       if (userData.account && userData.account == "Connect Wallet" && account) {
+       
         let checkAuthParams = {
           account: account,
           library: library,
@@ -192,15 +193,7 @@ export const LoginView = (props) => {
         };
         props.setTwoFAModal(false);
         props.onHide();
-        const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
-       
-        if (response.authToken) {
-          setLoader(false);
-          setTimeout(() => {
-            setLoader(true);
-            //dispatch(notificationSuccess("user login successfully"));
-          }, 10000);
-        }
+        dispatch(checkAuth(checkAuthParams)).unwrap();
       }
     };
     checkMetaAcc();
@@ -333,6 +326,7 @@ export const LoginView = (props) => {
     const fm = await new Fortmatic(apiConfig.FORTMATIC_KEY);
     window.web3 = await new Web3(fm.getProvider());
     await window.web3.eth.getAccounts(async (error, accounts) => {
+     
       if (error) {
         throw error;
       }
@@ -341,19 +335,9 @@ export const LoginView = (props) => {
         library: library,
         checkValue: checkValue,
       };
-
-      const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
-
-      if (response.authToken) {
-        setLoader(false);
-        //dispatch(notificationSuccess("user login successfully"))
-        setTimeout(() => {
-          setLoader(true);
-          dispatch(notificationSuccess("user login successfully"));
-        }, 2000);
-      }
       props.onHide();
       setAccountAddress(accounts[0]);
+      dispatch(checkAuth(checkAuthParams)).unwrap();
     });
   };
 
@@ -364,16 +348,7 @@ export const LoginView = (props) => {
       checkValue: checkValue,
       signMessage: signMessage,
     };
-    const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
-
-    if (response.authToken) {
-      setLoader(false);
-      //dispatch(notificationSuccess("user login successfully"))
-      setTimeout(() => {
-        setLoader(true);
-        dispatch(notificationSuccess("user login successfully"));
-      }, 6000);
-    }
+    dispatch(checkAuth(checkAuthParams)).unwrap();
     setAccountAddress(address);
   };
 
@@ -394,23 +369,14 @@ export const LoginView = (props) => {
     const fetchData = async () => {
       if (data) {
         try {
+          props.onHide();
+         
           let checkAuthParams = {
             account: address,
             checkValue: checkValue,
             signature: data,
           };
-          props.onHide();
-          const response = await dispatch(checkAuth(checkAuthParams)).unwrap();
-
-          // Your additional logic here based on the response
-          if (response.authToken) {
-            setLoader(false);
-            //dispatch(notificationSuccess("user login successfully"))
-            setTimeout(() => {
-              setLoader(true);
-              dispatch(notificationSuccess("user login successfully"));
-            }, 2000);
-          }
+          dispatch(checkAuth(checkAuthParams)).unwrap();    
         } catch (error) {
           // Handle errors if necessary
           console.error("Error fetching data:", error);
@@ -524,11 +490,11 @@ export const LoginView = (props) => {
 
   return (
     <>
-      {!loader ? (
+      {loading ? (
         <>
           <div className="middenLoader">
             <img src={require("../content/images/logo.png")} />
-            <p>welcome</p>
+            <p>Login Success</p>
             <div class="snippet" data-title="dot-flashing">
               <div class="stage">
                 <div class="dot-flashing"></div>

@@ -1623,8 +1623,7 @@ body {
         }
     }
 
-    .messageEscrow
-    {
+    .messageEscrow {
         background-color: $cards-bg;
         margin-bottom: 16px;
 
@@ -1737,6 +1736,7 @@ body {
                     &.active {
                         background: #202226;
                         margin-bottom: 12px;
+
                         &.no-message {
                             padding: 37px 23px;
                             color: $white;
@@ -3237,7 +3237,7 @@ body {
     }
 }
 
-.escrowPay{
+.escrowPay {
     margin-top: 20px;
 
     @include media-breakpoint-up(xxl) {
@@ -3263,7 +3263,7 @@ body {
         }
     }
 
-   
+
     .cards-dark {
         background-color: $cards-bg;
         margin-bottom: 16px;
@@ -3288,24 +3288,27 @@ body {
             .buyerBottom {
                 margin-bottom: 1.5rem;
             }
-        
-            .text-lg{
+
+            .text-lg {
                 font-size: 1.125rem;
                 font-weight: 500;
             }
-            .font-bold{
+
+            .font-bold {
                 --tw-text-opacity: 1;
                 color: rgb(174 251 105/var(--tw-text-opacity));
                 font-weight: 700;
             }
-            .rounded-deposite{
+
+            .rounded-deposite {
                 --tw-text-opacity: 1;
                 color: rgb(255 194 70/var(--tw-text-opacity));
                 padding-bottom: 6px;
                 padding-top: 6px;
-                background-color: rgba(255,194,70,.18);
+                background-color: rgba(255, 194, 70, .18);
                 border-radius: 5px;
             }
+
             .escrowBtn {
                 width: 100%;
                 padding: 12px;
@@ -3514,24 +3517,25 @@ body {
                         list-style: none;
                         margin: 0;
                         padding: 0;
+                        min-height: 365px;
 
-                        @include media-breakpoint-up(lg) {
-                            height: calc(100vh - 300px);
-                            overflow: auto;
-                        }
+                        // @include media-breakpoint-up(lg) {
+                        //     height: calc(100vh - 300px);
+                        //     overflow: auto;
+                        // }
 
-                        @media screen and (max-width: 1366px),
-                        screen and (max-height: 700px) {
-                            height: calc(100vh - 200px);
-                        }
+                        // @media screen and (max-width: 1366px),
+                        // screen and (max-height: 700px) {
+                        //     height: calc(100vh - 200px);
+                        // }
 
-                        @include media-breakpoint-down(lg) {
-                            height: calc(100vh - 270px);
-                        }
+                        // @include media-breakpoint-down(lg) {
+                        //     height: calc(100vh - 270px);
+                        // }
 
-                        @include media-breakpoint-down(md) {
-                            height: calc(100vh - 50px);
-                        }
+                        // @include media-breakpoint-down(md) {
+                        //     height: calc(100vh - 50px);
+                        // }
 
                         li {
                             display: flex;
@@ -3699,7 +3703,7 @@ body {
     }
 }
 
-.buyerDetails{
+.buyerDetails {
     margin-bottom: 1.5rem;
 }
 
@@ -4985,13 +4989,13 @@ body {
                             width: 0;
                             height: 0;
                             margin: 0;
-              
+
                             &.checked {
-                              &~label {
-                                background: #3c404e;
-                              }
+                                &~label {
+                                    background: #3c404e;
+                                }
                             }
-                          }
+                        }
 
                         label {
                             background: #23262F;
@@ -5991,8 +5995,8 @@ aside.EmojiPickerReact.epr-main {
                 position: relative;
 
                 img {
-                    height: 100%;
-                    width: 100%;
+                    height: 62px;
+                    width: 62px;
                     object-fit: cover;
                     border-radius: 50%;
                 }
@@ -6028,6 +6032,10 @@ aside.EmojiPickerReact.epr-main {
                     line-height: 16px;
                     color: #808191;
                 }
+            }
+
+            .escrow-trade-content{
+                width: calc(100% - 62px);
             }
         }
 
@@ -6131,6 +6139,7 @@ aside.EmojiPickerReact.epr-main {
                         opacity: 0;
                         visibility: hidden;
                     }
+
                     &.checked {
                         &:after {
                             opacity: 1;
@@ -6562,8 +6571,9 @@ aside.EmojiPickerReact.epr-main {
     background: #1e1f24;
     color: #808191;
     white-space: nowrap;
-    
-  }
+
+}
+
 .customSelectBox ul.options li {
     padding: 0 10px;
 }
@@ -6615,6 +6625,7 @@ aside.EmojiPickerReact.epr-main {
     padding: 0px 2px 1px;
     white-space: nowrap;
     background: #1e1f24;
+
     @media screen and (max-width:991px) {
         right: 100%;
         margin: 0px -42px 0 0px;
@@ -6669,9 +6680,10 @@ aside.EmojiPickerReact.epr-main {
 }
 
 //select box 
-.statisticBox{
+.statisticBox {
     position: relative;
     width: 185px;
+
     @include media-breakpoint-up(md) {
         width: 185px;
     }
@@ -6688,14 +6700,17 @@ aside.EmojiPickerReact.epr-main {
     background: #1e1f24;
     color: #808191;
     white-space: nowrap;
+
     @include media-breakpoint-up(md) {
-      width: 185px;
+        width: 185px;
     }
+
     @include media-breakpoint-up(lg) {
-      width: 185px;
+        width: 185px;
     }
+
     @include media-breakpoint-up(xl) {
-      width: 185px;
+        width: 185px;
     }
 }
 
@@ -6717,51 +6732,51 @@ aside.EmojiPickerReact.epr-main {
     align-items: center;
 
     .token-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #f4f4f6;
-      margin-right: 4px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f4f4f6;
+        margin-right: 4px;
     }
-  }
+}
 
 
 .custom-input-seller {
     .form-check {
         margin-bottom: 10px;
-    
+
         input {
-          width: 18px;
-          height: 18px;
-          border-radius: 4px;
-          background-color: #c4c4c4;
-          border: none;
-          box-shadow: none;
-    
-          &:checked {
-            background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
-          }
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background-color: #c4c4c4;
+            border: none;
+            box-shadow: none;
+
+            &:checked {
+                background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+            }
         }
-    
+
         .form-check-input {
-          width: 18px;
-          height: 18px;
-          border-radius: 4px;
-          background-color: #c4c4c4;
-          border: none;
-          box-shadow: none;
-    
-          &.checked {
-            background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
-          }
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            background-color: #c4c4c4;
+            border: none;
+            box-shadow: none;
+
+            &.checked {
+                background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+            }
         }
-    
+
         label {
-          font-size: 13px;
-          line-height: 16px;
-          letter-spacing: -0.03em;
+            font-size: 13px;
+            line-height: 16px;
+            letter-spacing: -0.03em;
         }
-      }
+    }
 }
 
 .ManageEscrowDetails {
@@ -6773,6 +6788,7 @@ aside.EmojiPickerReact.epr-main {
         background-color: rgb(24 25 29/var(--tw-bg-opacity));
         border-radius: 32px;
     }
+
     .ListHead {
         h4 {
             width: calc(100% / 3);
@@ -6790,31 +6806,32 @@ aside.EmojiPickerReact.epr-main {
     }
 }
 
-  
+
 @keyframes dot-flashing {
-0% {
-    background-color: #fff;
-}
-50%, 100% {
-    background-color: #c6fa5685;
-}
+    0% {
+        background-color: #fff;
+    }
+
+    50%,
+    100% {
+        background-color: #c6fa5685;
+    }
 }
 
-
-.middenLoader{
+.middenLoader {
     position: fixed;
     height: 100%;
     width: 100%;
     top: 0;
     left: 0;
-    background-color: rgba(0,0,0,0.9);
+    background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99;
     flex-direction: column;
     gap: 8px;
-  
+
     .dot-flashing {
         position: relative;
         width: 5px;
@@ -6824,13 +6841,15 @@ aside.EmojiPickerReact.epr-main {
         color: #C6FA56;
         animation: dot-flashing 1s infinite linear alternate;
         animation-delay: 0.5s;
+
         &:after,
-        &:before{
+        &:before {
             content: "";
             display: inline-block;
             position: absolute;
             top: 0;
         }
+
         &:before {
             left: -12px;
             width: 5px;
@@ -6841,6 +6860,7 @@ aside.EmojiPickerReact.epr-main {
             animation: dot-flashing 1s infinite alternate;
             animation-delay: 0s;
         }
+
         &:after {
             left: 12px;
             width: 5px;
@@ -6850,12 +6870,145 @@ aside.EmojiPickerReact.epr-main {
             color: #C6FA56;
             animation: dot-flashing 1s infinite alternate;
             animation-delay: 1s;
-          }
-      }
-  
-    p{
+        }
+    }
+
+    p {
         color: #fff;
         margin: 0;
-    }  
-  }
-  
+    }
+}
+
+.notification-view {
+    margin-top: 24px;
+    margin-bottom: 16px;
+
+    @include media-breakpoint-up(xl) {
+        margin-top: 59px;
+    }
+
+    h1 {
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 24px;
+        color: $white;
+        margin-bottom: 16px;
+
+        @include media-breakpoint-up(lg) {
+            margin-bottom: 48px;
+        }
+    }
+
+    .row {
+        @include media-breakpoint-up(lg) {
+            margin-left: -20px;
+            margin-right: -20px;
+
+            .col-lg-3 {
+                width: 290px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .col-lg-9 {
+                width: calc(100% - 290px);
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    }
+
+    .cards-dark {
+        background-color: $cards-bg;
+        border-radius: 16px;
+
+        .card-body {
+            @include media-breakpoint-up(xl) {
+                padding: 32px 16px;
+            }
+
+            .nav-tabs {
+                border-bottom: 0;
+
+                .nav-item {
+                    .nav-link {
+                        display: flex;
+                        align-items: center;
+                        font-weight: 700;
+                        font-size: 14px;
+                        line-height: 20px;
+                        color: rgba($color: $white, $alpha: 0.5);
+                        border: none;
+                        padding: 16px 20px;
+                        border-radius: 12px;
+
+                        &.active {
+                            background-color: #202226;
+                            color: $white;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .tab-content {
+        .cards-dark {
+            border-radius: 20px;
+
+            @include media-breakpoint-down(lg) {
+                margin-top: 24px;
+            }
+
+            .card-header {
+                padding: 32px;
+                font-weight: 500;
+                font-size: 24px;
+                line-height: 24px;
+                color: $white;
+                border-bottom-color: #25272D;
+
+                @include media-breakpoint-down(md) {
+                    padding: 16px;
+                }
+            }
+
+            .card-body {
+                padding: 20px 32px;
+                color: $white;
+
+                @include media-breakpoint-down(md) {
+                    padding: 16px;
+                }
+
+                h4 {
+                    font-weight: 500;
+                    font-size: 18px;
+                    line-height: 24px;
+                    margin-bottom: 12px;
+                }
+
+                p {
+                    font-size: 14px;
+                    line-height: 24px;
+                    margin-bottom: 12px;
+                }
+
+                ul {
+                    padding-left: 16px;
+                    margin-bottom: 16px;
+
+                    @include media-breakpoint-down(md) {
+                        padding-left: 20px;
+                    }
+
+                    li {
+                        font-size: 14px;
+                        line-height: 24px;
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+        }
+    }
+}

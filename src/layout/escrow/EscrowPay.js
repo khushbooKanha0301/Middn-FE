@@ -15,15 +15,13 @@ import { useLocation } from "react-router-dom";
 import { database } from "../../helper/config";
 import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import jwtAxios from "../../service/jwtAxios";
-//const CHAT_ROOM = "chat/escrow_room/";
+
 export const EscrowPay = () => {
   const location = useLocation();
   const { state } = location;
   const dbRef = ref(database);
 
   const receiverAddress = state?.userAddress;
- console.log("receiverAddress ", receiverAddress);
-
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);

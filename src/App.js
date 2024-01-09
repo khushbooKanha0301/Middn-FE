@@ -91,45 +91,6 @@ export const App = () => {
   }, [userData]);
 
   useEffect(() => {
-    if (acAddress.userid && token === acAddress?.authToken) {
-      dispatch(userGetData(acAddress.userid));
-      const interval = setInterval(function () {
-        const decodedToken = jwtDecode(acAddress?.authToken);
-        const currentTime = Date.now() / 1000;
-        if (decodedToken.exp < currentTime) {
-          dispatch(logoutAuth()).unwrap();
-        }
-      }, 1000); // 5 seconds in milliseconds
-
-      setInterval(function() {
-        const dbOfflineRef = ref(database);
-        get(
-          child(dbOfflineRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
-        ).then((snapshot) => {
-          const lastActive = snapshot.val()?.lastActive;
-          const isOnline = snapshot.val()?.isOnline;
-          const now = Date.now();
-          const timeWindow = 3 * 60 * 1000;
-          const timeDifference = now - lastActive;
-          const isMoreThan30Minutes = timeDifference > timeWindow;
-
-          if (isMoreThan30Minutes) {
-           updateOffline();
-          } 
-
-          const timeWindowAbsent = 1 * 60 * 1000;
-          const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
-          if(isMoreThan5Minutes && (isOnline != 2)){
-            updateAbsent();
-          }
-
-          // if (now - lastActive > 10000) {
-          //   // 10 seconds in milliseconds
-          //   updateOffline();
-          // }
-        });
-      }, 60000);
-
       // Set up the event listeners to update the user's last activity timestamp
       const updateLastActive = () => {
         const dbRef = ref(database);
@@ -181,6 +142,42 @@ export const App = () => {
         });
       };
 
+      let statusInterval = setInterval(function() {
+        const dbOfflineRef = ref(database);
+        get(
+          child(dbOfflineRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
+        ).then((snapshot) => {
+          const lastActive = snapshot.val()?.lastActive;
+          const isOnline = snapshot.val()?.isOnline;
+          const now = Date.now();
+          const timeWindow = 1 * 60 * 60 * 1000;
+          const timeDifference = now - lastActive;
+          const isMoreThan30Minutes = timeDifference > timeWindow;
+
+          if (isMoreThan30Minutes) {
+           updateOffline();
+          } 
+
+          const timeWindowAbsent = 15 * 60 * 1000;
+          const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
+          // if(isMoreThan5Minutes && (isOnline != 2)){
+          if(isMoreThan5Minutes){
+            updateAbsent();
+          }
+        });
+      }, 60000);
+
+    if (acAddress.userid && token === acAddress?.authToken) {
+      dispatch(userGetData(acAddress.userid));
+      const interval = setInterval(function () {
+        const decodedToken = jwtDecode(acAddress?.authToken);
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp < currentTime) {
+          dispatch(logoutAuth()).unwrap();
+        }
+      }, 1000); // 5 seconds in milliseconds
+
+      
       // window.addEventListener("beforeunload", updateOffline);
       // window.addEventListener("mousemove", updateLastActive);
       // window.addEventListener("keydown", updateLastActive);
@@ -190,7 +187,17 @@ export const App = () => {
       // Clean up the timer and event listeners when the component unmounts
       return () => {
         clearInterval(interval);
+        clearInterval(statusInterval);
       };
+     
+    } 
+    else {
+      console.log("-------------------------------------------------------")
+      window.removeEventListener("beforeunload", updateOffline);
+      window.removeEventListener("mousemove", updateLastActive);
+      window.removeEventListener("keydown", updateLastActive);
+      window.removeEventListener("scroll", updateLastActive);
+      window.removeEventListener("click", updateLastActive);
     }
   }, [acAddress.userid, token]);
 

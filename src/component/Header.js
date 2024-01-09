@@ -103,7 +103,6 @@ export const Header = (props) => {
                 return element.includes(acAddress?.account);
             })
             ?.map((object) => {
-              console.log("object ", object);
               const ReciverId = object.split("_")[0];
               const name = acAddress?.account;
               if (ReciverId === name) {
@@ -123,7 +122,6 @@ export const Header = (props) => {
            
             if (allunreadCount.some(Boolean)) {
               // If at least one element is true, indicating not empty
-              
               setNotificationCount(allunreadCount.filter(Boolean).length);
             } else {
               // If all elements are false, indicating empty

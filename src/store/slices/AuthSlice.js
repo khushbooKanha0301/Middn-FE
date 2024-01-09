@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import "react-toastify/dist/ReactToastify.css";
 import jwtAxios, { setAuthToken } from "../../service/jwtAxios";
 import { setLoading } from "./commonSlice";
+import { setLoginLoading } from "./loginLoderSlice";
 import { notificationFail, notificationSuccess } from "./notificationSlice";
 // import { countryCodes } from "../countryCodes";
 import axios from "axios";
@@ -42,7 +43,7 @@ const initialState = {
 export const checkAuth = createAsyncThunk(
   "checkAuth",
   async (action, { dispatch }) => {
-    dispatch(setLoading(true));
+    //dispatch(setLoading(true));
     try {
       let resBody = null;
       let account = action.account;
@@ -98,6 +99,7 @@ export const checkAuth = createAsyncThunk(
       }
 
       if (signature) {
+        dispatch(setLoginLoading(true));
         let verifyTokenData = await axios
           .post(
             `${apiConfigs.BASE_URL}users/verify?signatureId=${signature}`,
@@ -154,13 +156,15 @@ export const checkAuth = createAsyncThunk(
           });
           // update(ref(database, firebaseMessages.CHAT_USERS + userData?.account), {isOnline:true});
           dispatch(setLoading(false));
+          dispatch(setLoginLoading(false));
           if (
             verifyTokenData.data?.userInfo?.is_2FA_login_verified ===
               undefined ||
             verifyTokenData.data?.userInfo?.is_2FA_login_verified === true
           ) {
-            //dispatch(notificationSuccess("user login successfully"));
-            return userData;
+            
+            dispatch(notificationSuccess("user login successfully"));
+            // return userData;
           }
 
           return userData;
@@ -184,6 +188,7 @@ export const logoutAuth = createAsyncThunk(
   async (action, { dispatch }) => {
     try {
       let accountAdrr = JSON.parse(window.localStorage.getItem("userData")).account;
+ console.log("accountAdrr ", accountAdrr);
       const dbRef = ref(database);
       await get(
         child(dbRef, firebaseMessages?.CHAT_USERS + accountAdrr)
@@ -192,15 +197,17 @@ export const logoutAuth = createAsyncThunk(
           update(
             ref(database, firebaseMessages?.CHAT_USERS + accountAdrr),
             {
-              isOnline: 0
+              isOnline: 4
             }
           );
-          const snapshotArr = await get(ref(
-            database,
-            firebaseMessages.CHAT_USERS + accountAdrr
-          ));
         }
       });
+
+      const snapshotArr = await get(ref(
+        database,
+        firebaseMessages.CHAT_USERS + accountAdrr
+      ));
+      console.log("-------", snapshotArr.val())
 
       jwtAxios
         .get(`/users/logout`)

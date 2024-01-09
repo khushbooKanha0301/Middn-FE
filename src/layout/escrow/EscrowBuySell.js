@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { notificationFail } from "../../store/slices/notificationSlice";
-import { convertToCrypto } from "../../store/slices/currencySlice";
 
 // USD , EUR , AUD , GBP
 function EscrowDetails() {
@@ -28,9 +27,8 @@ function EscrowDetails() {
   const optionsDropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
   const [amount, setAmount] = useState(0);
-  const [loader, setLoader] = useState(true);
   const [readyForPayment, setReadyForPayment] = useState(true);
-  const { cryptoAmount } = useSelector((state) => state?.cuurencyReducer);
+  const [cryptoAmount, setCryptoAmount] = useState(0);
 
   const getAllEscrow = async () => {
     try {
@@ -88,7 +86,7 @@ function EscrowDetails() {
       );
       return false;
     }
-    const conversationRate = cryptoAmount?.amount || "0";
+    const conversationRate = cryptoAmount || "0";
     const reqData = {
       user_address: address,
       escrow_id: id,
@@ -102,10 +100,7 @@ function EscrowDetails() {
       .post(`/trade/createTrade`, reqData)
       .then((escrowResult) => {
         if (escrowResult?.data?.newTrade) {
-          setTimeout(() => {
-            setLoader(false);
-            navigate("/escrow-offer-buy", { state: { userAddress: address } });
-          }, 1000);
+          navigate("/escrow-offer-buy", { state: { userAddress: address } });
         } else {
           dispatch(notificationFail("Something went wrong"));
         }
@@ -124,7 +119,6 @@ function EscrowDetails() {
   };
 
   const handleFilterTypeChange = (value) => {
-    // setTypeFilter(vehicle);
     setTypeFilter((prevType) => (prevType === value ? null : value));
   };
 
@@ -150,9 +144,14 @@ function EscrowDetails() {
   };
 
   const onChangeAmount = useCallback(
-    debounce((data) => {
-      dispatch(convertToCrypto(data));
-      setLoader(true);
+    debounce(async (data) => {
+      const res = await jwtAxios
+        .post(`auth/getCryptoAmountDetails`, data)
+        .then((response) => {
+          return response?.data;
+        });
+
+      setCryptoAmount(res.amount);
     }, 500),
     []
   );
@@ -166,10 +165,7 @@ function EscrowDetails() {
         cryptoSymbol: currentCurrency,
         cryptoCountry: currentPre,
       };
-      setTimeout(() => {
-        setLoader(false);
-        onChangeAmount(data);
-      }, 800);
+      onChangeAmount(data);
 
       if (value) {
         if (value > 0) {
@@ -267,41 +263,14 @@ function EscrowDetails() {
               <Form.Group className="form-group">
                 <Form.Label>Conversation </Form.Label>
                 <div className="d-flex align-items-center">
-                  {!cryptoAmount?.amount ? (
-                    <>
-                      <Form.Control
-                        name="phone"
-                        type="text"
-                        value="0"
-                        disabled
-                      />
-                    </>
-                  ) : (
-                    <>
-                      {loader ? (
-                        <>
-                          <Form.Control
-                            name="phone"
-                            type="text"
-                            value={
-                              cryptoAmount?.amount ? cryptoAmount?.amount : "0"
-                            }
-                            disabled
-                          />
-                        </>
-                      ) : (
-                        <div className="middenLoader">
-                          <img src={require("../../content/images/logo.png")} />
-                          <p>welcome</p>
-                          <div class="snippet" data-title="dot-flashing">
-                            <div class="stage">
-                              <div class="dot-flashing"></div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <>
+                    <Form.Control
+                      name="phone"
+                      type="text"
+                      value={cryptoAmount ? cryptoAmount : "0"}
+                      disabled
+                    />
+                  </>
 
                   <div className="d-flex align-items-center">
                     <img
@@ -361,26 +330,31 @@ function EscrowDetails() {
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Amount to transfer to Middn </div>
                 <div class="limit-txt-left-amount">
-                  {cryptoAmount?.amount ? cryptoAmount?.amount + 0.02 : "0"} BNB
+                  {cryptoAmount ? cryptoAmount + 0.02 : "0"}{" "}
+                  {currentCurrency ? currentCurrency : "BTC"}
                 </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Invoice Amount</div>
                 <div class="limit-txt-left">
-                  {cryptoAmount?.amount ? cryptoAmount?.amount : "0"} BNB
+                  {cryptoAmount ? cryptoAmount : "0"}{" "}
+                  {currentCurrency ? currentCurrency : "BTC"}
                 </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Escrow fees </div>
-                <div class="limit-txt-left">0.02 BNB</div>
+                <div class="limit-txt-left">
+                  0.02  {currentCurrency ? currentCurrency : "BTC"}
+                </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Total</div>
                 <div class="limit-txt-left">
-                  {cryptoAmount?.amount ? cryptoAmount?.amount + 0.02 : "0"} BNB
+                  {cryptoAmount ? cryptoAmount + 0.02 : "0"}{" "}
+                  {currentCurrency ? currentCurrency : "BTC"}
                 </div>
               </div>
               <div className="d-flex main-limit">
@@ -411,20 +385,6 @@ function EscrowDetails() {
                     Submit
                   </Button>
                 </>
-
-                {/* {loader ? (
-                 
-                ) : (
-                  <div className="middenLoader">
-                    <img src={require("../../content/images/logo.png")} />
-                    <p>welcome</p>
-                    <div class="snippet" data-title="dot-flashing">
-                      <div class="stage">
-                        <div class="dot-flashing"></div>
-                      </div>
-                    </div>
-                  </div>
-                )} */}
               </div>
             </Col>
           </Row>

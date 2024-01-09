@@ -6,6 +6,7 @@ import countrySlice from "./slices/countrySettingSlice";
 import notificationReducer from "./slices/notificationSlice";
 import cuurencyReducer from "./slices/currencySlice";
 import chatEscrowReducer from "./slices/chatEscrowSlice";
+import loginLoderReducer from "./slices/loginLoderSlice";
 
 // const store = configureStore({
 //     reducer:{
@@ -21,7 +22,8 @@ const rootReducer = combineReducers({
   countrySlice,
   chatReducer,
   cuurencyReducer,
-  chatEscrowReducer
+  chatEscrowReducer,
+  loginLoderReducer
 });
 
 const store = configureStore({ reducer: rootReducer });

@@ -167,11 +167,6 @@ export const EscrowSeller = () => {
         address &&
         noError == true
       ) {
-        console.log("-----------", messageText,
-        userDetailsAll?.wallet_address,
-        address,
-        messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
-        file)
         sendMessage(
           //CHAT_ROOM,
           messageText,
