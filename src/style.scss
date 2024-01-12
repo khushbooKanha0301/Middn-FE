@@ -1256,9 +1256,10 @@ body {
         border: none;
         box-shadow: none;
         padding: 0;
-        font-size: 16px;
-        line-height: 42px;
-        color: $white;
+        font-size: 15px;
+        line-height: 37px;
+        // color: $white;
+        color: #808191;
         border-radius: 0;
     }
 
@@ -3707,6 +3708,30 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.buyer-details {
+    color: $white;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 18px;
+
+    label {
+        color: $nav-title;
+    }
+
+    .row {
+        .col-7 {
+            width: 163px;
+        }
+
+        &+.row {
+            margin-top: 24px;
+        }
+    }
+    .col {
+        font-size: 12px;
+    }
+}
+
 
 .escrow-view {
     margin-top: 24px;
@@ -3896,11 +3921,24 @@ body {
 
 
     label {
-        font-weight: 700;
-        font-size: 15px;
-        color: #FFF;
+        // font-weight: 700;
+        font-size: 12px;
+        // color: #FFF;
     }
 
+    .network-select {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        font-size: 15px;
+        line-height: 38px;
+        color: #808191;
+        border-radius: 0;
+        display: block;
+        width: 100%;
+        font-weight: 400;
+    }
 
 
     &>.row {
@@ -6365,6 +6403,12 @@ aside.EmojiPickerReact.epr-main {
     margin-left: auto;
 }
 
+.limit-txt-right-amount {
+    color: #FFF;
+    font-size: 15px;
+    font-weight: 700;
+}
+
 .limit-txt {
     color: #808191;
     font-size: 12px;
@@ -6372,7 +6416,7 @@ aside.EmojiPickerReact.epr-main {
 
 .limit-txt-right {
     color: #FFF;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .limit-txt-left {
@@ -6381,6 +6425,10 @@ aside.EmojiPickerReact.epr-main {
     font-weight: 700;
     text-align: right;
     margin-left: auto;
+}
+.color-free{
+    --tw-text-opacity: 1;
+    color: rgb(174 251 105/var(--tw-text-opacity));
 }
 
 .main-limit {
@@ -6497,6 +6545,7 @@ aside.EmojiPickerReact.epr-main {
     label {
         font-size: 12px;
         color: #FFF;
+        color: #808191;
     }
 
 }
@@ -6630,6 +6679,9 @@ aside.EmojiPickerReact.epr-main {
         right: 100%;
         margin: 0px -42px 0 0px;
     }
+}
+.country-select ul.wd{
+    width: 100%;
 }
 
 .country-select ul.options.locationPersonalData {
@@ -6775,6 +6827,7 @@ aside.EmojiPickerReact.epr-main {
             font-size: 13px;
             line-height: 16px;
             letter-spacing: -0.03em;
+            color: #FFF;
         }
     }
 }

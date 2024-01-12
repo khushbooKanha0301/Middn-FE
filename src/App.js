@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container, Spinner } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -31,17 +30,16 @@ import {
   userGetData,
   userGetFullDetails,
 } from "./store/slices/AuthSlice";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { child, get, ref, update } from "firebase/database";
+import { get, ref, update } from "firebase/database";
 import { database } from "./helper/config";
-import { firebaseMessages } from "./helper/chatMessage";
+import { firebaseStatus } from "./helper/statusManage";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
 
 export const App = () => {
-  const toastId = React.useRef(null);
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(true);
   const sidebarToggle = () => setIsOpen(!isOpen);
@@ -82,7 +80,7 @@ export const App = () => {
   };
   useEffect(() => {
     dispatch(getCountryDetails());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (userData?.is_2FA_login_verified === false) {
@@ -91,15 +89,15 @@ export const App = () => {
   }, [userData]);
 
   useEffect(() => {
-      // Set up the event listeners to update the user's last activity timestamp
+    const userRef = ref(database, firebaseStatus?.CHAT_USERS + acAddress?.account);
+    
+    if (acAddress.userid && token === acAddress?.authToken) {
+       // Set up the event listeners to update the user's last activity timestamp
       const updateLastActive = () => {
-        const dbRef = ref(database);
-        get(
-          child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
-        ).then((snapshot) => {
+        get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
             update(
-              ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
+              userRef,
               {
                 lastActive: Date.now(),
                 isOnline: 1,
@@ -109,44 +107,46 @@ export const App = () => {
         });
       };
 
+      const updateAbsent = () => {
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            update(
+              userRef,{
+                isOnline: 2
+              }
+            );
+          }
+        });
+      };
+
       // Set up the event listeners to update the user's last activity timestamp
       const updateOffline = () => {
-        const dbRef = ref(database);
-        get(
-          child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
-        ).then((snapshot) => {
+        get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
             update(
-              ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
+              userRef,
               {
-                isOnline: 0,
+                isOnline: 3,
+                lastActive: Date.now()
               }
             );
           }
         });
       };
 
-      const updateAbsent = () => {
-        const dbRef = ref(database);
-        get(
-          child(dbRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
-        ).then((snapshot) => {
-          if (snapshot.exists()) {
-            update(
-              ref(database, firebaseMessages?.CHAT_USERS + acAddress?.account),
-              {
-                isOnline: 2,
-              }
-            );
-          }
-        });
-      };
+      dispatch(userGetData(acAddress.userid));
+
+      const interval = setInterval(function () {
+        const decodedToken = jwtDecode(acAddress?.authToken);
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp < currentTime) {
+          dispatch(logoutAuth()).unwrap();
+        }
+      }, 1000); // 5 seconds in milliseconds
 
       let statusInterval = setInterval(function() {
-        const dbOfflineRef = ref(database);
-        get(
-          child(dbOfflineRef, firebaseMessages?.CHAT_USERS + acAddress?.account)
-        ).then((snapshot) => {
+        
+        get(userRef).then((snapshot) => {
           const lastActive = snapshot.val()?.lastActive;
           const isOnline = snapshot.val()?.isOnline;
           const now = Date.now();
@@ -160,45 +160,55 @@ export const App = () => {
 
           const timeWindowAbsent = 15 * 60 * 1000;
           const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
-          // if(isMoreThan5Minutes && (isOnline != 2)){
-          if(isMoreThan5Minutes){
+          if(isMoreThan5Minutes  && (isOnline != 2)){
             updateAbsent();
           }
         });
-      }, 60000);
+      }, 900000);
+      const handleBeforeUnload = () => {
+        // Add your logic for handling before unload event
+        updateOffline();
+      };
+    
+      const handleMouseMove = () => {
+        // Add your logic for handling mouse move event
+        updateLastActive();
+      };
+    
+      const handleKeyDown = () => {
+        // Add your logic for handling key down event
+        updateLastActive();
+      };
+    
+      const handleScroll = () => {
+        // Add your logic for handling scroll event
+        updateLastActive();
+      };
+    
+      const handleClick = () => {
+        // Add your logic for handling click event
+        updateLastActive();
+      };
 
-    if (acAddress.userid && token === acAddress?.authToken) {
-      dispatch(userGetData(acAddress.userid));
-      const interval = setInterval(function () {
-        const decodedToken = jwtDecode(acAddress?.authToken);
-        const currentTime = Date.now() / 1000;
-        if (decodedToken.exp < currentTime) {
-          dispatch(logoutAuth()).unwrap();
-        }
-      }, 1000); // 5 seconds in milliseconds
-
-      
-      // window.addEventListener("beforeunload", updateOffline);
-      // window.addEventListener("mousemove", updateLastActive);
-      // window.addEventListener("keydown", updateLastActive);
-      // window.addEventListener("scroll", updateLastActive);
-      // window.addEventListener("click", updateLastActive);
-
-      // Clean up the timer and event listeners when the component unmounts
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("click", handleClick);
+     
+  
+      // Clean up the listeners when the component unmounts or user logs out
       return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("click", handleClick);
+  
         clearInterval(interval);
         clearInterval(statusInterval);
       };
-     
     } 
-    else {
-      console.log("-------------------------------------------------------")
-      window.removeEventListener("beforeunload", updateOffline);
-      window.removeEventListener("mousemove", updateLastActive);
-      window.removeEventListener("keydown", updateLastActive);
-      window.removeEventListener("scroll", updateLastActive);
-      window.removeEventListener("click", updateLastActive);
-    }
   }, [acAddress.userid, token]);
 
   return (

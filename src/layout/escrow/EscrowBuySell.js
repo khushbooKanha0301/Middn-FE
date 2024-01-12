@@ -3,19 +3,21 @@ import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
 import { countryInfo } from "../accountSetting/countryData";
 import { useDispatch } from "react-redux";
-import { defineCurrency } from "../../store/slices/countrySettingSlice";
 import { useParams } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { notificationFail } from "../../store/slices/notificationSlice";
+import { database } from "../../helper/config";
+import { firebaseStatus } from "../../helper/statusManage";
+import { onValue, ref } from "firebase/database";
 
 // USD , EUR , AUD , GBP
 function EscrowDetails() {
   const dispatch = useDispatch();
   const [currentPre, setCurrentPre] = useState("USD");
-  const [currentCurrency, setCurrentCurrencyPre] = useState("BTC");
+  const [currentCurrency, setCurrentCurrencyPre] = useState("MID");
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
   const { id } = useParams();
@@ -23,25 +25,30 @@ function EscrowDetails() {
   const [typeFilter, setTypeFilter] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
-  const [cryptos, setCrypto] = useState([]);
   const optionsDropdownRef = useRef(null);
   const countryDropdownRef = useRef(null);
   const [amount, setAmount] = useState(0);
   const [readyForPayment, setReadyForPayment] = useState(true);
   const [cryptoAmount, setCryptoAmount] = useState(0);
 
-  const getAllEscrow = async () => {
-    try {
-      const res = await jwtAxios.get(`/auth/getCryptoDetails`);
-      setCrypto(res?.data?.data); // Update the state with the new array
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const networks = [{ value: "Polygon Chain", label: "Polygon Chain" }, 
+  { value: "Ethereum", label: "Ethereum" }];
+  const [network, setNetwork] = useState("Polygon Chain");
+  
+  const [otherStatus, setUserStatus] = useState(null);
 
-  useEffect(() => {
-    getAllEscrow();
-  }, []);
+  // const getAllEscrow = async () => {
+  //   try {
+  //     const res = await jwtAxios.get(`/auth/getCryptoDetails`);
+  //     setCrypto(res?.data?.data); // Update the state with the new array
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getAllEscrow();
+  // }, []);
 
   const handleGlobalClick = (event) => {
     // Close dropdowns if the click is outside of them
@@ -135,7 +142,12 @@ function EscrowDetails() {
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
-    setShowCurrencyOptions(false);
+   
+  };
+
+  const handleSelectedClick = (value) => {
+    setNetwork(value);
+    setShowOptions(false);
   };
 
   const toggleCurrencyOptions = () => {
@@ -165,18 +177,18 @@ function EscrowDetails() {
         cryptoSymbol: currentCurrency,
         cryptoCountry: currentPre,
       };
-      onChangeAmount(data);
+      // onChangeAmount(data);
 
-      if (value) {
-        if (value > 0) {
-          setReadyForPayment(false);
-        } else {
-          setReadyForPayment(true);
-          dispatch(notificationFail("Please Enter Correct Amount"));
-        }
-      } else {
-        setReadyForPayment(true);
-      }
+      // if (value) {
+      //   if (value > 0) {
+      //     setReadyForPayment(false);
+      //   } else {
+      //     setReadyForPayment(true);
+      //     dispatch(notificationFail("Please Enter Correct Amount"));
+      //   }
+      // } else {
+      //   setReadyForPayment(true);
+      // }
     }
   };
 
@@ -187,6 +199,19 @@ function EscrowDetails() {
     }
   };
 
+  useEffect(() => {
+    if (escrows && escrows?.user_address) {
+      const starCountRef = ref(
+        database,
+        firebaseStatus.CHAT_USERS + escrows?.user_address
+      );
+      onValue(starCountRef, (snapshot) => {
+        setUserStatus(snapshot.val()?.isOnline);
+      });
+    }
+  
+  }, [escrows]);
+
   return (
     <div className="escrow-details">
       <Row>
@@ -194,13 +219,8 @@ function EscrowDetails() {
           <Row>
             <Col lg="12">
               <div className="designCheap">
-                <h4>Cheap for you</h4>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Commodo lentesque consectetur adipiscing elit.Lorem ipsum
-                  dolor sit amet, consectetur adipiscing elit. Commodo lentesque
-                  consectetur adipiscing elit.
-                </p>
+                <h4>{escrows?.object}</h4>
+                <p>{escrows?.description}</p>
               </div>
             </Col>
           </Row>
@@ -227,87 +247,43 @@ function EscrowDetails() {
                     ) : (
                       "No Flag"
                     )}
+                    <p className="text-white mb-0">MID</p>
                   </div>
-                  <div className="country-select" ref={countryDropdownRef}>
-                    <div
-                      className="dropdownPersonalData form-select form-select-sm"
-                      onClick={toggleCurrencyOptions}
-                    >
-                      <p className="text-white mb-0">
-                        {cryptos.find((item) => item.symbol === currentCurrency)
-                          ?.symbol || "BTC"}
-                      </p>
-                    </div>
-                    {showCurrencyOptions && (
-                      <ul className="options">
-                        {cryptos.map((data) => (
-                          <li
-                            key={`${data.symbol}`}
-                            onClick={() => {
-                              handleChangeAmount(amount);
-                              setCurrentCurrencyPre(data.symbol);
-                              dispatch(defineCurrency(data.symbol));
-                            }}
-                            onFocus={handledAmountFocus}
-                          >
-                            {data.symbol}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+              
+                    {/* <div className="country-select"  ref={countryDropdownRef}>
+                      <div class="form-select form-select-sm" />
+                    </div> */}
                 </div>
               </Form.Group>
             </Col>
             <Col md="6">
               <Form.Group className="form-group">
-                <Form.Label>Conversation </Form.Label>
+                <Form.Label>Network </Form.Label>
                 <div className="d-flex align-items-center">
-                  <>
-                    <Form.Control
-                      name="phone"
-                      type="text"
-                      value={cryptoAmount ? cryptoAmount : "0"}
-                      disabled
-                    />
-                  </>
-
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={currencyCountry()}
-                      alt="Flag"
-                      className="circle-data"
-                    />
-                  </div>
-                  <div className="country-select" ref={optionsDropdownRef}>
-                    <div
-                      className="dropdownPersonalData form-select form-select-sm"
-                      onClick={toggleOptions}
-                    >
-                      <p className="text-white mb-0">
-                        {countryInfo.find(
-                          (item) => item.currency.code === currentPre
-                        )?.currency.code || "USD"}
-                      </p>
+                  <div className="country-select network-select"  ref={countryDropdownRef}>
+                      <div
+                        className="form-select"
+                        onClick={toggleOptions}
+                        aria-label="Polygon Chain"
+                      >
+                        {networks.find((cat) => cat.value === network)
+                          ?.label || "Polygon Chain"}
+                      </div>
+                      {showOptions && (
+                        <ul className="options wd">
+                          {networks.map((network) => (
+                            <li
+                              key={network?.value}
+                              onClick={() =>
+                                handleSelectedClick(network?.value)
+                              }
+                            >
+                              {network?.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    {showOptions && (
-                      <ul className="options">
-                        {countryInfo.map((data) => (
-                          <li
-                            key={`${data.currency.code}`}
-                            onClick={() => {
-                              handleChangeAmount(amount);
-                              setCurrentPre(data.currency.code);
-                              dispatch(defineCurrency(data.currency.code));
-                            }}
-                            onFocus={handledAmountFocus}
-                          >
-                            {data.currency?.code}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
                 </div>
               </Form.Group>
             </Col>
@@ -316,7 +292,7 @@ function EscrowDetails() {
             <Col lg="12">
               <div className="d-flex main-limit mb-3">
                 <div class="limit-txt">Limit: </div>
-                <div class="limit-txt-right">3BTC</div>
+                <div class="limit-txt-right">0.1-0.6 MID</div>
               </div>
 
               <div className="d-flex main-limit mb-2">
@@ -324,37 +300,37 @@ function EscrowDetails() {
               </div>
 
               <div className="d-flex main-limit">
-                <label>Payment Information</label>
+                <div class="limit-txt-right-amount">Payment Information</div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Amount to transfer to Middn </div>
                 <div class="limit-txt-left-amount">
-                  {cryptoAmount ? cryptoAmount + 0.02 : "0"}{" "}
-                  {currentCurrency ? currentCurrency : "BTC"}
+                  {amount || "0"}{" "}
+                  {currentCurrency ? currentCurrency : "MID"}
                 </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Invoice Amount</div>
                 <div class="limit-txt-left">
-                  {cryptoAmount ? cryptoAmount : "0"}{" "}
-                  {currentCurrency ? currentCurrency : "BTC"}
+                {amount || "0"}{" "}
+                  {currentCurrency ? currentCurrency : "MID"}
                 </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Escrow fees </div>
-                <div class="limit-txt-left">
-                  0.02  {currentCurrency ? currentCurrency : "BTC"}
+                <div class="limit-txt-left color-free">
+                 FREE
                 </div>
               </div>
 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Total</div>
                 <div class="limit-txt-left">
-                  {cryptoAmount ? cryptoAmount + 0.02 : "0"}{" "}
-                  {currentCurrency ? currentCurrency : "BTC"}
+                {amount || "0"}{" "}
+                  {currentCurrency ? currentCurrency : "MID"}
                 </div>
               </div>
               <div className="d-flex main-limit">
@@ -403,7 +379,16 @@ function EscrowDetails() {
                     }
                     alt={escrows?.newImage ? escrows?.newImage : "No Profile"}
                   />
-                  <span className="circle"></span>
+                  {/* <span className="circle"></span> */}
+                  {otherStatus === 1 && (
+                    <div className="chat-status"></div>
+                  )}
+                  {otherStatus === 2 && (
+                    <div className="chat-status-absent"></div>
+                  )}
+                  {otherStatus === 3 && (
+                    <div className="chat-status-offline"></div>
+                  )}
                 </div>
                 <div className="content ms-3">
                   <h6>
@@ -445,27 +430,27 @@ function EscrowDetails() {
               <Card.Title as="h2">Summary</Card.Title>
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Price</span>
-                <strong class="summery-txt">15.4905468 ETH</strong>
+                <strong class="summery-txt">{amount || "0" }{" "} MID</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Limit</span>
-                <strong class="summery-txt">0.1-0.6 BTC</strong>
+                <strong class="summery-txt">0.1-0.6 MID</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Payment methods</span>
-                <strong class="summery-txt">Ethereum</strong>
+                <strong class="summery-txt">MID</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Network</span>
-                <strong class="summery-txt"> Binance Smart Chain</strong>
+                <strong class="summery-txt">{network || "Polygon Chain"}</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Time constraints</span>
-                <strong class="summery-txt">09:00 AM - 00:00 AM</strong>
+                <strong class="summery-txt">24 Hours</strong>
               </div>
             </Card.Body>
           </Card>

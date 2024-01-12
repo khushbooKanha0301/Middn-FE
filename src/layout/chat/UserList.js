@@ -1,4 +1,4 @@
-import { onValue, ref } from "firebase/database";
+import { onValue, ref, get } from "firebase/database";
 import { useEffect, useState } from "react";
 import { Card, Col } from "react-bootstrap";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -8,6 +8,7 @@ import { setIsChatPage } from "../../store/slices/chatSlice";
 import { database } from "../../helper/config";
 import { firebaseMessages } from "../../helper/chatMessage";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
+import { firebaseStatus } from "../../helper/statusManage";
 //const CHAT_ROOM = "chat/chat_room/";
 
 export const UserList = (props) => {
@@ -16,8 +17,8 @@ export const UserList = (props) => {
   const [allusers, setAllUsers] = useState([]);
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
-  const usergetdata = useSelector(userGetFullDetails);
-
+  const [userStatuses, setUserStatuses] = useState([]);
+  
   const getChatUser = (user) => {
     dispatch(setIsChatPage({ user: user, isChatOpen: true }));
     window.localStorage.setItem("user", user?.id);
@@ -25,21 +26,18 @@ export const UserList = (props) => {
     if (userData?.account && user?.id) {
       setUnReadCountZero(userData?.account, user?.id);
     }
-  }
+  };
 
   useEffect(() => {
     if (receiverData) {
       const latestChanges = allusers.filter(function (e) {
-        return (
-          e.wallet_address === receiverData.wallet_address)
-      })
-      if(latestChanges){
+        return e.wallet_address === receiverData.wallet_address;
+      });
+      if (latestChanges) {
         dispatch(setIsChatPage({ user: latestChanges[0], isChatOpen: true }));
       }
     }
-
   }, [receiverData?.wallet_address, allusers, setAllUsers]);
-
 
   useEffect(() => {
     setLoader(true);
@@ -48,7 +46,7 @@ export const UserList = (props) => {
     }
   }, [userData.authToken]);
 
-  const getAllFirebaseUser = (userIds) => {
+  const getAllFirebaseUser = async (userIds) => {
     if (userIds) {
       const starCountRef = ref(database, firebaseMessages.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
@@ -83,6 +81,16 @@ export const UserList = (props) => {
           setLoader(false);
         }
       });
+
+      let statuses = await Promise.all(
+        userIds.map(async (e) => {
+          const starCount = ref(database, firebaseStatus.CHAT_USERS + e.id);
+          // Use await to wait for the onValue callback
+          const snapshot = await get(starCount);
+          return snapshot.exists() ? snapshot.val()?.isOnline : 4;
+        })
+      );
+      setUserStatuses(statuses);
     }
   };
 
@@ -118,8 +126,8 @@ export const UserList = (props) => {
                   messageNode && messageNode.file
                     ? messageNode.file?.name
                     : messageNode.message
-                      ? messageNode.message
-                      : "",
+                    ? messageNode.message
+                    : "",
                 lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
               };
             });
@@ -138,21 +146,14 @@ export const UserList = (props) => {
         <Card.Body>
           <Card.Title as="h2">Messages</Card.Title>
           <ul className="chat-list alluser-chat">
-            <PerfectScrollbar
-              options={{ suppressScrollX: true }}
-            >
+            <PerfectScrollbar options={{ suppressScrollX: true }}>
               {allusers &&
                 allusers?.map((user, index) => (
-
                   <li
                     key={index}
-                    className={`${user?.id === receiverData?.id
-                      ? "active"
-                      : "deactive"
-                      }${user?.unreadCount > 0
-                        ? "unreaded-msg"
-                        : ""
-                      }`}
+                    className={`${
+                      user?.id === receiverData?.id ? "active" : "deactive"
+                    }${user?.unreadCount > 0 ? "unreaded-msg" : ""}`}
                     onClick={() => getChatUser(user)}
                   >
                     <div className="chat-image">
@@ -164,9 +165,15 @@ export const UserList = (props) => {
                         }
                         alt={user?.fname_alias}
                       />
-                      {(user?.isOnline === 0 || user?.isOnline === false) && <div className="chat-status-offline"></div>}
-                      {(user?.isOnline === 1 || user?.isOnline === true) && <div className="chat-status"></div>}
-                      {(user?.isOnline === 2) && <div className="chat-status-absent"></div>}
+                      {userStatuses[index] === 0 && (
+                        <div className="chat-status-offline"></div>
+                      )}
+                      {userStatuses[index] === 1 && (
+                        <div className="chat-status"></div>
+                      )}
+                      {userStatuses[index] === 2 && (
+                        <div className="chat-status-absent"></div>
+                      )}
                     </div>
 
                     <div>
@@ -191,12 +198,11 @@ export const UserList = (props) => {
                     )}
                   </li>
                 ))}
-                {allusers.length == 0  && (
-                  <li className="active no-message">No Messages yet</li>
-                )}
+              {allusers.length == 0 && (
+                <li className="active no-message">No Messages yet</li>
+              )}
             </PerfectScrollbar>
           </ul>
-          
         </Card.Body>
       </Card>
     </Col>

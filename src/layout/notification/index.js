@@ -49,7 +49,7 @@ export const AccountSetting = () => {
         );
       }
     }
-  }, [receiverData?.wallet_address, allusers, setAllUsers]);
+  }, [dispatch , receiverData, allusers, setAllUsers]);
 
   useEffect(() => {
     if (userData.authToken) {
@@ -121,9 +121,7 @@ export const AccountSetting = () => {
               let messageNode = messages[Object.keys(messages).pop()];
               let lastUpdateAt = Object.keys(messages).pop();
 
-              if (senderId === name) {
-                return {};
-              } else if (ReciverId === name) {
+              if (ReciverId === name) {
                 return {
                   id: id,
                   senderId: senderId,
@@ -138,6 +136,7 @@ export const AccountSetting = () => {
                   lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
                 };
               }
+              return {}
             });
 
           if (userIds) {
@@ -312,16 +311,17 @@ export const AccountSetting = () => {
                                     }
                                     alt={user?.fname_alias}
                                   />
-                                  {(user?.isOnline === 0 ||
-                                    user?.isOnline === false) && (
-                                    <div className="chat-status-offline"></div>
-                                  )}
+                                  
                                   {(user?.isOnline === 1 ||
                                     user?.isOnline === true) && (
                                     <div className="chat-status"></div>
                                   )}
                                   {user?.isOnline === 2 && (
                                     <div className="chat-status-absent"></div>
+                                  )}
+                                  {(user?.isOnline === 3 ||
+                                    user?.isOnline === false) && (
+                                    <div className="chat-status-offline"></div>
                                   )}
                                 </div>
 
@@ -353,7 +353,7 @@ export const AccountSetting = () => {
                                 )}
                               </li>
                             ))}
-                          {allusers.length == 0 && (
+                          {allusers.length === 0 && (
                             <li className="active no-message">
                               No Messages yet
                             </li>

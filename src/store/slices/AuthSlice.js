@@ -5,13 +5,12 @@ import jwtAxios, { setAuthToken } from "../../service/jwtAxios";
 import { setLoading } from "./commonSlice";
 import { setLoginLoading } from "./loginLoderSlice";
 import { notificationFail, notificationSuccess } from "./notificationSlice";
-// import { countryCodes } from "../countryCodes";
 import axios from "axios";
 import apiConfigs from "../../config/config";
 import listData from "../../layout/accountSetting/countryData";
 import { database } from "../../helper/config";
-import { firebaseMessages } from "../../helper/chatMessage";
-import { child, get, ref, set, update } from "firebase/database";
+import { firebaseStatus } from "../../helper/statusManage";
+import { get, ref, set, update } from "firebase/database";
 
 const authTokenData = JSON.parse(window?.localStorage?.getItem("userData"))
   ?.authToken
@@ -65,7 +64,7 @@ export const checkAuth = createAsyncThunk(
       };
       // let signData = action.signData;
       if (!signature) {
-        let response = await jwtAxios
+        await jwtAxios
           .get(`/auth/nonce/${account}`, {
             headers: {
               "ngrok-skip-browser-warning": true,
@@ -81,15 +80,16 @@ export const checkAuth = createAsyncThunk(
             window.localStorage.removeItem("token");
             window.localStorage.clear();
           });
+
         let provider = window.localStorage.getItem("provider");
-        if (provider == "fortmatic") {
+        if (provider === "fortmatic") {
           signature = await window.web3.eth.personal.sign(
             resBody.message,
             account
           );
-        } else if (provider == "coinbaseWallet") {
+        } else if (provider === "coinbaseWallet") {
           signMessage({ message: resBody.message });
-        } else if (provider == "walletConnect") {
+        } else if (provider === "walletConnect") {
           signMessage({ message: resBody.message });
         } else {
           signature = await library
@@ -110,7 +110,7 @@ export const checkAuth = createAsyncThunk(
               },
             }
           )
-        
+
           .catch((error) => {
             if (error.response.data.message) {
               dispatch(notificationFail(error.response.data.message));
@@ -140,20 +140,26 @@ export const checkAuth = createAsyncThunk(
           if (hideLoginModal) {
             hideLoginModal();
           }
-          const dbRef = ref(database);
-          get(
-            child(dbRef, firebaseMessages?.CHAT_USERS + userData?.account)
-          ).then((snapshot) => {
-            // if (snapshot.exists()) {
-              update(
-                ref(database, firebaseMessages?.CHAT_USERS + userData?.account),
-                {
-                  isOnline: 1,
-                  lastActive: Date.now(),
-                }
-              );
-            //}
-          });
+          const userRef = ref(
+            database,
+            firebaseStatus?.CHAT_USERS + userData?.account
+          );
+          get(userRef)
+            .then((snapshot) => {
+              set(userRef, {
+                wallet_address: userData.account,
+                fname_alias: userData.fname_alias || "John",
+                lname_alias: userData.lname_alias || "Doe",
+                imageUrl: userData?.imageUrl ? userData?.imageUrl : "",
+                lastActive: Date.now(),
+                isOnline: 1,
+              });
+            })
+            .catch((error) => {
+              console.error("Error adding/updating user in Firebase:", error);
+              dispatch(notificationFail("Something went wrong!"));
+            });
+
           // update(ref(database, firebaseMessages.CHAT_USERS + userData?.account), {isOnline:true});
           dispatch(setLoading(false));
           dispatch(setLoginLoading(false));
@@ -162,7 +168,6 @@ export const checkAuth = createAsyncThunk(
               undefined ||
             verifyTokenData.data?.userInfo?.is_2FA_login_verified === true
           ) {
-            
             dispatch(notificationSuccess("user login successfully"));
             // return userData;
           }
@@ -187,28 +192,19 @@ export const logoutAuth = createAsyncThunk(
   "logoutAuth",
   async (action, { dispatch }) => {
     try {
-      let accountAdrr = JSON.parse(window.localStorage.getItem("userData")).account;
- console.log("accountAdrr ", accountAdrr);
-      const dbRef = ref(database);
-      await get(
-        child(dbRef, firebaseMessages?.CHAT_USERS + accountAdrr)
-      ).then(async (snapshot) => {
+      let accountAdrr = JSON.parse(
+        window.localStorage.getItem("userData")
+      ).account;
+
+      const userRef = ref(database, firebaseStatus?.CHAT_USERS + accountAdrr);
+      get(userRef).then((snapshot) => {
         if (snapshot.exists()) {
-          update(
-            ref(database, firebaseMessages?.CHAT_USERS + accountAdrr),
-            {
-              isOnline: 4
-            }
-          );
+          update(userRef, {
+            lastActive: Date.now(),
+            isOnline: 4,
+          });
         }
       });
-
-      const snapshotArr = await get(ref(
-        database,
-        firebaseMessages.CHAT_USERS + accountAdrr
-      ));
-      console.log("-------", snapshotArr.val())
-
       jwtAxios
         .get(`/users/logout`)
         .then(() => {
@@ -222,7 +218,7 @@ export const logoutAuth = createAsyncThunk(
         });
 
       window.localStorage.removeItem("userData");
-     
+
       let userData = {
         account: "Connect Wallet",
         authToken: null,
@@ -242,10 +238,8 @@ export const userGetData = createAsyncThunk(
   async (action, { dispatch }) => {
     dispatch(setLoading(true));
     try {
-      const userid = action;
       let user = {};
       let imageUrl = "";
-      const token = localStorage.getItem("token");
       await jwtAxios
         .get(`/users/getuser`)
         .then((response) => {

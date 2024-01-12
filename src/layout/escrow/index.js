@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { Link } from "react-router-dom";
 import { database } from "../../helper/config";
-import { firebaseMessages } from "../../helper/chatMessage";
+import { firebaseStatus } from "../../helper/statusManage";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
 import { useNavigate } from "react-router-dom";
@@ -84,25 +84,23 @@ export const Escrow = () => {
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [userStatuses, setUserStatuses] = useState([]);
- console.log("userStatuses ", userStatuses);
-
+  
   const getAllEscrow = async () => {
     if (currentPage) {
       try {
-        setUserStatuses([])
+        setUserStatuses([]);
         const res = await jwtAxios.get(
           `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
         );
         setEscrow(res.data?.data); // Update the state with the new array
         setTotalEscrowCount(res.data?.escrowsCount);
         setEscrowLoading(false);
-       
+
         let statuses = await Promise.all(
           res.data?.data.map(async (e) => {
-            console.log(e.user_address)
             const starCountRef = ref(
               database,
-              firebaseMessages.CHAT_USERS + e.user_address
+              firebaseStatus.CHAT_USERS + e.user_address
             );
             // Use await to wait for the onValue callback
             const snapshot = await get(starCountRef);
@@ -323,17 +321,17 @@ export const Escrow = () => {
                               escrow?.newImage ? escrow?.newImage : "No Profile"
                             }
                           />
-                          {/* <span className="circle"></span> */}
-                          {(userStatuses[index] === 0 ||
-                            userStatuses[index] === false) && (
-                            <div className="chat-status-offline"></div>
-                          )}
+                          
                           {(userStatuses[index] === 1 ||
                             userStatuses[index] === true) && (
                             <div className="chat-status"></div>
                           )}
                           {userStatuses[index] === 2 && (
                             <div className="chat-status-absent"></div>
+                          )}
+                          {(userStatuses[index] === 3 ||
+                            userStatuses[index] === false) && (
+                            <div className="chat-status-offline"></div>
                           )}
                         </div>
                         <div className="content ms-3 escrow-trade-content">

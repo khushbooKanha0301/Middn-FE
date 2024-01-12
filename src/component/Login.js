@@ -38,6 +38,11 @@ export const LoginView = (props) => {
     window.localStorage.setItem("provider", type);
   };
 
+  const refreshState = () => {
+    window.localStorage.setItem("provider", undefined);
+    window.localStorage.removeItem("userData");
+  };
+
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
@@ -300,10 +305,6 @@ export const LoginView = (props) => {
     props.handleaccountaddress(accountAddress);
   }, [accountAddress]);
 
-  const refreshState = () => {
-    window.localStorage.setItem("provider", undefined);
-    window.localStorage.removeItem("userData");
-  };
   useEffect(() => {
     if (props.isSign === true) {
       props.setTwoFAModal(false);

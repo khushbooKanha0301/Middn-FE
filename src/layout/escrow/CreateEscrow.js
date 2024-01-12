@@ -310,17 +310,6 @@ export const CreateEscrowView = (props) => {
                       />
                       <label class="form-check-label">Buyer</label>
                     </div>
-
-                    {/* <Form.Check
-                      className="yourself-option"
-                      label="Buyer"
-                      name="radiooption"
-                      type="radio"
-                      id="radiooption1"
-                      checked={escrowType === "buyer"}
-                      value={"buyer"}
-                      readOnly
-                    /> */}
                   </Col>
                   <Col md="6">
                     <div
@@ -334,16 +323,6 @@ export const CreateEscrowView = (props) => {
                       />
                       <label class="form-check-label">Seller</label>
                     </div>
-                    {/* <Form.Check
-                      className="yourself-option"
-                      label="Seller"
-                      name="radiooption"
-                      type="radio"
-                      id="radiooption2"
-                      checked={escrowType === "seller"}
-                      value={"seller"}
-                      readOnly
-                    /> */}
                   </Col>
                 </Row>
               </Form.Group>
@@ -383,28 +362,6 @@ export const CreateEscrowView = (props) => {
                         onChange={inputChangeHandler}
                         value={price}
                       />
-
-                      {/* <div
-                      data-name="price"
-                      className="form-control"
-                      contentEditable
-                      placeholder="1"
-                      onInputCapture={inputChangeHandler}
-                      dangerouslySetInnerHTML={{ __html: price }}
-                      // dir="ltr"
-                      /> */}
-
-                      {/* <div
-                        data-name="price"
-                        className="form-control"
-                        contentEditable
-                        placeholder="1"
-                        onInput={inputChangeHandler}
-                        onChange={onChange}
-                      >
-                        {price}
-                      </div> */}
-
                       <div className="currency-type">
                         <span className="currency-flag"></span>USD
                       </div>
@@ -425,16 +382,6 @@ export const CreateEscrowView = (props) => {
                         onChange={inputChangeHandler}
                         value={minPrice}
                       />
-                      {/* <div
-                        data-name="minPrice"
-                        className="form-control"
-                        contentEditable
-                        placeholder="5"
-                        onChange={inputChangeHandler}
-                        //dangerouslySetInnerHTML={{ __html: minPrice }}
-                      >
-                        {minPrice}
-                      </div> */}
                       <div className="currency-type">
                         <span className="currency-flag"></span>USD
                       </div>
@@ -486,13 +433,7 @@ export const CreateEscrowView = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Category</Form.Label>
-                    {/* <Form.Select
-                      name="category"
-                      aria-label="High-value items"
-                      onChange={inputChangeHandler}
-                    >
-                      <option value="high_value_items">High-value items</option>
-                    </Form.Select> */}
+                   
                     <div className="customSelectBox" ref={countryDropdownRef}>
                       <div
                         className="form-select"

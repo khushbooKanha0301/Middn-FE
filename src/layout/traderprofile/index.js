@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Col, Row, Card, Button, Tabs, Tab, Nav } from "react-bootstrap";
 import EditProfileView from "../../component/EditProfile";
 import MessageView from "../../component/Message";
-import ReportUserView from "../../component/ReportUser";
 import {
   InstagramIcon,
   TelegramIcon,
@@ -21,12 +20,12 @@ import { InfoLoader, ProfileLoader } from "./Loader";
 import { TableLoader } from "../../helper/Loader";
 import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
-import { firebaseMessages } from "../../helper/chatMessage";
+import { firebaseStatus } from "../../helper/statusManage";
 import { onValue, ref, get } from "firebase/database";
 import ReviewTransactionView from "../../component/ReviewTransaction";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
-import { Link } from "react-router-dom";
+
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -66,49 +65,35 @@ export const TraderProfile = (props) => {
   const [totalActiveEscrowCount, setTotalActiveEscrowCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [otherStatus, setUserStatus] = useState(null);
+  const [userStatuses, setUserStatuses] = useState([]);
   let PageSize = 5;
 
   useEffect(() => {
     if (loginuserdata) {
       getActiveEscrows()
     }
-  }, [loginuserdata]);
+  }, [ loginuserdata]);
 
   const getActiveEscrows = async () => {
     if (currentPage) {
       try {
         const res = await jwtAxios.get(`/auth/activeEscrows/${address}?page=${currentPage}&pageSize=${PageSize}`)
+        setEscrowLoading(false);
+        setActiveEscrows(res.data?.data); // Update the state with the new array
+        setTotalActiveEscrowCount(res.data?.escrowsCount);
 
-        let escrowErr = await Promise.all(
+        let statuses = await Promise.all(
           res.data?.data.map(async (e) => {
-            if (e.user_address) {
-              const starCountRef = ref(
-                database,
-                firebaseMessages.CHAT_USERS + e.user_address
-              );
-              // Use await to wait for the onValue callback
-              const snapshot = await get(starCountRef);
-              if (snapshot.val()) {
-                if (snapshot.exists()) {
-                  // Return the updated object with the new key-value pair
-                  return {
-                    ...e,
-                    status: snapshot.val().isOnline,
-                  };
-                }
-              } else {
-                return {
-                  ...e,
-                  status: 0,
-                };
-              }
-            }
-            return e; // Return the original object if no update is needed
+            const starCountRef = ref(
+              database,
+              firebaseStatus.CHAT_USERS + e.user_address
+            );
+            // Use await to wait for the onValue callback
+            const snapshot = await get(starCountRef);
+            return snapshot.exists() ? snapshot.val()?.isOnline : 4;
           })
         );
-        setEscrowLoading(false);
-        setActiveEscrows(escrowErr); // Update the state with the new array
-        setTotalActiveEscrowCount(res.data?.escrowsCount);
+        setUserStatuses(statuses);
        
       } catch (err) {
         setEscrowLoading(true);
@@ -127,6 +112,7 @@ export const TraderProfile = (props) => {
       setCountryCode(countryDetails?.country_code);
     }
   }, [countryDetails]);
+  
   const flagUrl = countryCode
     ? `https://flagcdn.com/h40/${countryCode?.toLowerCase()}.png`
     : "";
@@ -171,27 +157,25 @@ export const TraderProfile = (props) => {
         }
       }
     }
-  }, [address, loginuserdata, otherUserData, isAuthAddress]);
+  }, [ address, loginuserdata, otherUserData, isAuthAddress, navigate]);
 
   useEffect(() => {
     if (otherUserData && otherUserData?.wallet_address) {
       const starCountRef = ref(
         database,
-        firebaseMessages.CHAT_USERS + otherUserData?.wallet_address
+        firebaseStatus.CHAT_USERS + otherUserData?.wallet_address
       );
       onValue(starCountRef, (snapshot) => {
         setUserStatus(snapshot.val()?.isOnline);
-        // setOtherUserLastActive(snapshot.val()?.lastActive);
       });
     }
     if (loginuserdata && loginuserdata?.wallet_address) {
       const starCountRef = ref(
         database,
-        firebaseMessages.CHAT_USERS + loginuserdata?.wallet_address
+        firebaseStatus.CHAT_USERS + loginuserdata?.wallet_address
       );
       onValue(starCountRef, (snapshot) => {
         setUserStatus(snapshot.val()?.isOnline);
-        // setLoginUserLastActive(snapshot.val()?.lastActive);
       });
     }
   }, [otherUserData, loginuserdata]);
@@ -227,11 +211,12 @@ export const TraderProfile = (props) => {
                       {otherStatus === 1 && (
                         <div className="profile-status"></div>
                       )}
-                      {otherStatus === 0 && (
-                        <div className="profile-status-offline"></div>
-                      )}
+                     
                       {otherStatus === 2 && (
                         <div className="profile-status-absent"></div>
+                      )}
+                       {otherStatus === 3 && (
+                        <div className="profile-status-offline"></div>
                       )}
                     </Button>
                   ) : (
@@ -247,11 +232,11 @@ export const TraderProfile = (props) => {
                       {otherStatus === 1 && (
                         <div className="profile-status"></div>
                       )}
-                      {otherStatus === 0 && (
-                        <div className="profile-status-offline"></div>
-                      )}
                       {otherStatus === 2 && (
                         <div className="profile-status-absent"></div>
+                      )}
+                      {otherStatus === 3 && (
+                        <div className="profile-status-offline"></div>
                       )}
                     </Button>
                   )}
@@ -442,7 +427,7 @@ export const TraderProfile = (props) => {
                 <TableLoader />
               ) : (
                 <>
-                  {activeEscrows?.map((escrow) => (
+                  {activeEscrows?.map((escrow, i) => (
                     <div
                       className="flex-table-body tradeListBody"
                       key={escrow._id}
@@ -485,15 +470,15 @@ export const TraderProfile = (props) => {
                               }
                             />
                             {/* <span className="circle"></span> */}
-                            {(escrow?.status === 0 ||
-                              escrow?.status === false) && (
+                            {(userStatuses[i] === 0 ||
+                              userStatuses[i]  === false) && (
                               <div className="chat-status-offline"></div>
                             )}
-                            {(escrow?.status === 1 ||
-                              escrow?.status === true) && (
+                            {(userStatuses[i]  === 1 ||
+                              userStatuses[i]  === true) && (
                               <div className="chat-status"></div>
                             )}
-                            {escrow?.status === 2 && (
+                            {userStatuses[i]  === 2 && (
                               <div className="chat-status-absent"></div>
                             )}
                           </div>
@@ -523,7 +508,7 @@ export const TraderProfile = (props) => {
                       </div>
                     </div>
                   ))}
-                  {totalActiveEscrowCount === 0 && escrowLoading == false && (
+                  {totalActiveEscrowCount === 0 && escrowLoading === false && (
                     <div className="flex-table-body no-records justify-content-between">
                       <div className="no-records-text">
                         <div className="no-record-label">No Records</div>
@@ -544,7 +529,7 @@ export const TraderProfile = (props) => {
               )}
             </div>
           </div>
-          {totalActiveEscrowCount !== 0 && escrowLoading == false && (
+          {totalActiveEscrowCount !== 0 && escrowLoading === false && (
             <div className="d-flex justify-content-between align-items-center table-pagination">
               <PaginationComponent
                 className="pagination-bar"

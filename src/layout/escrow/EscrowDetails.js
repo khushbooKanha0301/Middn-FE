@@ -10,17 +10,26 @@ import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import EditEscrow from "./EditEscrow";
 import { useNavigate } from "react-router-dom";
+import EscrowDetailLoader from "./EscrowDetailLoader";
+
+import { database } from "../../helper/config";
+import { firebaseStatus } from "../../helper/statusManage";
+import { onValue, ref } from "firebase/database";
 
 function EscrowDetails() {
   const dispatch = useDispatch();
-  const [countryCallingCode, setCountryCallingCode] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  const [country, setCountry] = useState();
   const [currentPre, setCurrentPre] = useState("USD");
   const [editEscrowModalShow, setEditEscrowModalShow] = useState(false);
+  const countryDetails = useSelector((state) => state.auth.countryDetails);
   const [escrows, setEscrow] = useState(null);
   const [typeFilter, setTypeFilter] = useState(null);
   const acAddress = useSelector(userDetails);
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
+  const [otherStatus, setUserStatus] = useState(null);
 
   const deleteUserKyc = (id) => {
     Swal.fire({
@@ -63,6 +72,13 @@ function EscrowDetails() {
     return result?.flag;
   };
 
+  useEffect(() => {
+    if (countryDetails) {
+      setCountry(countryDetails?.country_name);
+      setCountryCode(countryDetails?.country_code);
+    }
+  }, [countryDetails]);
+
   const editEscrowModalToggle = () =>
     setEditEscrowModalShow(!editEscrowModalShow);
 
@@ -70,370 +86,314 @@ function EscrowDetails() {
     setTypeFilter((prevType) => (prevType === vehicle ? null : vehicle));
   };
 
+  const flagUrl = countryCode
+    ? `https://flagcdn.com/h40/${countryCode?.toLowerCase()}.png`
+    : "";
+
   useEffect(() => {
     jwtAxios
       .get(`/escrows/getEscrowsById/${id}`)
       .then((res) => {
-        setEscrow(res.data?.data);
+        if (res.data?.data.user_address === acAddress.account) {
+          setEscrow(res.data?.data);
+        } else {
+          navigate("/");
+        }
       })
       .catch((err) => {
         console.log(err);
       });
   }, [acAddress.authToken]);
 
+  useEffect(() => {
+    if (escrows && escrows?.user_address) {
+      const starCountRef = ref(
+        database,
+        firebaseStatus.CHAT_USERS + escrows?.user_address
+      );
+      onValue(starCountRef, (snapshot) => {
+        setUserStatus(snapshot.val()?.isOnline);
+      });
+    }
+  }, [escrows]);
+
   return (
-    <div className="escrow-details">
-      <Row>
-        <Col lg="8">
-          <Row>
-            <Col lg="12">
-              <div className="designCheap">
-                <h4>Design for cheap</h4>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Commodo lentesque consectetur adipiscing elit.Lorem ipsum
-                  dolor sit amet, consectetur adipiscing elit. Commodo lentesque
-                  consectetur adipiscing elit.
-                </p>
-                <div className="edit-btn ">
-                  <Button
-                    className="btn btn-success btn-width"
-                    variant="success"
-                    onClick={editEscrowModalToggle}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    className="btn btn-danger btn-width"
-                    variant="success"
-                    onClick={() => deleteUserKyc(id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col md="6">
-              <Form.Group className="form-group">
-                <Form.Label>Amount</Form.Label>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    placeholder={countryCallingCode}
-                    name="phone"
-                    type="text"
-                    value="1"
-                    maxLength="10"
-                  />
-
-                  <div className="d-flex align-items-center currency-info">
-                    {/* <div className="currency-type">
-                      <span className="currency-flag">
-                        <img
-                          className="currency-flag"
-                          src={require("../../content/images/bitcoin.png")}
-                          alt="Bitcoin"
+    <>
+      {acAddress?.account === escrows?.user_address && (
+        <div className="escrow-details">
+          {loader ? (
+            <EscrowDetailLoader />
+          ) : (
+            <Row>
+              <Col lg="8">
+                <Row>
+                  <Col lg="12">
+                    <div className="designCheap">
+                      <h4>{escrows?.object}</h4>
+                      <p>{escrows?.description}</p>
+                      <div className="edit-btn ">
+                        <Button
+                          className="btn btn-success btn-width"
+                          variant="success"
+                          onClick={editEscrowModalToggle}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          className="btn btn-danger btn-width"
+                          variant="success"
+                          onClick={() => deleteUserKyc(id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md="6">
+                    <Form.Group className="form-group">
+                      <Form.Label>Amount</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <Form.Control
+                          name="phone"
+                          type="text"
+                          value="1"
+                          maxLength="10"
                         />
-                      </span>
-                      BTC
+
+                        <div className="d-flex align-items-center currency-info">
+                          <div className="token-type">
+                            <span className="token-icon"></span>
+                          </div>
+                          <p className="text-white mb-0">MID</p>
+                        </div>
+                        {/* <div className="country-select">
+                          <div class="form-select form-select-sm" />
+                        </div> */}
+                      </div>
+                    </Form.Group>
+                  </Col>
+                  <Col md="6">
+                    <Form.Group className="form-group">
+                      <Form.Label>Network </Form.Label>
+                      <div className="d-flex align-items-center">
+                        <Form.Control
+                          name="phone"
+                          type="text"
+                          value="Polygon Chain"
+                          maxLength="10"
+                        />
+                        {/* <div className="d-flex align-items-center currency-info">
+                      <div className="token-type">
+                        <span className="token-icon"></span>
+                      </div>
+
+                      <p className="text-white mb-0">USD</p>
                     </div> */}
 
-                    <div className="token-type">
-                      <span className="token-icon"></span>
+                        <div className="country-select">
+                          <div class="form-select form-select-sm" />
+                        </div>
+                      </div>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <div className="d-flex main-limit mb-3">
+                      <div class="limit-txt">Limit: </div>
+                      <div class="limit-txt-right">800/4900 MID</div>
                     </div>
 
-                    <p className="text-white mb-0">BTC</p>
-
-                    {/* <div className="text-white mb-0 currency-amount">
-                      USD
-                    </div> */}
-                  </div>
-
-                  {/* <div className="d-flex align-items-center">
-                    {currentPre ? (
-                      <img
-                        src={currencyCountry()}
-                        alt="Flag"
-                        className="circle-data"
-                      />
-                    ) : (
-                      "No Flag"
-                    )}
-                    <p className="text-white mb-0">
-                      {
-                        countryInfo.find(
-                          (item) => item.currency.code === currentPre
-                        )?.currency.code
-                      } BTC
-                    </p>
-                  </div> */}
-                  <div className="country-select">
-                    <div class="form-select form-select-sm" />
-                    {/* <Form.Select
-                      size="sm"
-                      value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
-                    >
-                      {countryInfo.map((data) => (
-                        <option
-                          value={`${data.currency.code}`}
-                          key={`${data.currency.code}`}
-                        >
-                          {data.currency?.code}
-                        </option>
-                      ))}
-                    </Form.Select> */}
-                  </div>
-                </div>
-              </Form.Group>
-            </Col>
-            <Col md="6">
-              <Form.Group className="form-group">
-                <Form.Label>Conversation </Form.Label>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    placeholder={countryCallingCode}
-                    name="phone"
-                    type="text"
-                    value="1"
-                    // onChange={(e) => {
-                    //   onChange(e);
-                    // }}
-                    maxLength="10"
-                  />
-                  {/* <div className="d-flex align-items-center">
-                    {currentPre ? (
-                      // <img
-                      //   src={currencyCountry()}
-                      //   alt="Flag"
-                      //   className="circle-data"
-                      // />   
-                    ) : (
-                      "No Flag"
-                    )}
-                    <p className="text-white mb-0">
-                      {
-                        // countryInfo.find(
-                        //   (item) => item.currency.code === currentPre
-                        // )?.currency.code
-                      }
-                    </p>
-                  </div> */}
-
-                  <div className="d-flex align-items-center currency-info">
-                    <div className="token-type">
-                      <span className="token-icon"></span>
+                    <div className="d-flex main-limit mb-2">
+                      <h6>Detail</h6>
                     </div>
 
-                    <p className="text-white mb-0">USD</p>
-                    {/* <div className="currency-type">
-                      <span className="currency-flag">
-                        <img
-                          className="currency-flag"
-                          src={require("../../content/images/usd-icon-resized.png")}
-                          alt="Bitcoin"
-                        />
-                      </span>
-                      USD
-                    </div> */}
-                    {/* <div className="text-white mb-0 currency-amount">
-                      USD
-                    </div> */}
-                  </div>
+                    <div className="d-flex main-limit">
+                      <div class="limit-txt-right-amount">
+                        Payment Information
+                      </div>
+                    </div>
 
-                  <div className="country-select">
-                    <div class="form-select form-select-sm" />
-                    {/* <Form.Select
-                      size="sm"
-                      value={currentPre}
-                      onChange={(e) => {
-                        setCurrentPre(e.target.value);
-                        dispatch(defineCurrency(e.target.value));
-                      }}
-                    >
-                      {countryInfo.map((data) => (
-                        <option
-                          value={`${data.currency.code}`}
-                          key={`${data.currency.code}`}
+                    <div className="d-flex main-limit">
+                      <div class="limit-txt-right">
+                        Amount to transfer to Middn{" "}
+                      </div>
+                      <div class="limit-txt-left-amount">00 MID</div>
+                    </div>
+
+                    <div className="d-flex main-limit">
+                      <div class="limit-txt-right">Invoice Amount</div>
+                      <div class="limit-txt-left">00 MID</div>
+                    </div>
+
+                    <div className="d-flex main-limit">
+                      <div class="limit-txt-right">Escrow fees </div>
+                      <div class="limit-txt-left">00 MID</div>
+                    </div>
+
+                    <div className="d-flex main-limit">
+                      <div class="limit-txt-right">Total</div>
+                      <div class="limit-txt-left">00 MID</div>
+                    </div>
+                    <div className="d-flex main-limit">
+                      <Form.Group className="custom-input-seller">
+                        <div
+                          className="form-check"
+                          onClick={() => handleFilterTypeChange("Bike")}
                         >
-                          {data.currency?.code}
-                        </option>
-                      ))}
-                    </Form.Select> */}
-                  </div>
-                </div>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row>
-            <Col lg="12">
-              <div className="d-flex main-limit mb-3">
-                <div class="limit-txt">Limit: </div>
-                <div class="limit-txt-right">3BTC</div>
-              </div>
+                          <div
+                            className={`form-check-input ${
+                              typeFilter == "Bike" ? "checked" : ""
+                            }`}
+                          />
+                          <label class="form-check-label" for="vehicle1">
+                            I agree to Middin's escrow terms and conditions.
+                          </label>
+                        </div>
+                      </Form.Group>
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+              <Col lg="4">
+                <Card className="cards-dark mb-4">
+                  <Card className="cards-dark">
+                    <Card.Body>
+                      <Card.Title as="h2">Information</Card.Title>
+                      <div className="d-flex align-items-center buyerDetails">
+                        <div className="chat-image">
+                          <img
+                            src={
+                              escrows?.newImage
+                                ? escrows?.newImage
+                                : require("../../content/images/avatar.png")
+                            }
+                            alt={
+                              escrows?.newImage
+                                ? escrows?.newImage
+                                : "No Profile"
+                            }
+                          />
+                          {otherStatus === 1 && (
+                            <div className="chat-status"></div>
+                          )}
+                          {otherStatus === 2 && (
+                            <div className="chat-status-absent"></div>
+                          )}
+                          {otherStatus === 3 && (
+                            <div className="chat-status-offline"></div>
+                          )}
+                        </div>
+                        <div className="content ms-3">
+                          <h6>
+                            {escrows?.user_name
+                              ? escrows?.user_name
+                              : "John doe"}
+                          </h6>
+                          <span>(100%, 500+)</span>
+                        </div>
+                      </div>
+                      <div className="buyer-details">
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Location</label>
+                          </Col>
+                          <Col>
+                            {flagUrl && (
+                              <img
+                                src={flagUrl}
+                                alt="Flag"
+                                style={{ weight: "14px", height: "10px" }}
+                              />
+                            )}{" "}
+                            <span>{country && country}</span>
+                          </Col>
+                        </Row>
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Trades</label>
+                          </Col>
+                          <Col>1029</Col>
+                        </Row>
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Trading partners</label>
+                          </Col>
+                          <Col>720</Col>
+                        </Row>
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Feedback score</label>
+                          </Col>
+                          <Col>99%</Col>
+                        </Row>
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Account created</label>
+                          </Col>
+                          <Col>Yesterday</Col>
+                        </Row>
+                        <Row className="align-items-center g-0">
+                          <Col xs="7">
+                            <label>Typical finalization time</label>
+                          </Col>
+                          <Col>20 minutes</Col>
+                        </Row>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Card>
 
-              <div className="d-flex main-limit mb-2">
-                <h6>Detail</h6>
-              </div>
-
-              <div className="d-flex main-limit">
-                <label>Payment Information</label>
-              </div>
-
-              <div className="d-flex main-limit">
-                <div class="limit-txt-right">Amount to transfer to Middn </div>
-                <div class="limit-txt-left-amount">105,02 BNB</div>
-              </div>
-
-              <div className="d-flex main-limit">
-                <div class="limit-txt-right">Invoice Amount</div>
-                <div class="limit-txt-left">105,00 BNB</div>
-              </div>
-
-              <div className="d-flex main-limit">
-                <div class="limit-txt-right">Escrow fees </div>
-                <div class="limit-txt-left">0,02 BNB</div>
-              </div>
-
-              <div className="d-flex main-limit">
-                <div class="limit-txt-right">Total</div>
-                <div class="limit-txt-left">105,02 BNB</div>
-              </div>
-              <div className="d-flex main-limit">
-                {/* <div className="checkbox">
-                  <input
-                    type="checkbox"
-                    id="vehicle1"
-                    name="vehicle1"
-                    value="Bike"
-                  />
-                  <label for="vehicle1">
-                    I agree to Middin's escrow terms and conditions.
-                  </label>
-                </div> */}
-                <Form.Group className="custom-input-seller">
-                  {/* <div className="checkbox">
-                  <input
-                    type="checkbox"
-                    id="vehicle1"
-                    name="vehicle1"
-                    value="Bike"
-                  />
-                  <label for="vehicle1">
-                    I agree to Middin's escrow terms and conditions.
-                  </label>
-                </div> */}
-
-                  <div
-                    className="form-check"
-                    onClick={() => handleFilterTypeChange("Bike")}
-                  >
-                    <div
-                      className={`form-check-input ${
-                        typeFilter == "Bike" ? "checked" : ""
-                      }`}
-                    />
-                    <label class="form-check-label" for="vehicle1">
-                      I agree to Middin's escrow terms and conditions.
-                    </label>
-                  </div>
-                </Form.Group>
-              </div>
-            </Col>
-          </Row>
-        </Col>
-        <Col lg="4">
-          <Card className="cards-dark mb-4">
-            <Card.Body>
-              <Card.Title as="h2">Information</Card.Title>
-              <div className="d-flex align-items-center buyerDetails">
-                <div className="chat-image">
-                  <img
-                    src={
-                      escrows?.newImage
-                        ? escrows?.newImage
-                        : require("../../content/images/avatar.png")
-                    }
-                    alt={escrows?.newImage ? escrows?.newImage : "No Profile"}
-                  />
-                  <span className="circle"></span>
-                </div>
-                <div className="content ms-3">
-                  <h6>
-                    {escrows?.user_name ? escrows?.user_name : "John doe"}
-                  </h6>
-                  <span>(100%, 500+)</span>
-                </div>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="card-txt-left">Location</span>
-                <strong class="card-txt">🇺🇸 United States</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="card-txt-left">Trades</span>
-                <strong class="card-txt">1029</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="card-txt-left">Trading partners</span>
-                <strong class="card-txt">720</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="card-txt-left">Feedback score</span>
-                <strong class="card-txt">99%</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="card-txt-left">Typical finalization time</span>
-                <strong class="card-txt">20 minutes</strong>
-              </div>
-            </Card.Body>
-          </Card>
-
-          <Card className="cards-dark">
-            <Card.Body>
-              <Card.Title as="h2">Summary</Card.Title>
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Price</span>
-                <strong class="summery-txt">15.4905468 ETH</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Limit</span>
-                <strong class="summery-txt">0.1-0.6 BTC</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Payment methods</span>
-                <strong class="summery-txt">Ethereum</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Network</span>
-                <strong class="summery-txt"> Binance Smart Chain</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Time constraints</span>
-                <strong class="summery-txt">09:00 AM - 00:00 AM</strong>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      <EditEscrow
-        show={editEscrowModalShow}
-        onHide={() => setEditEscrowModalShow(false)}
-        id={id}
-      />
-    </div>
+                <Card className="cards-dark">
+                  <Card.Body>
+                    <Card.Title as="h2">Summary</Card.Title>
+                    <div className="buyer-details">
+                      <Row className="align-items-center g-0">
+                        <Col xs="7">
+                          <label>Price</label>
+                        </Col>
+                        <Col>00 MID</Col>
+                      </Row>
+                      <Row className="align-items-center g-0">
+                        <Col xs="7">
+                          <label>Limit</label>
+                        </Col>
+                        <Col>800/4900 MID</Col>
+                      </Row>
+                      <Row className="align-items-center g-0">
+                        <Col xs="7">
+                          <label>Payment methods</label>
+                        </Col>
+                        <Col>MID</Col>
+                      </Row>
+                      <Row className="align-items-center g-0">
+                        <Col xs="7">
+                          <label>Network</label>
+                        </Col>
+                        <Col>Polygon Chain</Col>
+                      </Row>
+                      <Row className="align-items-center g-0">
+                        <Col xs="7">
+                          <label>Time constraints</label>
+                        </Col>
+                        <Col>24 Hours</Col>
+                      </Row>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
+          <EditEscrow
+            show={editEscrowModalShow}
+            onHide={() => setEditEscrowModalShow(false)}
+            id={id}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

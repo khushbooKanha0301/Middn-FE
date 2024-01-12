@@ -1,3 +1,4 @@
+import "react-toastify/dist/ReactToastify.css";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { CameraIcon } from "./SVGIcon";
@@ -8,7 +9,6 @@ import {
   userGetFullDetails,
 } from "../store/slices/AuthSlice";
 
-import "react-toastify/dist/ReactToastify.css";
 import { FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import jwtAxios from "../service/jwtAxios";
@@ -16,15 +16,14 @@ import {
   notificationFail,
   notificationSuccess,
 } from "../store/slices/notificationSlice";
-import {
-  ref,
-  update,
+import { ref, update,
   get,
   child,
 } from "firebase/database";
 import { database } from "./../helper/config";
 import { firebaseMessages } from "./../helper/chatMessage";
 import { firebaseMessagesEscrow } from "./../helper/configEscrow";
+import { firebaseStatus } from "./../helper/statusManage";
 
 import {
   converImageToBase64,
@@ -160,7 +159,7 @@ export const EditProfileView = (props) => {
             }
             const userRef = ref(database, firebaseMessages?.CHAT_USERS + userData?.account);
             const userEscrowRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + userData?.account);
-          
+            const userStatusRef = ref(database, firebaseStatus?.CHAT_USERS + userData?.account);
             await get(userRef)
             .then((snapshot) => {
                if (snapshot.exists()) {
@@ -187,6 +186,19 @@ export const EditProfileView = (props) => {
               dispatch(notificationFail("Something went wrong!"));
             });
 
+            await get(userStatusRef)
+            .then((snapshot) => {
+               if (snapshot.exists()) {
+                update(
+                  userStatusRef,
+                  updateArr
+                );
+              } 
+            })
+            .catch((error) => {
+              dispatch(notificationFail("Something went wrong!"));
+            });
+
             dispatch(notificationSuccess(response?.data.message));
             props.onHide();
             //getActiveEscrows();
@@ -201,9 +213,8 @@ export const EditProfileView = (props) => {
             dispatch(notificationFail(error?.response?.data?.message));
           }
         });
-    }
+      }
   };
-
 
   useEffect(() => {
     if (isLoading) {

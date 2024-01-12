@@ -200,23 +200,22 @@ export const EscrowPay = () => {
     .get(`/users/getUserByAddress/${address}`)
     .then((res) => {
       const user = res.data?.data
-      
       const userRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + user.wallet_address);
       get(userRef)
       .then((snapshot) => {
         if (snapshot.exists()) {
           // User exists, update the data
           update(userRef, {
-            fname_alias: user.fname_alias,
-            lname_alias: user.lname_alias,
+            fname_alias: user.fname_alias || "John",
+            lname_alias: user.lname_alias || "Doe",
             imageUrl: user?.imageUrl ? user?.imageUrl : "",
           });
         } else {
           // User doesn't exist, add new data
           set(userRef, {
             wallet_address: user?.wallet_address,
-            fname_alias: user.fname_alias,
-            lname_alias: user.lname_alias,
+            fname_alias: user.fname_alias || "John",
+            lname_alias: user.lname_alias || "Doe",
             imageUrl: user?.imageUrl ? user?.imageUrl : "",
           });
         }
