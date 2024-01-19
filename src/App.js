@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Sidebar from "./component/Sidebar";
 import Header from "./component/Header";
@@ -51,6 +47,30 @@ export const App = () => {
   const token = localStorage.getItem("token");
   const [twoFAModal, setTwoFAModal] = useState(true);
   const [isResponsive, setIsResponsive] = useState(false);
+  const userData = useSelector(userGetFullDetails);
+  const [ipAddress, setIPAddress] = useState(null);
+  const [isIpGetted, setIsIpGetted] = useState(false);
+  const [error, setError] = useState(null);
+  const allowedIPs = ["101.109.200.74", "122.182.191.172"]; // Add blocked IPs here
+
+  const fetchIPAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json();
+      setIPAddress(data.ip);
+      setIsIpGetted(true);
+      if (!allowedIPs.includes(ipAddress)) {
+        setError(new Error(`Access Denied!!`));
+      }
+    } catch (error) {
+      setIsIpGetted(true);
+      console.error("Error fetching IP address:", error);
+    }
+  };
+
+  useLayoutEffect(() => {
+    fetchIPAddress();
+  }, []);
 
   const handleAccountAddress = (address) => {
     setIsSign(false);
@@ -65,15 +85,13 @@ export const App = () => {
 
     handleResize();
     // Add an event listener to track window size changes
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     // Clean up the event listener when the component is unmounted
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const userData = useSelector(userGetFullDetails);
 
   const signOut = () => {
     setIsSign(true);
@@ -89,20 +107,20 @@ export const App = () => {
   }, [userData]);
 
   useEffect(() => {
-    const userRef = ref(database, firebaseStatus?.CHAT_USERS + acAddress?.account);
-    
+    const userRef = ref(
+      database,
+      firebaseStatus?.CHAT_USERS + acAddress?.account
+    );
+
     if (acAddress.userid && token === acAddress?.authToken) {
-       // Set up the event listeners to update the user's last activity timestamp
+      // Set up the event listeners to update the user's last activity timestamp
       const updateLastActive = () => {
         get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
-            update(
-              userRef,
-              {
-                lastActive: Date.now(),
-                isOnline: 1,
-              }
-            );
+            update(userRef, {
+              lastActive: Date.now(),
+              isOnline: 1,
+            });
           }
         });
       };
@@ -110,11 +128,9 @@ export const App = () => {
       const updateAbsent = () => {
         get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
-            update(
-              userRef,{
-                isOnline: 2
-              }
-            );
+            update(userRef, {
+              isOnline: 2,
+            });
           }
         });
       };
@@ -123,13 +139,10 @@ export const App = () => {
       const updateOffline = () => {
         get(userRef).then((snapshot) => {
           if (snapshot.exists()) {
-            update(
-              userRef,
-              {
-                isOnline: 3,
-                lastActive: Date.now()
-              }
-            );
+            update(userRef, {
+              isOnline: 3,
+              lastActive: Date.now(),
+            });
           }
         });
       };
@@ -144,8 +157,7 @@ export const App = () => {
         }
       }, 1000); // 5 seconds in milliseconds
 
-      let statusInterval = setInterval(function() {
-        
+      let statusInterval = setInterval(function () {
         get(userRef).then((snapshot) => {
           const lastActive = snapshot.val()?.lastActive;
           const isOnline = snapshot.val()?.isOnline;
@@ -155,12 +167,12 @@ export const App = () => {
           const isMoreThan30Minutes = timeDifference > timeWindow;
 
           if (isMoreThan30Minutes) {
-           updateOffline();
-          } 
+            updateOffline();
+          }
 
           const timeWindowAbsent = 15 * 60 * 1000;
           const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
-          if(isMoreThan5Minutes  && (isOnline != 2)){
+          if (isMoreThan5Minutes && isOnline != 2) {
             updateAbsent();
           }
         });
@@ -169,22 +181,22 @@ export const App = () => {
         // Add your logic for handling before unload event
         updateOffline();
       };
-    
+
       const handleMouseMove = () => {
         // Add your logic for handling mouse move event
         updateLastActive();
       };
-    
+
       const handleKeyDown = () => {
         // Add your logic for handling key down event
         updateLastActive();
       };
-    
+
       const handleScroll = () => {
         // Add your logic for handling scroll event
         updateLastActive();
       };
-    
+
       const handleClick = () => {
         // Add your logic for handling click event
         updateLastActive();
@@ -195,8 +207,7 @@ export const App = () => {
       window.addEventListener("keydown", handleKeyDown);
       window.addEventListener("scroll", handleScroll);
       window.addEventListener("click", handleClick);
-     
-  
+
       // Clean up the listeners when the component unmounts or user logs out
       return () => {
         window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -204,125 +215,132 @@ export const App = () => {
         window.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("scroll", handleScroll);
         window.removeEventListener("click", handleClick);
-  
+
         clearInterval(interval);
         clearInterval(statusInterval);
       };
-    } 
+    }
   }, [acAddress.userid, token]);
 
-  return (
-    <div>
-      <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
-        <ToastContainer />
-        <SnackBar />
-        <Sidebar
-          clickHandler={sidebarToggle}
-          setModalShow={setModalShow}
-          setIsOpen={setIsOpen}
-          isResponsive={isResponsive}
-        />
-        <div className="wrapper">
-          <Header
+  if (allowedIPs.includes(ipAddress) && isIpGetted) {
+    return (
+      <div>
+        <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
+          <ToastContainer />
+          <SnackBar />
+          <Sidebar
             clickHandler={sidebarToggle}
-            clickModalHandler={modalToggle}
-            signOut={signOut}
+            setModalShow={setModalShow}
+            setIsOpen={setIsOpen}
+            isResponsive={isResponsive}
           />
+          <div className="wrapper">
+            <Header
+              clickHandler={sidebarToggle}
+              clickModalHandler={modalToggle}
+              signOut={signOut}
+            />
 
-          <div className="contain">
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <HomePageComponent />
-                    {twoFAModal === true &&
-                      userData?.is_2FA_login_verified === false && (
-                        <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
-                      )}
-                  </>
-                }
-              />
+            <div className="contain">
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <HomePageComponent />
+                      {twoFAModal === true &&
+                        userData?.is_2FA_login_verified === false && (
+                          <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
+                        )}
+                    </>
+                  }
+                />
 
-              <Route path="/" element={<HomePageComponent />} />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <AccountSettingComponent />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/notification"
-                element={
-                  <ProtectedRoute>
-                    <NotificationComponent />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/escrow-details/:id" element={<EscrowDetails />} />  
-              <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} /> 
-              <Route path="/escrow-offer-buy" element={<EscrowPay />} />  
-              <Route path="/escrow-seller/:address" element={<EscrowSeller />} />  
-              <Route
-                path="/profile/:address"
-                element={
-                  <>
-                    <TraderProfileComponent isLogin={isLogin} />
-                    {twoFAModal === true &&
-                      userData?.is_2FA_login_verified === false && (
-                        <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
-                      )}
-                  </>
-                }
-              />
-              <Route
-                path="/chat"
-                element={
-                  <ProtectedRoute>
-                    <ChatComponent />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/escrow"
-                element={
-                  // <ProtectedRoute>
-                  <EscrowComponent />
-                  // </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/trade"
-                element={
-                  // <ProtectedRoute>
-                  <TradeHistoryComponent />
-                  // </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/help"
-                element={
-                  // <ProtectedRoute>
-                  <HelpCenterComponent />
-                  // </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+                <Route path="/" element={<HomePageComponent />} />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <AccountSettingComponent />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/notification"
+                  element={
+                    <ProtectedRoute>
+                      <NotificationComponent />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/escrow-details/:id" element={<EscrowDetails />} />
+                <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} />
+                <Route path="/escrow-offer-buy" element={<EscrowPay />} />
+                <Route
+                  path="/escrow-seller/:address"
+                  element={<EscrowSeller />}
+                />
+                <Route
+                  path="/profile/:address"
+                  element={
+                    <>
+                      <TraderProfileComponent isLogin={isLogin} />
+                      {twoFAModal === true &&
+                        userData?.is_2FA_login_verified === false && (
+                          <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
+                        )}
+                    </>
+                  }
+                />
+                <Route
+                  path="/chat"
+                  element={
+                    <ProtectedRoute>
+                      <ChatComponent />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/escrow"
+                  element={
+                    // <ProtectedRoute>
+                    <EscrowComponent />
+                    // </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/trade"
+                  element={
+                    // <ProtectedRoute>
+                    <TradeHistoryComponent />
+                    // </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/help"
+                  element={
+                    // <ProtectedRoute>
+                    <HelpCenterComponent />
+                    // </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </div>
           </div>
-        </div>
-      </Container>
-      <LoginView
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        handleaccountaddress={handleAccountAddress}
-        isSign={isSign}
-        setTwoFAModal={setTwoFAModal}
-      />
-    </div>
-  );
+        </Container>
+        <LoginView
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          handleaccountaddress={handleAccountAddress}
+          isSign={isSign}
+          setTwoFAModal={setTwoFAModal}
+        />
+      </div>
+    );
+  } else if (error) {
+    return <h1 class="accessMsg">{error.message}</h1>;
+  }
 };
 
 export default App;

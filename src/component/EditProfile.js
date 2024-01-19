@@ -139,6 +139,7 @@ export const EditProfileView = (props) => {
         .then(async (response) => {
           if (response?.status === 200) {
             dispatch(userGetData(userData.userid)).unwrap();
+            dispatch(notificationSuccess(response?.data.message));
             let file = {};
             let updateArr = {};
             if (typeof profile != "string" && profile) {
@@ -198,8 +199,6 @@ export const EditProfileView = (props) => {
             .catch((error) => {
               dispatch(notificationFail("Something went wrong!"));
             });
-
-            dispatch(notificationSuccess(response?.data.message));
             props.onHide();
             //getActiveEscrows();
             //window.location.reload();

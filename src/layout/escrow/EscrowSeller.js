@@ -4,20 +4,25 @@ import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
-import { LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
+import { BackArrow, LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
-import { converImageToBase64, sendMessage } from "../../helper/firebaseConfigEscrow";
+import {
+  converImageToBase64,
+  sendMessage,
+} from "../../helper/firebaseConfigEscrow";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useParams } from "react-router-dom";
+
+import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 
 export const EscrowSeller = () => {
   const { address } = useParams();
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
- 
+
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
 
@@ -26,6 +31,11 @@ export const EscrowSeller = () => {
   const { onClickOutside } = <Picker />;
   const [messageText, setMessageText] = useState("");
   const [messageFile, setMessageFile] = useState("");
+
+  useEffect(() => {
+    window.localStorage.removeItem("user");
+    dispatch(setIsChatEscrowPage({ user: null, isChatOpen: true }));
+  }, []);
 
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
@@ -182,60 +192,72 @@ export const EscrowSeller = () => {
     }
   };
 
+  const handleBack = () => {
+    window.localStorage.removeItem("user");
+    dispatch(setIsChatEscrowPage({ user: null, isChatOpen: true }));
+  };
+
   return (
     <div className="escrowPay">
       <Row>
         <Col lg="4">
           <Card className="cards-dark">
             <Card.Body>
-              <div className="d-flex justify-content-between buyerBottom">
-                <h3 className="text-white text-lg">
-                  Contract : <span className="font-bold">Seller</span>{" "}
-                </h3>
-                <span className="px-4 rounded-deposite">Depositing</span>
+              <div className="chat-box-pay">
+                <div className="chat-box-seller">
+                  <div className="d-flex justify-content-between buyerBottom">
+                    <h3 className="text-white text-lg">
+                      Contract : <span className="font-bold">Seller</span>{" "}
+                    </h3>
+                    <span className="px-4 rounded-deposite">Depositing</span>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">Price</span>
+                    <strong class="card-txt">105,02 BNB</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">You are buying</span>
+                    <strong class="card-txt">1 BTC</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">You must send</span>
+                    <strong class="card-txt">105,02 BNB</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">Location</span>
+                    <strong class="card-txt">Anywhere</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">Depositing window</span>
+                    <strong class="card-txt">29:42</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">Payment window</span>
+                    <strong class="card-txt">60 minutes</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center buyerBottom">
+                    <span class="card-txt-left">Buyer release address</span>
+                    <strong class="card-txt">0x...asd22A</strong>
+                  </div>
+                </div>
+                <div className="chat-box-btn">
+                  <button type="button" class="btn btn-primary escrowBtn">
+                    Pay
+                  </button>
+
+                  <span class="card-txt-left">
+                    You can cancel the contract once the depositing window is
+                    expired
+                  </span>
+                </div>
               </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">Price</span>
-                <strong class="card-txt">105,02 BNB</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">You are buying</span>
-                <strong class="card-txt">1 BTC</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">You must send</span>
-                <strong class="card-txt">105,02 BNB</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">Location</span>
-                <strong class="card-txt">Anywhere</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">Depositing window</span>
-                <strong class="card-txt">29:42</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">Payment window</span>
-                <strong class="card-txt">60 minutes</strong>
-              </div>
-
-              <div className="d-flex justify-content-between align-items-center buyerBottom">
-                <span class="card-txt-left">Buyer release address</span>
-                <strong class="card-txt">0x...asd22A</strong>
-              </div>
-
-              <button type="button" class="btn btn-primary escrowBtn">
-                Pay
-              </button>
-
-              <span class="card-txt-left">You can cancel the contract once the depositing window is expired</span>
-              
             </Card.Body>
           </Card>
         </Col>
@@ -251,10 +273,7 @@ export const EscrowSeller = () => {
               </div>
               <div className="chat-box-list">
                 <ul>
-                  <MessageList
-                    ReciverId={address}
-                    EscrowPay={"escrow-offer"}
-                  />
+                  <MessageList ReciverId={address} EscrowPay={"escrow-offer"} />
                   {/* {receiverData ? (
                     
                   ) : (

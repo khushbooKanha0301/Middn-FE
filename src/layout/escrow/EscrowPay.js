@@ -1,19 +1,23 @@
 import Picker from "emoji-picker-react";
-import { get, ref, set, update} from "firebase/database";
+import { get, ref, set, update } from "firebase/database";
 import { useEffect, useRef, useState } from "react";
 import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
-import { LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
+import { LinkSimpleIcon, SmileyIcon, BackArrow} from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
-import { converImageToBase64, sendMessage } from "../../helper/firebaseConfigEscrow";
+import {
+  converImageToBase64,
+  sendMessage,
+} from "../../helper/firebaseConfigEscrow";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
 import { useLocation } from "react-router-dom";
 import { database } from "../../helper/config";
 import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import jwtAxios from "../../service/jwtAxios";
 
 export const EscrowPay = () => {
@@ -25,7 +29,7 @@ export const EscrowPay = () => {
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const userDetailsAll = useSelector(userGetFullDetails);
- 
+
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
 
@@ -40,6 +44,16 @@ export const EscrowPay = () => {
     return () => {
       document.removeEventListener("click", handleClickOutside, true);
     };
+  }, []);
+
+  const handleBack = () => {
+    window.localStorage.removeItem("user");
+    dispatch(setIsChatEscrowPage({ user: null, isChatOpen: true }));
+  };
+
+  useEffect(() => {
+    window.localStorage.removeItem("user");
+    dispatch(setIsChatEscrowPage({ user: null, isChatOpen: true }));
   }, []);
 
   const handleClickOutside = (event) => {
@@ -171,7 +185,6 @@ export const EscrowPay = () => {
     if (messageText !== "" || messageFile !== "" || !file) {
       if (
         userDetailsAll?.wallet_address &&
-        //receiverData?.wallet_address &&
         receiverAddress &&
         noError == true
       ) {
@@ -197,46 +210,50 @@ export const EscrowPay = () => {
 
   const addUserInFirebase = (address) => {
     jwtAxios
-    .get(`/users/getUserByAddress/${address}`)
-    .then((res) => {
-      const user = res.data?.data
-      const userRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + user.wallet_address);
-      get(userRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          // User exists, update the data
-          update(userRef, {
-            fname_alias: user.fname_alias || "John",
-            lname_alias: user.lname_alias || "Doe",
-            imageUrl: user?.imageUrl ? user?.imageUrl : "",
+      .get(`/users/getUserByAddress/${address}`)
+      .then((res) => {
+        const user = res.data?.data;
+        const userRef = ref(
+          database,
+          firebaseMessagesEscrow?.CHAT_USERS + user.wallet_address
+        );
+        get(userRef)
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              // User exists, update the data
+              update(userRef, {
+                fname_alias: user.fname_alias || "John",
+                lname_alias: user.lname_alias || "Doe",
+                imageUrl: user?.imageUrl ? user?.imageUrl : "",
+              });
+            } else {
+              // User doesn't exist, add new data
+              set(userRef, {
+                wallet_address: user?.wallet_address,
+                fname_alias: user.fname_alias || "John",
+                lname_alias: user.lname_alias || "Doe",
+                imageUrl: user?.imageUrl ? user?.imageUrl : "",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding/updating user in Firebase:", error);
+            dispatch(notificationFail("Something went wrong!"));
           });
-        } else {
-          // User doesn't exist, add new data
-          set(userRef, {
-            wallet_address: user?.wallet_address,
-            fname_alias: user.fname_alias || "John",
-            lname_alias: user.lname_alias || "Doe",
-            imageUrl: user?.imageUrl ? user?.imageUrl : "",
-          });
-        }
       })
-      .catch((error) => {
-        console.error("Error adding/updating user in Firebase:", error);
-        dispatch(notificationFail("Something went wrong!"));
+      .catch((err) => {
+        console.log(err);
       });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-    
   };
 
   return (
-    <div className="escrowPay">
+    <div className="escrowPay chat-view">
       <Row>
         <Col lg="4">
           <Card className="cards-dark">
             <Card.Body>
+            <div className="chat-box-pay">
+              <div className="chat-box-seller">
               <div className="d-flex justify-content-between buyerBottom">
                 <h3 className="text-white text-lg">
                   Contract : <span className="font-bold">Buyer</span>{" "}
@@ -279,12 +296,18 @@ export const EscrowPay = () => {
                 <strong class="card-txt">0x...asd22A</strong>
               </div>
 
-              <button type="button" class="btn btn-primary escrowBtn">
-                Pay
-              </button>
+              </div>
+              <div className="chat-box-btn">
+                <button type="button" class="btn btn-primary escrowBtn">
+                  Pay
+                </button>
 
-              <span class="card-txt-left">You can cancel the contract once the depositing window is expired</span>
-              
+                <span class="card-txt-left">
+                  You can cancel the contract once the depositing window is
+                  expired
+                </span>
+              </div>
+              </div>
             </Card.Body>
           </Card>
         </Col>
@@ -293,10 +316,7 @@ export const EscrowPay = () => {
             <Card.Body>
               <div className="d-flex items-center justify-content-between pe-4">
                 <Card.Title as="h2">Chatbox</Card.Title>
-                {/* <p className="text-white">
-                  {receiverData &&
-                    `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
-                </p> */}
+               
               </div>
               <div className="chat-box-list">
                 <ul>
@@ -304,11 +324,7 @@ export const EscrowPay = () => {
                     ReciverId={receiverAddress}
                     EscrowPay={"escrow-offer"}
                   />
-                  {/* {receiverData ? (
-                    
-                  ) : (
-                    <div className="no-chat-msg"></div>
-                  )} */}
+                 
                 </ul>
                 {showSmily && (
                   <div userRef={emojiPickerRef} className="emoji-picker">
@@ -325,7 +341,6 @@ export const EscrowPay = () => {
                 <div
                   className="chat-action"
                   style={{ visibility: "visible" }}
-                  //   style={{ visibility: receiverData ? "visible" : "hidden" }}
                 >
                   {messageFile && (
                     <div className="attach">
