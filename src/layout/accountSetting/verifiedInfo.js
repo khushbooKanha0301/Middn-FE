@@ -115,7 +115,8 @@ export const VerifiedInfo = () => {
         show={
           ((userData?.kyc_completed === true &&
             userData?.is_verified === 2) ||
-            userData?.kyc_completed === false || userData?.kyc_completed == undefined) &&
+            userData?.kyc_completed === false || 
+            userData?.kyc_completed == undefined) &&
           modalKycShow
         }
         onHide={() => setModalKYCShow(false)}
