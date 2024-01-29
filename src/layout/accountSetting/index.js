@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, Form, Button, Placeholder } from "react-bootstrap";
 import {
-  CheckmarkIcon,
-  IdentificationCardIcon,
-  MapPinIcon,
-  SecurityIcon,
-  UserFocusIcon,
-  UserListIcon,
+  SecurityIcon
 } from "../../component/SVGIcon";
 import ChangePasswordView from "../../component/ChangePassword";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,8 +12,8 @@ import {
   notificationFail,
   notificationSuccess,
 } from "../../store/slices/notificationSlice";
-import listData from "./countryData";
-import { countryInfo } from "./countryData";
+import listData from "../../component/countryData";
+import { countryInfo } from "../../component/countryData";
 import {
   defineCountry,
   defineCurrency,

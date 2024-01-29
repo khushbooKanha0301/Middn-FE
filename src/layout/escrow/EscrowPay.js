@@ -247,7 +247,7 @@ export const EscrowPay = () => {
   };
 
   return (
-    <div className="escrowPay chat-view">
+    <div className="escrowPay">
       <Row>
         <Col lg="4">
           <Card className="cards-dark">

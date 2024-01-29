@@ -78,7 +78,8 @@ body {
     background-color: $bg-color;
     @include eudoxussans;
 }
-.accessMsg{
+
+.accessMsg {
     color: white;
 }
 
@@ -1259,9 +1260,8 @@ body {
         border: none;
         box-shadow: none;
         padding: 0;
-        font-size: 15px;
+        font-size: 18px;
         line-height: 37px;
-        // color: $white;
         color: #808191;
         border-radius: 0;
     }
@@ -1343,6 +1343,101 @@ body {
             margin-right: 4px;
         }
     }
+
+    .react-datepicker-popper {
+        padding-top: 0;
+    
+        .react-datepicker {
+          &__triangle {
+            display: none;
+          }
+    
+          &__header {
+            border-radius: 16px 16px 0 0;
+            border-bottom-width: 0;
+            background-color: transparent;
+            padding: 0;
+          }
+    
+          &__current-month {
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 24px;
+            color: #fcfcfd;
+          }
+    
+          &__day-names {
+            margin-top: 12px;
+          }
+    
+          &__day-name {
+            padding: 0;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 24px;
+            color: #777e91;
+            text-align: center;
+            margin: 0;
+            width: 40px;
+          }
+    
+          &__month {
+            margin: 15px 0 0;
+          }
+    
+          &__day {
+            width: 40px;
+            height: 40px;
+            margin: 0;
+            padding: 0;
+            line-height: 40px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #fcfcfd;
+            border-radius: 40px;
+    
+            &--today,
+            &--selected,
+            &--keyboard-selected,
+            &:hover {
+              background: #fcfcfd;
+              color: #24262d;
+            }
+    
+            &--outside-month {
+              color: transparent;
+              pointer-events: none;
+            }
+          }
+    
+          &__navigation {
+            top: 24px;
+    
+            &--previous {
+              left: 20px;
+            }
+    
+            &--next {
+              right: 20px;
+            }
+    
+            &-icon {
+              &::before {
+                width: 6px;
+                height: 6px;
+                border-color: #777e90;
+                border-width: 1.5px 1.5px 0 0;
+              }
+            }
+          }
+    
+          background-color: #24262c;
+          border: none;
+          box-shadow: 0px 40px 32px -24px rgba(15, 15, 15, 0.12);
+          border-radius: 16px;
+          padding: 24px;
+        }
+      }
 }
 
 .account-setting {
@@ -2893,7 +2988,7 @@ body {
                 overflow: auto;
 
                 @include media-breakpoint-up(lg) {
-                    height: calc(100vh - 300px);
+                    height: calc(100vh - 400px);
                 }
 
                 @include media-breakpoint-down(lg) {
@@ -3058,13 +3153,13 @@ body {
                         padding: 0;
 
                         @include media-breakpoint-up(lg) {
-                            height: calc(100vh - 300px);
+                            height: calc(100vh - 385px);
                             overflow: auto;
                         }
 
                         @media screen and (max-width: 1366px),
                         screen and (max-height: 700px) {
-                            height: calc(100vh - 200px);
+                            height: calc(100vh - 360px);
                         }
 
                         @include media-breakpoint-down(lg) {
@@ -3267,21 +3362,22 @@ body {
         }
 
         @include media-breakpoint-down(lg) {
-            .col-lg-4 {
-                &.hide-mobile {
-                    display: none;
-                }
-            }
+            // .col-lg-4 {
+            //     &.hide-mobile {
+            //         display: none;
+            //     }
+            // }
 
-            .col-lg-8 {
-                display: none;
+            // .col-lg-8 {
+            //     display: none;
 
-                &.show-mobile {
-                    display: block;
-                }
-            }
+            //     &.show-mobile {
+            //         display: block;
+            //     }
+            // }
         }
     }
+
     .cards-dark {
         background-color: $cards-bg;
         margin-bottom: 16px;
@@ -3537,13 +3633,13 @@ body {
                         padding: 0;
 
                         @include media-breakpoint-up(lg) {
-                            height: calc(100vh - 300px);
+                            height: calc(100vh - 385px);
                             overflow: auto;
                         }
 
                         @media screen and (max-width: 1366px),
                         screen and (max-height: 700px) {
-                            height: calc(100vh - 200px);
+                            height: calc(100vh - 350px);
                         }
 
                         @include media-breakpoint-down(lg) {
@@ -3717,14 +3813,15 @@ body {
                 }
             }
         }
-       
-        .chat-box-btn{
+
+        .chat-box-btn {
             margin-top: auto;
         }
 
-        .chat-box-pay{
+        .chat-box-pay {
             display: flex;
             flex-direction: column;
+
             @include media-breakpoint-up(lg) {
                 height: calc(100vh - 300px);
             }
@@ -3732,6 +3829,7 @@ body {
             @media screen and (max-width: 1366px),
             screen and (max-height: 700px) {
                 height: calc(100vh - 200px);
+                overflow: auto;
             }
 
             @include media-breakpoint-down(lg) {
@@ -3742,7 +3840,7 @@ body {
                 height: calc(100vh - 50px);
             }
         }
-        
+
     }
 
 
@@ -3771,6 +3869,7 @@ body {
             margin-top: 24px;
         }
     }
+
     .col {
         font-size: 12px;
     }
@@ -4875,7 +4974,7 @@ body {
     }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 600px) {
     .statistics {
         .card-body {
             .transaction-view {
@@ -4929,6 +5028,33 @@ body {
     .EmojiPickerReact {
         overflow: auto !important;
     }
+
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list .chat-action .messsge .input-container .btn-primary {
+        padding: 5px 12px;
+        font-size: 13px;
+    }
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list .chat-action .messsge .button-container .btn {
+        margin-left: 0px !important;
+    }
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list {
+        padding: 8px;
+    }
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list .chat-action .messsge .input-container .form-control {
+        margin-left: -35px;
+    }
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list .chat-action .messsge .button-container {
+        margin-left: 0px;
+    }
+
+    .escrowPay .cards-dark.chat-box .card-body .chat-box-list .chat-action {
+        padding: 8px;
+    }
+
 }
 
 .modal-backdrop {
@@ -5415,6 +5541,7 @@ body {
                     justify-content: space-between;
                     align-items: center;
                     margin-top: 62px;
+                    flex-wrap: wrap;
 
                     @include media-breakpoint-down(md) {
                         margin-top: 1rem;
@@ -5436,6 +5563,240 @@ body {
                         &.btn-secondary {
                             background-color: #373A43;
                             color: $white;
+                        }
+                    }
+                }
+
+                &.kyc-step {
+                    padding-top: 24px;
+
+                    h5 {
+                        font-weight: 500;
+                        font-size: 16px;
+                        line-height: 24px;
+                        margin-bottom: 1rem;
+                    }
+
+                    p {
+                        font-weight: 500;
+                        font-size: 13px;
+                        line-height: 24px;
+                        color: rgba($color: $white, $alpha: 0.48);
+                        margin-bottom: 16px;
+
+                        strong {
+                            font-weight: 700;
+                            margin-left: 24px;
+                            color: $green-lite;
+                        }
+                    }
+
+                    .form-group {
+                        transition: all 0.1s ease-in-out;
+                        border: 1px solid transparent;
+
+                        &:focus-within {
+                            border-color: #c6fa56;
+                        }
+                    }
+
+                    .form-select {
+                        border-radius: 0;
+                        background-color: transparent;
+                        border: none;
+                        font-size: 16px;
+                        color: $white;
+                        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+                        background-repeat: no-repeat;
+                        background-position: right center;
+                        background-size: 16px 12px;
+                        padding: 0;
+                        line-height: 42px;
+                        box-shadow: none;
+                    }
+
+                    .progress {
+                        flex: 0 0 100%;
+                        margin-bottom: 32px;
+                        height: 5px;
+                        border-radius: 0;
+                        background-color: #24252d;
+
+                        .bg-success {
+                            @include gradientmenu(263.76deg, $green-lite, $green-medium);
+                        }
+                    }
+
+                    .form-check {
+                        &.document-issued {
+                            padding-left: 0;
+                            margin-bottom: 24px;
+
+                            input {
+                                opacity: 0;
+                                position: absolute;
+                                width: 0;
+                                height: 0;
+                                margin: 0;
+
+                                &:checked {
+                                    &~label {
+                                        border-color: #94fc7d;
+
+                                        .checkmark {
+                                            background-color: $green-medium;
+                                            outline: 2px solid rgba(198, 250, 86, 0.17);
+
+                                            svg {
+                                                fill: $cards-bg;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            .form-check-input {
+                                opacity: 0;
+                                position: absolute;
+                                width: 0;
+                                height: 0;
+                                margin: 0;
+
+                                &.checked {
+                                    &~label {
+                                        border-color: #94fc7d;
+
+                                        .checkmark {
+                                            background-color: $green-medium;
+                                            outline: 2px solid rgba(198, 250, 86, 0.17);
+
+                                            svg {
+                                                fill: $cards-bg;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            label {
+                                background: #202127;
+                                border-radius: 8px;
+                                border: 1px solid transparent;
+                                padding: 28px 23px 28px 16px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                font-weight: 400;
+                                font-size: 18px;
+                                line-height: 42px;
+                                color: #afb4c0;
+                                cursor: pointer;
+                                transition: all 0.1s ease-in-out;
+
+                                .checkmark {
+                                    width: 19px;
+                                    flex: 0 0 19px;
+                                    height: 19px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    background-color: #3f4148;
+                                    margin-left: 16px;
+                                    outline: 2px solid rgba(198, 250, 86, 0.17);
+
+                                    svg {
+                                        fill: #696969;
+                                    }
+                                }
+                            }
+                        }
+
+                        &.terms-checkbox {
+                            margin-bottom: 12px;
+
+                            input {
+                                width: 18px;
+                                height: 18px;
+                                border-radius: 4px;
+                                background-color: #c4c4c4;
+                                border: none;
+                                box-shadow: none;
+
+                                &:checked {
+                                    background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+                                }
+                            }
+
+                            .form-check-input {
+                                width: 18px;
+                                height: 18px;
+                                border-radius: 4px;
+                                background-color: #c4c4c4;
+                                border: none;
+                                box-shadow: none;
+
+                                &.checked {
+                                    background: #34363e url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e');
+                                }
+                            }
+
+                            label {
+                                font-size: 13px;
+                                line-height: 16px;
+                                font-weight: 400;
+                                letter-spacing: -0.03em;
+                                color: $white;
+                            }
+                        }
+                    }
+
+                    .document-info {
+                        list-style: none;
+                        padding: 0;
+                        margin: 0 0 24px;
+
+                        li {
+                            position: relative;
+                            padding-left: 22px;
+                            font-weight: 500;
+                            font-size: 13px;
+                            line-height: 24px;
+                            color: rgba($color: $white, $alpha: 0.48);
+
+                            svg {
+                                position: absolute;
+                                left: 0px;
+                                top: 7px;
+                            }
+                        }
+                    }
+
+                    .dropzone {
+                        background: #202127;
+                        border: 1px dashed #303030;
+                        border-radius: 8px;
+                        min-height: 100px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 24px;
+                        padding: 10px;
+
+                        svg {
+                            stroke: #afb4c0;
+                            margin-right: 15px;
+                        }
+
+                        ul {
+                            li {
+                                word-break: break-all;
+                                list-style: none;
+                                margin-top: 10px;
+                                font-size: 13px;
+                                line-height: 24px;
+                                color: rgba(255, 255, 255, 0.48);
+                            }
                         }
                     }
                 }
@@ -5632,6 +5993,9 @@ body {
         margin-top: 10px;
         margin-left: 0 !important;
     }
+}
+.auth-btn {
+    padding: 18px 43px
 }
 
 .swal2-modal {
@@ -6116,7 +6480,7 @@ aside.EmojiPickerReact.epr-main {
                 }
             }
 
-            .escrow-trade-content{
+            .escrow-trade-content {
                 width: calc(100% - 62px);
             }
         }
@@ -6470,7 +6834,8 @@ aside.EmojiPickerReact.epr-main {
     text-align: right;
     margin-left: auto;
 }
-.color-free{
+
+.color-free {
     --tw-text-opacity: 1;
     color: rgb(174 251 105/var(--tw-text-opacity));
 }
@@ -6724,7 +7089,8 @@ aside.EmojiPickerReact.epr-main {
         margin: 0px -42px 0 0px;
     }
 }
-.country-select ul.wd{
+
+.country-select ul.wd {
     width: 100%;
 }
 

@@ -7,7 +7,7 @@ import { setLoginLoading } from "./loginLoderSlice";
 import { notificationFail, notificationSuccess } from "./notificationSlice";
 import axios from "axios";
 import apiConfigs from "../../config/config";
-import listData from "../../layout/accountSetting/countryData";
+import listData from "../../component/countryData";
 import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { get, ref, set, update } from "firebase/database";
@@ -48,6 +48,7 @@ export const checkAuth = createAsyncThunk(
       let account = action.account;
       let library = action.library;
       let checkValue = action.checkValue;
+ console.log("checkValue ", checkValue);
       var deactivate = action.deactivate;
 
       let signMessage = action.signMessage;
@@ -99,7 +100,7 @@ export const checkAuth = createAsyncThunk(
       }
 
       if (signature) {
-        dispatch(setLoginLoading(true));
+        
         let verifyTokenData = await axios
           .post(
             `${apiConfigs.BASE_URL}users/verify?signatureId=${signature}`,
@@ -110,9 +111,9 @@ export const checkAuth = createAsyncThunk(
               },
             }
           )
-
           .catch((error) => {
             if (error.response.data.message) {
+              console.log("-------------------", error.response.data.message)
               dispatch(notificationFail(error.response.data.message));
             } else {
               dispatch(
@@ -125,8 +126,9 @@ export const checkAuth = createAsyncThunk(
             window.localStorage.clear();
             deactivate();
           });
-
+          
         if (verifyTokenData.data.token) {
+          dispatch(setLoginLoading(true));
           window.localStorage.setItem("token", verifyTokenData.data.token);
           // setAuthToken(verifyTokenData.data.token)
           userData = {
@@ -208,12 +210,15 @@ export const logoutAuth = createAsyncThunk(
       jwtAxios
         .get(`/users/logout`)
         .then(() => {
+          console.log("hello")
           setAuthToken(null);
           window.localStorage.clear();
           window.localStorage.removeItem("token");
         })
         .catch((error) => {
-          dispatch(notificationFail("Something went wrong"));
+          window.localStorage.clear();
+          window.localStorage.removeItem("token");
+          dispatch(notificationFail(error.response.data.message));
           dispatch(setLoading(false));
         });
 

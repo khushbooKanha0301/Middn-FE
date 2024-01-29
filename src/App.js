@@ -28,9 +28,10 @@ import {
 } from "./store/slices/AuthSlice";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { get, ref, update } from "firebase/database";
+import { get, ref, update, onValue } from "firebase/database";
 import { database } from "./helper/config";
 import { firebaseStatus } from "./helper/statusManage";
+import { firebaseMessagesActive } from "./helper/userStatus";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
@@ -51,7 +52,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["101.109.200.74", "122.182.191.172"]; // Add blocked IPs here
+  const allowedIPs = ["150.249.254.81" , "223.177.155.110", "223.236.126.142"]; // Add blocked IPs here
 
   const fetchIPAddress = async () => {
     try {
@@ -96,9 +97,10 @@ export const App = () => {
   const signOut = () => {
     setIsSign(true);
   };
+
   useEffect(() => {
     dispatch(getCountryDetails());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (userData?.is_2FA_login_verified === false) {
@@ -221,6 +223,22 @@ export const App = () => {
       };
     }
   }, [acAddress.userid, token]);
+
+  useEffect(() => {
+    if (acAddress?.userid) {
+      var childKey = firebaseMessagesActive.Middn_USERS + "/" + acAddress?.userid;
+      const setReciverReadCountNode = ref(database, childKey);
+      onValue(setReciverReadCountNode, (snapshot) => {
+        if (snapshot && snapshot.val() && localStorage.getItem("token")) {
+          let findUser = snapshot.val();
+          if (findUser.is_active === true) {
+            signOut();
+          }
+        }
+      });
+    }
+  }, [acAddress?.userid]);
+
 
   if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (

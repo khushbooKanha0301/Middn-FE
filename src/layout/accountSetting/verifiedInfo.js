@@ -1,4 +1,6 @@
-import { Card } from "react-bootstrap";
+import React, { useState } from "react";
+import { Card, Button } from "react-bootstrap";
+import { useDispatch } from "react-redux";
 import {
   CheckmarkIcon,
   IdentificationCardIcon,
@@ -6,8 +8,41 @@ import {
   UserFocusIcon,
   UserListIcon,
 } from "../../component/SVGIcon";
+import { useSelector } from "react-redux";
+import { userGetFullDetails } from "../../store/slices/AuthSlice";
+import jwtAxios from "../../service/jwtAxios";
+import { notificationFail } from "../../store/slices/notificationSlice";
+import KYCVerification from "../../component/KYCVerification";
 
 export const VerifiedInfo = () => {
+  const dispatch = useDispatch();
+  const [modalShow, setModalShow] = useState(false);
+  const userData = useSelector(userGetFullDetails);
+  const [modalKycShow, setModalKYCShow] = useState(false);
+  const [kycSubmitted, setKYCSubmitted] = useState(false);
+  const modalToggle = () => setModalShow(!modalShow);
+
+  const modalKycToggle = async () => {
+    await jwtAxios
+      .get(`/users/getuser`)
+      .then((response) => {
+        if (
+          (response.data?.User?.kyc_completed === true &&
+            response.data?.User?.is_verified === 2) ||
+          response.data?.User?.kyc_completed === false ||
+          response.data?.User?.kyc_completed == undefined
+         
+        ) {
+          setModalKYCShow(!modalShow);
+        } else {
+          dispatch(notificationFail("KYC already Submitted"));
+        }
+      })
+      .catch((error) => {
+        dispatch(notificationFail("Something went wrong with get user"));
+      });
+  };
+
   return (
     <Card className="cards-dark">
       <Card.Body>
@@ -50,8 +85,44 @@ export const VerifiedInfo = () => {
             </div>
           </li>
         </ul>
+          {(userData?.kyc_completed === true || kycSubmitted === true) &&
+          ((userData?.is_verified === 1 && kycSubmitted === false) ? (
+            <Button variant="success" disabled>
+              Your KYC Details is approved
+            </Button>
+          ) : (userData?.is_verified === 2 && kycSubmitted === false) ? (
+            <Button variant="primary" className="auth-btn" onClick={modalKycToggle}>
+              KYC Verification
+            </Button>
+          ) : (userData?.is_verified === 0 || kycSubmitted === true) ? (
+            <Button variant="warning" disabled>
+               Your KYC Details is Under Review
+            </Button>
+          ) : null)}
+
+          {(userData?.kyc_completed === false || userData?.kyc_completed === undefined )&&
+          kycSubmitted === false && (
+            <Button
+              variant="primary"
+              className="auth-btn"
+              onClick={modalKycToggle}
+            >
+              KYC Verification
+            </Button>
+          )}
       </Card.Body>
+      <KYCVerification
+        show={
+          ((userData?.kyc_completed === true &&
+            userData?.is_verified === 2) ||
+            userData?.kyc_completed === false || userData?.kyc_completed == undefined) &&
+          modalKycShow
+        }
+        onHide={() => setModalKYCShow(false)}
+        setkycsubmitted={setKYCSubmitted}
+      />
     </Card>
+    
   );
 };
 export default VerifiedInfo;

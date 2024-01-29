@@ -10,7 +10,7 @@ import {
   TwitterIcon,
 } from "../../component/SVGIcon";
 import { useSelector } from "react-redux";
-import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
+import { userDetails, userGetData, userGetFullDetails } from "../../store/slices/AuthSlice";
 import LoginView from "../../component/Login";
 import { useNavigate, useParams } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";
@@ -25,6 +25,9 @@ import { onValue, ref, get } from "firebase/database";
 import ReviewTransactionView from "../../component/ReviewTransaction";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
+import KYCVerification from "../../component/KYCVerification";
+import { notificationFail } from "../../store/slices/notificationSlice";
+import { Link } from "react-router-dom";
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -49,7 +52,6 @@ export const TraderProfile = (props) => {
   const editProfileModalToggle = () =>
     setEditProfileModalShow(!editProfileModalShow);
   const userData = useSelector(userDetails);
-
   let loginuserdata = useSelector(userGetFullDetails);
   const [countryCode, setCountryCode] = useState("");
   const isAuth = userData.authToken;
@@ -60,6 +62,8 @@ export const TraderProfile = (props) => {
   const [otherUserData, setOtherUserData] = useState({});
   const countryDetails = useSelector((state) => state.auth.countryDetails);
   const navigate = useNavigate();
+  const [modalKycShow, setModalKYCShow] = useState(false);
+  const [kycSubmitted, setKYCSubmitted] = useState(false);
   const [escrowLoading, setEscrowLoading] = useState(true);
   const [activeEscrows, setActiveEscrows] = useState([]);
   const [totalActiveEscrowCount, setTotalActiveEscrowCount] = useState(0);
@@ -68,16 +72,46 @@ export const TraderProfile = (props) => {
   const [userStatuses, setUserStatuses] = useState([]);
   let PageSize = 5;
 
+  const modalKycToggle = async () => {
+    await jwtAxios
+      .get(`/users/getuser`)
+      .then((response) => {
+        if (
+          (response.data?.User?.kyc_completed === true &&
+            response.data?.User?.is_verified === 2) ||
+          response.data?.User?.kyc_completed === false ||
+          response.data?.User?.kyc_completed == undefined
+         
+        ) {
+          setModalKYCShow(!modalShow);
+        } else {
+          dispatch(notificationFail("KYC already Submitted"));
+        }
+      })
+      .catch((error) => {
+        dispatch(notificationFail("Something went wrong with get user"));
+      });
+  };
+
+  useEffect(() => {
+    if (userData?.userid) {
+      dispatch(userGetData(userData.userid)).unwrap();
+    }
+  }, [userData?.userid]);
+
+  
   useEffect(() => {
     if (loginuserdata) {
-      getActiveEscrows()
+      getActiveEscrows();
     }
-  }, [ loginuserdata]);
+  }, [loginuserdata]);
 
   const getActiveEscrows = async () => {
     if (currentPage) {
       try {
-        const res = await jwtAxios.get(`/auth/activeEscrows/${address}?page=${currentPage}&pageSize=${PageSize}`)
+        const res = await jwtAxios.get(
+          `/auth/activeEscrows/${address}?page=${currentPage}&pageSize=${PageSize}`
+        );
         setEscrowLoading(false);
         setActiveEscrows(res.data?.data); // Update the state with the new array
         setTotalActiveEscrowCount(res.data?.escrowsCount);
@@ -94,7 +128,6 @@ export const TraderProfile = (props) => {
           })
         );
         setUserStatuses(statuses);
-       
       } catch (err) {
         setEscrowLoading(true);
         console.error(err);
@@ -112,7 +145,7 @@ export const TraderProfile = (props) => {
       setCountryCode(countryDetails?.country_code);
     }
   }, [countryDetails]);
-  
+
   const flagUrl = countryCode
     ? `https://flagcdn.com/h40/${countryCode?.toLowerCase()}.png`
     : "";
@@ -157,7 +190,7 @@ export const TraderProfile = (props) => {
         }
       }
     }
-  }, [ address, loginuserdata, otherUserData, isAuthAddress, navigate]);
+  }, [address, loginuserdata, otherUserData, isAuthAddress, navigate]);
 
   useEffect(() => {
     if (otherUserData && otherUserData?.wallet_address) {
@@ -211,11 +244,11 @@ export const TraderProfile = (props) => {
                       {otherStatus === 1 && (
                         <div className="profile-status"></div>
                       )}
-                     
+
                       {otherStatus === 2 && (
                         <div className="profile-status-absent"></div>
                       )}
-                       {otherStatus === 3 && (
+                      {otherStatus === 3 && (
                         <div className="profile-status-offline"></div>
                       )}
                     </Button>
@@ -300,12 +333,32 @@ export const TraderProfile = (props) => {
                         >
                           Edit Profile{" "}
                         </Button>
-                        <Button
-                          variant="primary"
-                          className="buttonspace auth-btn"
-                        >
-                          Verification
-                        </Button>
+
+                        {(loginuserdata?.kyc_completed === true || kycSubmitted === true) &&
+                          ((loginuserdata?.is_verified === 1 && kycSubmitted === false) ? (
+                            <Button variant="success" className="buttonspace auth-btn" disabled>
+                               KYC approved
+                            </Button>
+                          ) : (loginuserdata?.is_verified === 2 && kycSubmitted === false) ? (
+                            <Button variant="primary" className="buttonspace auth-btn" onClick={modalKycToggle}>
+                              Verification
+                            </Button>
+                          ) : (loginuserdata?.is_verified === 0 || kycSubmitted === true) ? (
+                            <Button variant="warning" className="buttonspace auth-btn" disabled>
+                              KYC Under Review
+                            </Button>
+                          ) : null)}
+
+                        {(loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed === undefined )&&
+                          kycSubmitted === false && (
+                            <Button
+                              variant="primary"
+                              className="buttonspace auth-btn"
+                              onClick={modalKycToggle}
+                            >
+                              Verification
+                            </Button>
+                          )}
                       </>
                     ) : (
                       <>
@@ -471,14 +524,14 @@ export const TraderProfile = (props) => {
                             />
                             {/* <span className="circle"></span> */}
                             {(userStatuses[i] === 0 ||
-                              userStatuses[i]  === false) && (
+                              userStatuses[i] === false) && (
                               <div className="chat-status-offline"></div>
                             )}
-                            {(userStatuses[i]  === 1 ||
-                              userStatuses[i]  === true) && (
+                            {(userStatuses[i] === 1 ||
+                              userStatuses[i] === true) && (
                               <div className="chat-status"></div>
                             )}
-                            {userStatuses[i]  === 2 && (
+                            {userStatuses[i] === 2 && (
                               <div className="chat-status-absent"></div>
                             )}
                           </div>
@@ -491,19 +544,15 @@ export const TraderProfile = (props) => {
                         </div>
                       </div>
                       <div className="actions profile-action text-center">
-                        {userData &&
-                        userData.account === escrow.user_address ? (
-                          // <Link className="action" to={`/escrow-details/${escrow._id}`}>
-                          <Button variant="primary">Details</Button>
-                        ) : // </Link>
-                        escrow && escrow.escrow_type === "buyer" ? (
-                          // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
-                          <Button variant="primary">Sell</Button>
-                        ) : (
-                          // </Link>
-                          // <Link className="action" to={`/escrow-buy-sell/${escrow._id}`}>
-                          <Button variant="primary">Buy</Button>
-                          // </Link>
+                
+                      {userData &&
+                        userData.account === escrow.user_address && (
+                          <Link
+                            className="action"
+                            to={`/escrow-details/${escrow?._id}`}
+                          >
+                            <Button variant="primary">Details</Button>
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -716,6 +765,17 @@ export const TraderProfile = (props) => {
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}
+      />
+
+      <KYCVerification
+        show={
+          ((loginuserdata?.kyc_completed === true &&
+            loginuserdata?.is_verified === 2) ||
+            loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed == undefined) &&
+          modalKycShow
+        }
+        onHide={() => setModalKYCShow(false)}
+        setkycsubmitted={setKYCSubmitted}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 import { debounce } from "lodash";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
-import { countryInfo } from "../accountSetting/countryData";
+import { countryInfo } from "../../component/countryData";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";

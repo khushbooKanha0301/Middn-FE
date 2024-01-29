@@ -40,6 +40,7 @@ jwtAxios.interceptors.request.use(
 jwtAxios.interceptors.response.use(
   (res) => res,
   (err) => {
+    console.log("------------------", err?.response && err?.response?.data?.message)
     if (
       err.response &&
       err.response.data.message === "Authorization Token not valid."
@@ -62,6 +63,15 @@ jwtAxios.interceptors.response.use(
       apiThrottle[err.config.url] = [futureTime];
       localStorage.setItem("throttleTime", JSON.stringify(apiThrottle));
     }
+    if (err?.response && err?.response?.data?.message === 'Account not found.' && err?.response?.data?.logout !== true) {
+      window.localStorage.clear();
+      window.location.href="/";
+    }
+    if (err?.response && err?.response?.data?.message === 'You are Blocked by Admin.' && err?.response?.data?.logout !== true) {
+      window.localStorage.clear();
+      window.location.href="/";
+    }
+
     return Promise.reject(err);
   }
 );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
 import jwtAxios from "../../service/jwtAxios";
-import { countryInfo } from "../accountSetting/countryData";
+import { countryInfo } from "../../component/countryData";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { notificationFail } from "../../store/slices/notificationSlice";

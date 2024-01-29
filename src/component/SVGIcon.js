@@ -1087,3 +1087,102 @@ export const BackArrow = ({ width, height }) => {
     </svg>
   );
 };
+
+export const CalenderIcon = ({width, height}) => {
+  return (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="-50 -80 200 200" 
+      width={width}
+      height={height}
+      fill="#FFFFFF"
+      // style="enable-background:new 0 0 122.88 122.88" 
+      >
+      <g>
+        <path d="M81.61,4.73c0-2.61,2.58-4.73,5.77-4.73s5.77,2.12,5.77,4.73v20.72c0,2.61-2.58,4.73-5.77,4.73s-5.77-2.12-5.77-4.73V4.73 L81.61,4.73z M29.61,4.73c0-2.61,2.58-4.73,5.77-4.73s5.77,2.12,5.77,4.73v20.72c0,2.61-2.58,4.73-5.77,4.73s-5.77-2.12-5.77-4.73 V4.73L29.61,4.73z M6.4,45.32h110.08V21.47c0-0.8-0.33-1.53-0.86-2.07c-0.53-0.53-1.26-0.86-2.07-0.86H103 c-1.77,0-3.2-1.43-3.2-3.2c0-1.77,1.43-3.2,3.2-3.2h10.55c2.57,0,4.9,1.05,6.59,2.74c1.69,1.69,2.74,4.02,2.74,6.59v27.06v65.03 c0,2.57-1.05,4.9-2.74,6.59c-1.69,1.69-4.02,2.74-6.59,2.74H9.33c-2.57,0-4.9-1.05-6.59-2.74C1.05,118.45,0,116.12,0,113.55V48.53 V21.47c0-2.57,1.05-4.9,2.74-6.59c1.69-1.69,4.02-2.74,6.59-2.74H20.6c1.77,0,3.2,1.43,3.2,3.2c0,1.77-1.43,3.2-3.2,3.2H9.33 c-0.8,0-1.53,0.33-2.07,0.86c-0.53,0.53-0.86,1.26-0.86,2.07V45.32L6.4,45.32z M116.48,51.73H6.4v61.82c0,0.8,0.33,1.53,0.86,2.07 c0.53,0.53,1.26,0.86,2.07,0.86h104.22c0.8,0,1.53-0.33,2.07-0.86c0.53-0.53,0.86-1.26,0.86-2.07V51.73L116.48,51.73z M50.43,18.54 c-1.77,0-3.2-1.43-3.2-3.2c0-1.77,1.43-3.2,3.2-3.2h21.49c1.77,0,3.2,1.43,3.2,3.2c0,1.77-1.43,3.2-3.2,3.2H50.43L50.43,18.54z"/>
+      </g>
+    </svg>
+  )
+}
+
+export const GreenCheckIcon = ({ width, height }) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 10 8"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3.138 5.70803L0.942666 3.6499L0 4.53365L3.138 7.47553L9.60933 1.40865L8.66667 0.524902L3.138 5.70803Z"
+        fill="url(#paint0_linear_1_3160)"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_1_3160"
+          x1="12.6511"
+          y1="0.524902"
+          x2="-4.91885"
+          y2="3.18086"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#7FFC8D" />
+          <stop offset="1" stopColor="#C6FA56" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+};
+
+export const RedCrossIcon = ({ width, height }) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 10 10"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.39062 1.80469L2 8.19531"
+        stroke="#FE4949"
+        strokeWidth="1.5"
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.39062 8.19531L2 1.80469"
+        stroke="#FE4949"
+        strokeWidth="1.5"
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const CameraLineIcon = ({ width, height }) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 23 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M18.6875 19.5H4.3125C3.93125 19.5 3.56562 19.342 3.29603 19.0607C3.02645 18.7794 2.875 18.3978 2.875 18V7.5C2.875 7.10218 3.02645 6.72064 3.29603 6.43934C3.56562 6.15804 3.93125 6 4.3125 6H7.1875L8.625 3.75H14.375L15.8125 6H18.6875C19.0687 6 19.4344 6.15804 19.704 6.43934C19.9735 6.72064 20.125 7.10218 20.125 7.5V18C20.125 18.3978 19.9735 18.7794 19.704 19.0607C19.4344 19.342 19.0687 19.5 18.6875 19.5Z"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M11.5 15.75C13.2863 15.75 14.7344 14.239 14.7344 12.375C14.7344 10.511 13.2863 9 11.5 9C9.7137 9 8.26562 10.511 8.26562 12.375C8.26562 14.239 9.7137 15.75 11.5 15.75Z"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
