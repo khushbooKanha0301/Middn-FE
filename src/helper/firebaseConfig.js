@@ -62,7 +62,6 @@ function convertMessageObj(
       reciverID: reciverID,
       file: file,
     };
-    console.log("99999999", firebaseInsertRecordObject)
     return firebaseInsertRecordObject;
   } else {
     var firebaseInsertRecordObject = {

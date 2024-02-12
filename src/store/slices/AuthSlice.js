@@ -48,7 +48,6 @@ export const checkAuth = createAsyncThunk(
       let account = action.account;
       let library = action.library;
       let checkValue = action.checkValue;
- console.log("checkValue ", checkValue);
       var deactivate = action.deactivate;
 
       let signMessage = action.signMessage;
@@ -113,7 +112,6 @@ export const checkAuth = createAsyncThunk(
           )
           .catch((error) => {
             if (error.response.data.message) {
-              console.log("-------------------", error.response.data.message)
               dispatch(notificationFail(error.response.data.message));
             } else {
               dispatch(
@@ -210,7 +208,6 @@ export const logoutAuth = createAsyncThunk(
       jwtAxios
         .get(`/users/logout`)
         .then(() => {
-          console.log("hello")
           setAuthToken(null);
           window.localStorage.clear();
           window.localStorage.removeItem("token");

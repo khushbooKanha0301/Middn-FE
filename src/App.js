@@ -52,7 +52,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["150.249.254.81" , "223.177.155.110", "223.236.126.142"]; // Add blocked IPs here
+  const allowedIPs = ["182.232.137.198" , "122.176.225.39"]; // Add blocked IPs here
 
   const fetchIPAddress = async () => {
     try {

@@ -109,6 +109,52 @@ body {
 .cards-dark {
     border-radius: 20px;
     border: 0;
+    .unverified-info{
+        color: red;
+    }
+
+    &.kyc-verification {
+      height: 100%;
+      margin-top: 20px;
+
+      @include media-breakpoint-up(xl) {
+        height: auto;
+      }
+
+      @include media-breakpoint-down(lg) {
+        height: auto;
+      }
+
+      h4 {
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 24px;
+        color: $white;
+        margin-bottom: 6px;
+
+        a {
+          color: #7fba7a;
+          font-weight: 700;
+          display: inline-block;
+          margin-left: 10px;
+          text-decoration: none;
+        }
+      }
+
+      .card-text {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 23px;
+        color: rgba($color: $white, $alpha: 0.6);
+        margin-bottom: 24px;
+      }
+
+      .btn-primary {
+        padding: 16px;
+        color: $modalContent;
+        width: 100%;
+      }
+    }
 }
 
 .banner {
@@ -1104,16 +1150,16 @@ body {
         align-items: center;
 
         .nav-item {
-            padding-left: 4px;
-            padding-right: 4px;
+            padding-left: 10px;
+            padding-right: 10px;
 
             &:last-child {
                 padding-right: 0;
             }
 
             @include media-breakpoint-up(xl) {
-                padding-left: 20px;
-                padding-right: 20px;
+                // padding-left: 10px;
+                // padding-right: 10px;
 
                 &.login-menu {
                     padding-left: 8px;
@@ -1227,6 +1273,15 @@ body {
                         background-color: transparent;
                     }
                 }
+            }
+        }
+       
+        .items {
+            padding-left: 0px;
+            padding-right: 0px;
+
+            &:last-child {
+                padding-right: 0;
             }
         }
     }
@@ -1629,6 +1684,21 @@ body {
 
                 svg {
                     fill: $cards-bg;
+                }
+            }
+            .crossmark{
+                width: 19px;
+                height: 19px;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: $red-medium;
+                outline: 2px solid #402b2d;
+
+                svg {
+                    // fill: $cards-bg;
+                    stroke: $white;
                 }
             }
         }
@@ -5996,6 +6066,9 @@ body {
 }
 .auth-btn {
     padding: 18px 43px
+}
+.kyc-margin {
+    margin-right: 16px 
 }
 
 .swal2-modal {

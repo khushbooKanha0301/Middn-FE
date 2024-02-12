@@ -80,7 +80,6 @@ export const KYCVerification = (props) => {
     };
   }, []);
 
-
   const onChange = (e) => {
     if (e.target.name === "nationality") {
       setNationality(e.target.value);
@@ -470,7 +469,7 @@ export const KYCVerification = (props) => {
                   )}
                   <div className="country-select" ref={optionsDropdownRef}> 
                     <div
-                      className="country-select-dropdown form-select form-select-sm"
+                      className="country-select-dropdown form-select form-select-sm kyc-margin"
                       onClick={toggleOptions}
                     >
                       {listData.find((data) => data?.country === nationality)?.cca3 || ""}
@@ -622,7 +621,7 @@ export const KYCVerification = (props) => {
                   )}
                   <div className="country-select" ref={countryDropdownRef}>
                     <div
-                      className="country-select-dropdown form-select form-select-sm"
+                      className="country-select-dropdown form-select form-select-sm kyc-margin"
                       onClick={toggleCountryOptions}
                     >
                       {listData.find((data) => data?.country === country_of_issue)?.cca3 || ""}

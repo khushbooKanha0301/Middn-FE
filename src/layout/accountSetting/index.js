@@ -604,6 +604,7 @@ export const AccountSetting = () => {
           <Col lg="4">
             <VerifiedInfo />
           </Col>
+          
         </Row>
       ) : (
         <Row className="account-setting-skeleton">

@@ -40,7 +40,6 @@ jwtAxios.interceptors.request.use(
 jwtAxios.interceptors.response.use(
   (res) => res,
   (err) => {
-    console.log("------------------", err?.response && err?.response?.data?.message)
     if (
       err.response &&
       err.response.data.message === "Authorization Token not valid."

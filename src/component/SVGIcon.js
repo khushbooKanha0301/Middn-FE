@@ -1162,6 +1162,33 @@ export const RedCrossIcon = ({ width, height }) => {
   );
 };
 
+export const WhiteCrossIcon = ({ width, height }) => {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 10 10"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M8.39062 1.80469L2 8.19531"
+        stroke="#fff"
+        strokeWidth="1.5"
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.39062 8.19531L2 1.80469"
+        stroke="#fff"
+        strokeWidth="1.5"
+        strokeLinecap="square"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
+
 export const CameraLineIcon = ({ width, height }) => {
   return (
     <svg

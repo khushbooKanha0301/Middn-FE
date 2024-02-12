@@ -165,14 +165,24 @@ export const Header = (props) => {
 
         {acAddress?.authToken ? (
           <>
-            <Nav.Item as="li">
-              <Nav.Link as={Link} to="/chat">
-                <NotificationIcon width="26" height="24" />
-                {messageCount > 0 && (
-                  <span className="notification-badge">{messageCount}</span>
-                )}
-              </Nav.Link>
-            </Nav.Item>
+           
+            {messageCount > 0 ? (
+              <Nav.Item as="li" className="items">
+                <Nav.Link as={Link} to="/chat">
+                  <NotificationIcon width="26" height="24" />
+                    <span className="notification-badge">{messageCount}</span>
+                </Nav.Link>
+              </Nav.Item>
+            ) :  
+              <Nav.Item as="li">
+                <Nav.Link as={Link} to="/chat">
+                  <NotificationIcon width="26" height="24" />
+                  {messageCount > 0 && (
+                    <span className="notification-badge">{messageCount}</span>
+                  )}
+                </Nav.Link>
+              </Nav.Item>
+            }
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/notification">
                 <BellIcon width="20" height="22" />
