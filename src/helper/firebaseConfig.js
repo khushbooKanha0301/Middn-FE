@@ -77,8 +77,7 @@ function convertMessageObj(
 }
 export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   let unreadCount = 0;
-  var childKey =
-  firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
+  var childKey = firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
   const setReciverReadCountNode = ref(database, childKey);
  
   if (setReciverReadCountNode) {
@@ -100,7 +99,6 @@ export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   var updates = {};
   updates[reciverID] = unreadCount;
   updates[senderID] = 0;
-
   set(ref(database, childKey), updates);
 };
 

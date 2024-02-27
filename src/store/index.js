@@ -8,13 +8,6 @@ import cuurencyReducer from "./slices/currencySlice";
 import chatEscrowReducer from "./slices/chatEscrowSlice";
 import loginLoderReducer from "./slices/loginLoderSlice";
 
-// const store = configureStore({
-//     reducer:{
-//         auth: AuthSlice,
-//         commonSlice: commonSlice,
-//     }
-// })
-
 const rootReducer = combineReducers({
   auth,
   commonReducer,

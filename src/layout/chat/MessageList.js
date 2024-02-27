@@ -40,8 +40,7 @@ export const MessageList = (props) => {
         }
       });
 
-      var childKey =
-      firebaseMessages.CHAT_ROOM +
+      const childKey = firebaseMessages.CHAT_ROOM +
         firebaseRootKey +
         "/" +
         firebaseMessages.MESSAGES;

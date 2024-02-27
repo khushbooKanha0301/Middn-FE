@@ -442,7 +442,7 @@ body {
 
             .create-escrow-text {
                 position: relative;
-                left: -10px;
+                // left: -10px;
             }
         }
     }
@@ -948,11 +948,23 @@ body {
                 margin-right: 16px;
             }
 
-            .dot {
+            .sidebar-left-dot {
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
                 background-color: $green-dark;
+            }
+            .sidebar-left-dot-absent {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: $orange-color;
+            }
+            .sidebar-left-dot-offline {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: $red-medium;
             }
         }
     }
@@ -7542,9 +7554,72 @@ aside.EmojiPickerReact.epr-main {
                         font-size: 14px;
                         line-height: 24px;
                         margin-bottom: 10px;
+                        background: #202226;
                     }
                 }
             }
         }
+    }
+}
+
+.dashboard-escrows {
+    position: relative;
+    width: 90px;
+    padding: 0;
+    border: none;
+
+    @include media-breakpoint-down(md) {
+        margin-bottom: 16px;
+        width: 62px;
+    }
+
+    img {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 50%;
+
+        @include media-breakpoint-down(md) {
+            width: 62px;
+            height: 62px;
+        }
+    }
+
+    .escrow-name{
+        position: relative;
+        margin-top: 16px;
+    }
+
+    .profile-status {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background-color: $green-dark;
+        border-radius: 50%;
+        border: 2px solid $white;
+        right: 0px;
+        top: 4px;
+    }
+
+    .profile-status-offline {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background-color: $red-medium;
+        border-radius: 50%;
+        border: 2px solid $white;
+        right: 0px;
+        top: 4px;
+    }
+
+    .profile-status-absent {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background-color: $orange-color;
+        border-radius: 50%;
+        border: 2px solid $white;
+        right: 0px;
+        top: 4px;
     }
 }

@@ -17,13 +17,13 @@ export const setFirebaseChatMessage = async (
   message,
   messageType,
   firebaseRootKey,
+  escrowId,
   reciverID,
   senderID,
   file
 ) => {
   // firebase database successfully inserted record callback
-  var childKey =
-  firebaseMessagesEscrow.CHAT_ROOM +
+  const childKey =  firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' +
     firebaseRootKey +
     "/" +
     firebaseMessagesEscrow.MESSAGES +
@@ -34,53 +34,57 @@ export const setFirebaseChatMessage = async (
       message,
       serverTime,
       messageType,
+      escrowId,
       senderID,
       reciverID,
       file
     )
   )
-    .then((sucess) => {
-      setUnReadCount( firebaseRootKey, reciverID, senderID, "NO");
-    })
-    .catch((error) => {});
+  .then((sucess) => {
+    setUnReadCount( escrowId, firebaseRootKey, reciverID, senderID, "NO");
+  })
+  .catch((error) => { console.log("err")});
 };
 
 function convertMessageObj(
   textMessage,
   sendTime,
   messageType,
+  escrowId,
   senderID,
   reciverID,
   file
 ) {
   if (messageType === messageTypes.TEXT) {
-    var firebaseInsertRecordObject = {
+    const firebaseInsertRecordObject = {
       message: textMessage,
       sendTime: sendTime,
       type: messageType,
       senderID: senderID,
       reciverID: reciverID,
+      escrowId:escrowId,
       file: file,
     };
     return firebaseInsertRecordObject;
   } else {
-    var firebaseInsertRecordObject = {
+    const firebaseInsertRecordObject = {
       message: textMessage,
       sendTime: sendTime,
       type: messageType,
       senderID: senderID,
       reciverID: reciverID,
+      escrowId:escrowId,
       file: file,
     };
     return firebaseInsertRecordObject;
   }
 }
-export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
-  let unreadCount = 0;
-  var childKey =
-  firebaseMessagesEscrow.CHAT_ROOM + child + "/" + firebaseMessagesEscrow.UN_READ_COUNT;
-  const setReciverReadCountNode = ref(database, childKey);
 
+export const setUnReadCount = async ( escrowId, child, reciverID, senderID, isset) => {
+  let unreadCount = 1;
+  let childKey = firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + child + "/" + firebaseMessagesEscrow.UN_READ_COUNT;
+  const setReciverReadCountNode = ref(database, childKey);
+ 
   if (setReciverReadCountNode) {
     onValue(
       setReciverReadCountNode,
@@ -97,28 +101,29 @@ export const setUnReadCount = async ( child, reciverID, senderID, isset) => {
   }
 
   unreadCount = isset === "YES" ? unreadCount : unreadCount + 1;
-  var updates = {};
-  updates[reciverID] = unreadCount;
+  let updates = {};
+  updates[reciverID] = unreadCount || 1;
   updates[senderID] = 0;
-
   set(ref(database, childKey), updates);
 };
 
 // onSend is use for send message
 export const sendMessage = async (
-  message,
   senderID,
   reciverID,
+  escrowId,
+  message,
   messageType = messageTypes.TEXT,
   file = null
 ) => {
- 
+  //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowId);
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
-  get(child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey))
+  get(child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey))
     .then((snapshot) => {
       if (snapshot.val()) {
       } else {
         firebaseRootKey = generateFirebaseChatRootKey(reciverID, senderID);
+        //firebaseRootKey = generateFirebaseEscrowRootKey(escrowId);
       }
 
       fetch("https://worldtimeapi.org/api/ip")
@@ -129,6 +134,7 @@ export const sendMessage = async (
             message,
             messageType,
             firebaseRootKey,
+            escrowId,
             reciverID,
             senderID,
             file
@@ -152,7 +158,7 @@ export const sendMessage = async (
 };
 
 export function getBase64(file) {
-  var reader = new FileReader();
+  let reader = new FileReader();
   reader.readAsDataURL(file);
   reader.onload = function () {};
   reader.onerror = function (error) {
@@ -161,25 +167,25 @@ export function getBase64(file) {
 }
 
 //for set UnreadCountZero when first time enter in chat screen
-export const setUnReadCountZero = async (senderID, reciverID) => {
-  let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
+export const setUnReadCountZero = async (escrowId, senderID, reciverID) => {
+   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
+  //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowID);
   await get(
-    child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey)
+    child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey)
   ).then((snapshot) => {
     if (snapshot.val()) {
     } else {
+      //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowID);
       firebaseRootKey = generateFirebaseChatRootKey(reciverID, senderID);
     }
   });
 
-  var childKey =
-  firebaseMessagesEscrow.CHAT_ROOM +
-    firebaseRootKey +
+  let childKey = firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey +
     "/" +
     firebaseMessagesEscrow.UN_READ_COUNT;
-
   await update(ref(database, childKey), {
-    [senderID]: 0,
+    //[reciverID]: 0,
+    [senderID]: 0
   });
 };
 

@@ -35,9 +35,6 @@ function capitalizeFirstLetter(str) {
 
 export const TraderProfile = (props) => {
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-  const createEscrowModalToggle = () =>
-    setCreateEscrowModalShow(!createEscrowModalShow);
-
   const dispatch = useDispatch();
   const [country, setCountry] = useState();
   const [modalShow, setModalShow] = useState(false);
@@ -52,6 +49,15 @@ export const TraderProfile = (props) => {
   const editProfileModalToggle = () =>
     setEditProfileModalShow(!editProfileModalShow);
   const userData = useSelector(userDetails);
+
+  const createEscrowModalToggle = () => {
+    if (userData.authToken) {
+      setCreateEscrowModalShow(!createEscrowModalShow);
+    } else {
+      setconnectWalletModalShow(true);
+    }
+  };
+
   let loginuserdata = useSelector(userGetFullDetails);
   const [countryCode, setCountryCode] = useState("");
   const isAuth = userData.authToken;
@@ -244,7 +250,6 @@ export const TraderProfile = (props) => {
                       {otherStatus === 1 && (
                         <div className="profile-status"></div>
                       )}
-
                       {otherStatus === 2 && (
                         <div className="profile-status-absent"></div>
                       )}
@@ -456,7 +461,7 @@ export const TraderProfile = (props) => {
       <Tabs defaultActiveKey="active-offers" id="profile-tab">
         <Tab eventKey="active-offers" title="Active offers">
           <h2>Active offers</h2>
-          <Nav defaultActiveKey="all" as="ul" className="filter-btn">
+          {/* <Nav defaultActiveKey="all" as="ul" className="filter-btn">
             <Nav.Item as="li">
               <Nav.Link eventKey="all">All</Nav.Link>
             </Nav.Item>
@@ -466,7 +471,7 @@ export const TraderProfile = (props) => {
             <Nav.Item as="li">
               <Nav.Link eventKey="sell">Sell</Nav.Link>
             </Nav.Item>
-          </Nav>
+          </Nav> */}
           <div className="table-responsive tradeList">
             <div className="flex-table">
               <div className="flex-table-header">
@@ -549,7 +554,7 @@ export const TraderProfile = (props) => {
                         userData.account === escrow.user_address && (
                           <Link
                             className="action"
-                            to={`/escrow-details/${escrow?._id}`}
+                            to={`/escrow/details/${escrow?._id}`}
                           >
                             <Button variant="primary">Details</Button>
                           </Link>

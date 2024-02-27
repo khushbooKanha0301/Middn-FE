@@ -37,17 +37,6 @@ export const Header = (props) => {
   const modalNotifyToggle = () => setModalNofificationShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
 
-  const handleAccountAddress = (address) => {
-    setIsSign(false);
-  };
-
-  useEffect(() => {
-    if (acAddress.authToken) {
-      findFirebaseUserList();
-      findFirebaseUserListNotification();
-    }
-  }, []);
-
   let addressLine = "";
   if (acAddress?.account === "Connect Wallet" && userDetailsAll === undefined) {
     addressLine = "Connect Wallet";
@@ -76,7 +65,7 @@ export const Header = (props) => {
               return element.includes(acAddress?.account);
             })
             ?.filter((object) => {
-              var name = acAddress?.account;
+              const name = acAddress?.account;
               return (
                 name &&
                 snapshot &&
@@ -86,7 +75,6 @@ export const Header = (props) => {
                 snapshot.val()[object]?.unreadcount[name] > 0
               );
             });
-
           setMessageCount(allunreadCount.length);
         }
       });
@@ -98,40 +86,31 @@ export const Header = (props) => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const allunreadCount = Object.keys(snapshot.val())
-            .filter((element) => {
-                return element.includes(acAddress?.account);
-            })
-            ?.map((object) => {
-              const ReciverId = object.split("_")[0];
+          const unreadCount = Object.values(snapshot.val())
+          .filter((e) => {
+            return Object.keys(e).some((element) => {
+              const ReciverId = element.split("_")[0];
               const name = acAddress?.account;
-              if (ReciverId === name) {
-                return (
-                  name &&
-                  snapshot &&
-                  snapshot.val() &&
-                  snapshot.val()[object] &&
-                  snapshot.val()[object]?.unreadcount &&
-                  snapshot.val()[object]?.unreadcount[name] > 0
-                )
-              } 
-              return false;
-              // const name = acAddress?.account;
-            
+              return ReciverId === name && e[element]?.unreadcount && e[element]?.unreadcount[name] > 0;
             });
-           
-            if (allunreadCount.some(Boolean)) {
-              // If at least one element is true, indicating not empty
-              setNotificationCount(allunreadCount.filter(Boolean).length);
-            } else {
-              // If all elements are false, indicating empty
-              setNotificationCount(0);
-            }
+          });
+          setNotificationCount(unreadCount.length);
         }
       });
     }
   };
-  
+
+  const handleAccountAddress = (address) => {
+    setIsSign(false);
+  };
+
+  useEffect(() => {
+    if (acAddress.authToken) {
+      findFirebaseUserList();
+      findFirebaseUserListNotification();
+    }
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       let moving = window.pageYOffset;
@@ -161,11 +140,8 @@ export const Header = (props) => {
         aria-controls="basic-navbar-nav"
       />
       <Nav className="ms-auto" as="ul">
-        {/* {(acAddress.authToken && (addressLine != "" && addressLine != "Connect Wallet")) && ( */}
-
         {acAddress?.authToken ? (
           <>
-           
             {messageCount > 0 ? (
               <Nav.Item as="li" className="items">
                 <Nav.Link as={Link} to="/chat">
@@ -229,12 +205,10 @@ export const Header = (props) => {
           onClick={acAddress?.authToken ? null : props.clickModalHandler}
           className="login-menu"
         >
-          {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
             <span className="user-name d-none d-md-block">{addressLine}</span>
           )}
 
-          {/* {acAddress && addressLine != "" && ( */}
           {acAddress && (
             <span className="login-btn d-flex d-md-none text-white">
               {addressLine}

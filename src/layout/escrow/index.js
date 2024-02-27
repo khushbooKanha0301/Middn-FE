@@ -13,7 +13,7 @@ import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 let PageSize = 5;
 
@@ -84,14 +84,27 @@ export const Escrow = () => {
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [userStatuses, setUserStatuses] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [isComponentMounted, setIsComponentMounted] = useState(false);
   
   const getAllEscrow = async () => {
     if (currentPage) {
-      try {
+     try {
         setUserStatuses([]);
-        const res = await jwtAxios.get(
-          `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}`
-        );
+        let res;
+        if (acAddress.authToken) {
+          res = await jwtAxios.get(
+            `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}&userAddress=${userData?.account}&statusFilter=${
+              statusFilter ? statusFilter : 'All'}`
+          );
+        
+        } else {
+          res = await jwtAxios.get(
+            `/auth/getAllEscrowsWithoutLogin?page=${currentPage}&pageSize=${PageSize}&statusFilter=${
+              statusFilter ? statusFilter : 'All'}`
+          );
+        }
+    
         setEscrow(res.data?.data); // Update the state with the new array
         setTotalEscrowCount(res.data?.escrowsCount);
         setEscrowLoading(false);
@@ -116,8 +129,16 @@ export const Escrow = () => {
   };
 
   useEffect(() => {
+    if (isComponentMounted) {
+      setCurrentPage(1);
+      getAllEscrow();
+    }
+  }, [statusFilter, acAddress]);
+  
+  useEffect(() => {
     getAllEscrow();
-  }, [currentPage]);
+    setIsComponentMounted(true);
+  }, [currentPage, statusFilter, acAddress]);
 
   const handleChangeAny = (e) => {
     setSelectedOptionAny(e);
@@ -141,22 +162,18 @@ export const Escrow = () => {
     setIsSign(false);
   };
 
-  const onSellerClick = (user_address) => {
+  const onBuySellClick = async (escrow_id) => {
     if (acAddress.authToken) {
-      navigate(`/escrow-seller/${user_address}`);
+      navigate("/escrow", { state: { id :  escrow_id } });
     } else {
       setModalShow(true);
     }
   };
 
-  const onBuyerClick = (escrow_id) => {
-    if (acAddress.authToken) {
-      navigate(`/escrow-buyer/${escrow_id}`);
-    } else {
-      setModalShow(true);
-    }
-  };
-
+  const changeStatus = (status) => {
+    setStatusFilter(status);
+  }
+  
   return (
     <div className="escrow-view">
       <h4>Hi Alex, Welcome back!</h4>
@@ -196,13 +213,36 @@ export const Escrow = () => {
           <Col lg="auto default-active-keys ">
             <Nav defaultActiveKey="all" as="ul" className="filter-btn">
               <Nav.Item as="li">
-                <Nav.Link eventKey="all">All</Nav.Link>
+                {/* <Nav.Link eventKey="all">All</Nav.Link> */}
+               
+                <Nav.Link 
+                  as={Link} 
+                  className={statusFilter === 'All' ? "active" : ""}
+                  onClick={() => changeStatus('All')}
+                >
+                  All
+                </Nav.Link>
+
               </Nav.Item>
               <Nav.Item as="li">
-                <Nav.Link eventKey="buy">Buy</Nav.Link>
+                {/* <Nav.Link eventKey="buy">Buy</Nav.Link> */}
+                <Nav.Link 
+                as={Link} 
+                  className={statusFilter === 'Buy' ? "active" : ""}
+                  onClick={() => changeStatus('Buy')}
+                >
+                  Buy
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item as="li">
-                <Nav.Link eventKey="sell">Sell</Nav.Link>
+                {/* <Nav.Link eventKey="sell">Sell</Nav.Link> */}
+                <Nav.Link 
+                as={Link} 
+                  className={statusFilter === 'Sell' ? "active" : ""}
+                  onClick={() => changeStatus('Sell')}
+                >
+                  Sell
+                </Nav.Link>
               </Nav.Item>
             </Nav>
           </Col>
@@ -279,102 +319,103 @@ export const Escrow = () => {
             ) : (
               <>
                 {escrows?.map((escrow, index) => (
-                  <div
-                    className="flex-table-body escrowListBody"
-                    key={escrow?._id}
-                  >
-                    {escrow && escrow?.price_type === "fixed" && (
-                      <div className="escrow-price">
-                        {escrow?.fixed_price} USD
-                        <span>Buy Limit 0.1-0.6 BTC</span>{" "}
-                      </div>
-                    )}
-                    {escrow && escrow?.price_type === "flexible" && (
-                      <div className="escrow-price">
-                        {capitalizeFirstLetter(escrow?.price_type)}
-                        <span>Buy Limit 0.1-0.6 BTC</span>{" "}
-                      </div>
-                    )}
-                    <div className="escrow-title d-flex justify-content-center align-items-center">
-                      {escrow?.object}
-                    </div>
-                    <div className="escrow-payment d-flex justify-content-center align-items-center">
-                      <img
-                        src={require("../../content/images/ethereum.png")}
-                        alt="Gabriel  Erickson"
-                      />
-                      <span className="ms-2"> Ethereum </span>
-                    </div>
-                    <div className="escrow-time d-flex justify-content-center">
-                      {escrow?.time_constraints}
-                    </div>
-                    <div className="escrow-trader d-flex align-items-center justify-content-start">
-                      <div className="d-flex">
-                        <div className="chat-image">
-                          <img
-                            src={
-                              escrow?.newImage
-                                ? escrow?.newImage
-                                : require("../../content/images/avatar.png")
-                            }
-                            alt={
-                              escrow?.newImage ? escrow?.newImage : "No Profile"
-                            }
-                          />
-                          
-                          {(userStatuses[index] === 1 ||
-                            userStatuses[index] === true) && (
-                            <div className="chat-status"></div>
-                          )}
-                          {userStatuses[index] === 2 && (
-                            <div className="chat-status-absent"></div>
-                          )}
-                          {(userStatuses[index] === 3 ||
-                            userStatuses[index] === false) && (
-                            <div className="chat-status-offline"></div>
-                          )}
+                 <> 
+                    <div className="flex-table-body escrowListBody"
+                    key={escrow?._id} > 
+                      {escrow && escrow?.price_type === "fixed" && (
+                        <div className="escrow-price">
+                          {escrow?.fixed_price} USD
+                          <span>Buy Limit 0.1-0.6 BTC</span>{" "}
                         </div>
-                        <div className="content ms-3 escrow-trade-content">
-                          <h6>
-                            {escrow?.user_name ? escrow?.user_name : "John doe"}
-                          </h6>
-                          <span>(100%, 500+)</span>
+                      )}
+                      {escrow && escrow?.price_type === "flexible" && (
+                        <div className="escrow-price">
+                          {capitalizeFirstLetter(escrow?.price_type)}
+                          <span>Buy Limit 0.1-0.6 BTC</span>{" "}
+                        </div>
+                      )}
+                      <div className="escrow-title d-flex justify-content-center align-items-center">
+                        {escrow?.object}
+                      </div>
+                      <div className="escrow-payment d-flex justify-content-center align-items-center">
+                        <img
+                          src={require("../../content/images/ethereum.png")}
+                          alt="Gabriel  Erickson"
+                        />
+                        <span className="ms-2"> Ethereum </span>
+                      </div>
+                      <div className="escrow-time d-flex justify-content-center">
+                        {escrow?.time_constraints}
+                      </div>
+                      <div className="escrow-trader d-flex align-items-center justify-content-start">
+                        <div className="d-flex">
+                          <div className="chat-image">
+                            <img
+                              src={
+                                escrow?.newImage
+                                  ? escrow?.newImage
+                                  : require("../../content/images/avatar.png")
+                              }
+                              alt={
+                                escrow?.newImage ? escrow?.newImage : "No Profile"
+                              }
+                            />
+                            
+                            {(userStatuses[index] === 1 ||
+                              userStatuses[index] === true) && (
+                              <div className="chat-status"></div>
+                            )}
+                            {userStatuses[index] === 2 && (
+                              <div className="chat-status-absent"></div>
+                            )}
+                            {(userStatuses[index] === 3 ||
+                              userStatuses[index] === false) && (
+                              <div className="chat-status-offline"></div>
+                            )}
+                          </div>
+                          <div className="content ms-3 escrow-trade-content">
+                            <h6>
+                              {escrow?.user_name ? escrow?.user_name : "John doe"}
+                            </h6>
+                            <span>(100%, 500+)</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="escrow-actions text-center d-flex justify-content-center">
-                      <div className="actions profile-action text-center">
-                        {userData &&
-                        userData?.account === escrow?.user_address ? (
-                          <Link
-                            className="action"
-                            to={`/escrow-details/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Details</Button>
-                          </Link>
-                        ) : escrow && escrow?.escrow_type === "buyer" ? (
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              onSellerClick(escrow?.user_address);
-                            }}
-                          >
-                            Sell
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              onBuyerClick(escrow?._id);
-                            }}
-                          >
-                            Buy
-                          </Button>
-                        )}
+                      <div className="escrow-actions text-center d-flex justify-content-center">
+                        <div className="actions profile-action text-center">
+                          {userData &&
+                          userData?.account === escrow?.user_address ? (
+                            <Link
+                              className="action"
+                              to={`/escrow/details/${escrow?._id}`}
+                            >
+                              <Button variant="primary">Details</Button>
+                            </Link>
+                          ) : userData &&
+                          userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "buyer" ? (
+                            <Button
+                              variant="primary"
+                              onClick={() => {
+                                onBuySellClick(escrow?._id);
+                              }}
+                            >
+                              Sell
+                            </Button>
+                          ) : userData && userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "seller"  ? (
+                            <Button
+                              variant="primary"
+                              onClick={() => {
+                                onBuySellClick(escrow?._id);
+                              }}
+                            >
+                              Buy
+                            </Button>
+                          ) : null}
+                        </div>
                       </div>
+                      <div className="escrow-network">Binance Smart Chain</div>
                     </div>
-                    <div className="escrow-network">Binance Smart Chain</div>
-                  </div>
+                 </>
                 ))}
                 {totalEscrowCount === 0 && escrowLoading === false && (
                   <div className="flex-table-body no-records justify-content-between">

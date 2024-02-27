@@ -14,49 +14,12 @@ import { userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import CreateEscrowView from "../layout/escrow/CreateEscrow";
 import LoginView from "../component/Login";
-
-const activeTrader = [
-  {
-    id: "1",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "2",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "3",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "4",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "5",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "6",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "7",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-  {
-    id: "8",
-    name: "Dylan Hodges",
-    img: require("../content/images/pic-1.png"),
-  },
-];
+import jwtAxios from "../service/jwtAxios";
+import { database } from "../helper/config";
+import { firebaseStatus } from "../helper/statusManage";
+import { get, ref } from "firebase/database";
+import { useNavigate } from "react-router-dom";
+let divSize = 0;
 
 function getHeight() {
   return document.documentElement.clientHeight;
@@ -74,26 +37,23 @@ function getCount(height) {
   return userDisplayCal;
 }
 
-let divSize = 0;
-
 export const Sidebar = (props) => {
+  const navigate = useNavigate();
   let height = getHeight();
   let userDisplayCal = getCount(height);
   const location = useLocation();
-  const [activeKey, setActiveKey] = useState();
   const acAddress = useSelector(userDetails);
-
-  const [userDisplayCount, setUserDisplayCount] =
-    React.useState(userDisplayCal);
-  const [userList, setUserList] = React.useState(
-    activeTrader.filter((item, index) => index < userDisplayCount)
+  const [userDisplayCount, setUserDisplayCount] = useState(userDisplayCal);
+  const [activeKey, setActiveKey] = useState();
+  const [escrows, setEscrow] = useState([]);
+  const [userStatuses, setUserStatuses] = useState([]);
+  const [userList, setUserList] = useState(
+    escrows.filter((item, index) => index < userDisplayCount)
   );
-
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [modalShow, setModalShow] = useState(false);
   const [isSign, setIsSign] = useState(null);
 
-  
   const createEscrowModalToggle = () => {
     if (acAddress.authToken) {
       setCreateEscrowModalShow(!createEscrowModalShow);
@@ -107,22 +67,51 @@ export const Sidebar = (props) => {
     let userDisplayCal = getCount(height);
 
     divSize = height;
-
     setTimeout(() => {
       if (divSize === height) {
         setUserDisplayCount(userDisplayCal);
-        setUserList(
-          activeTrader.filter((item, index) => index < userDisplayCal)
-        );
+        setUserList(escrows.filter((item, index) => index < userDisplayCal));
       }
     }, 500);
   };
 
-  React.useEffect(() => {
+  const getAllEscrow = async () => {
+    try {
+      setUserStatuses([]);
+      let res;
+      if (acAddress.authToken) {
+        res = await jwtAxios.get(
+          `/escrows/getAllOpenEscrows/${acAddress?.account}`
+        );
+        setEscrow(res.data?.data);
+        let statuses = await Promise.all(
+          res.data?.data.map(async (e) => {
+            const starCountRef = ref(
+              database,
+              firebaseStatus.CHAT_USERS + e.trade_address
+            );
+            const snapshot = await get(starCountRef);
+            return snapshot.exists() ? snapshot.val()?.isOnline : 4;
+          })
+        );
+        setUserStatuses(statuses);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getAllEscrow();
+  }, [acAddress]);
+
+  useEffect(() => {
     window.addEventListener("resize", handleResize);
   });
+
   const loadMoreData = () => {
-    setUserList(activeTrader);
+    getAllEscrow();
+    setUserList(escrows);
   };
 
   const handleResizePage = () => {
@@ -137,16 +126,20 @@ export const Sidebar = (props) => {
   };
 
   useEffect(() => {
+    getAllEscrow();
     // Update the active key based on the current URL
     setActiveKey(location.pathname);
-    if(props.isResponsive)
-    {
+    if (props.isResponsive) {
       props.setIsOpen(false);
     }
-  }, [location,props.isResponsive]);
+  }, [location, props.isResponsive]);
 
   const handleAccountAddress = (address) => {
     setIsSign(false);
+  };
+
+  const openEscrow = (e) => {
+    navigate(`/escrow/${e._id}`);
   };
 
   return (
@@ -182,10 +175,8 @@ export const Sidebar = (props) => {
               <Nav.Link
                 as={Link}
                 eventKey="escrow"
-                to={"/escrow"}
-                // to={acAddress.authToken && "/escrow"}
-                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
-                className={activeKey === "/escrow" && "active"}
+                to={"/escrows"}
+                className={activeKey === "/escrows" && "active"}
               >
                 <EscrowIcon width="24" height="24" />{" "}
                 <span className="menu-hide">Escrow</span>
@@ -196,8 +187,6 @@ export const Sidebar = (props) => {
                 as={Link}
                 eventKey="trade"
                 to={"/trade"}
-                // to={acAddress.authToken && "/trade"}
-                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
                 className={activeKey === "/trade" && "active"}
               >
                 <TradeHistoryIcon width="24" height="24" />{" "}
@@ -209,8 +198,6 @@ export const Sidebar = (props) => {
                 as={Link}
                 eventKey="help"
                 to={"/help"}
-                // to={acAddress.authToken && "/help"}
-                // onClick={!acAddress.authToken ? props.setModalShow :undefined}
                 className={activeKey === "/help" && "active"}
               >
                 <QuestionIcon width="24" height="24" />{" "}
@@ -220,34 +207,70 @@ export const Sidebar = (props) => {
           </Nav>
           <div className="divider"></div>
           <div className="nav-title">Active Trader</div>
-          {/* <ul className="active-trader">
-            {userList.map((item, index) => (
-            
-              <li key={index}>
-                <div>
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                  />
-                  <span className="menu-hide">{item.name}</span>
-                </div>
-                <i className="dot"></i>
-              </li>
-            ))}
-          </ul> */}
-          {/* {activeTrader.length === userList.length ? ( */}
-          <Button variant="link" className="btn-create-escrow" onClick={createEscrowModalToggle}>
-            <span className="create-new">
-              <PlusIcon width="14" height="14" />
-            </span>{" "}
-            <span className="menu-hide">Create Escrow</span> 
-          </Button>
-          {/* ) : (
-            <Button variant="link" onClick={loadMoreData}>
-              <span className="load-arrow"></span>{" "}
-              <span className="menu-hide">Load more</span>
+          {acAddress?.authToken && (
+            <>
+              <ul className="active-trader">
+                {userList.map((item, index) => (
+                  <li key={index} onClick={() => openEscrow(item)}>
+                    <div>
+                      <img
+                        src={
+                          item?.newImage
+                            ? item?.newImage
+                            : require("../content/images/avatar.png")
+                        }
+                        alt={require("../content/images/avatar.png")}
+                      />
+                      <span className="menu-hide">
+                        {item.user_name ? item.user_name : "John Doe"}
+                      </span>
+                    </div>
+                    {(userStatuses[index] === 1 ||
+                      userStatuses[index] === true) && (
+                      <div className="sidebar-left-dot"></div>
+                    )}
+                    {userStatuses[index] === 2 && (
+                      <div className="sidebar-left-dot-absent"></div>
+                    )}
+                    {(userStatuses[index] === 3 ||
+                      userStatuses[index] === false) && (
+                      <div className="sidebar-left-dot-offline"></div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {escrows.length === userList.length ? (
+                <Button
+                  variant="link"
+                  className="btn-create-escrow"
+                  onClick={createEscrowModalToggle}
+                >
+                  <span className="create-new">
+                    <PlusIcon width="14" height="14" />
+                  </span>{" "}
+                  <span className="menu-hide">Create Escrow</span>
+                </Button>
+              ) : (
+                <Button variant="link" onClick={loadMoreData}>
+                  <span className="load-arrow"></span>{" "}
+                  <span className="menu-hide">Load more</span>
+                </Button>
+              )}
+            </>
+          )}
+
+          {!acAddress?.authToken && (
+            <Button
+              variant="link"
+              className="btn-create-escrow"
+              onClick={createEscrowModalToggle}
+            >
+              <span className="create-new">
+                <PlusIcon width="14" height="14" />
+              </span>{" "}
+              <span className="menu-hide">Create Escrow</span>
             </Button>
-          )} */}
+          )}
         </PerfectScrollbar>
       </div>
       <Card className="cards-dark menu-hide">
@@ -259,21 +282,18 @@ export const Sidebar = (props) => {
           <Button variant="primary">Contact us</Button>
         </Card.Body>
       </Card>
-
       {modalShow && (
         <LoginView
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        handleaccountaddress={handleAccountAddress}
-        isSign={isSign}
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          handleaccountaddress={handleAccountAddress}
+          isSign={isSign}
         />
       )}
-      
       <CreateEscrowView
         show={createEscrowModalShow}
         onHide={() => setCreateEscrowModalShow(false)}
       />
-
     </div>
   );
 };

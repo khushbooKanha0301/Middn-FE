@@ -4,20 +4,13 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
-import {
-  database,
-  generateFirebaseChatRootKey
-} from "../../helper/config";
-
-import {
-  firebaseMessagesEscrow
-} from "../../helper/configEscrow";
+import { database, generateFirebaseChatRootKey } from "../../helper/config";
+import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
-//const CHAT_ROOM = "chat/escrow_room/";
 
 export const MessageList = (props) => {
-  const { ReciverId } = props;
+  const { ReciverId , escrowId} = props;
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
@@ -31,7 +24,7 @@ export const MessageList = (props) => {
         ReciverId
       );
       await get(
-        child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + firebaseRootKey)
+        child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey)
       ).then((snapshot) => {
         if (snapshot.val()) {
         } else {
@@ -42,23 +35,22 @@ export const MessageList = (props) => {
         }
       });
 
-      var childKey =
-      firebaseMessagesEscrow.CHAT_ROOM +
+      const childKey = firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' +
         firebaseRootKey +
         "/" +
         firebaseMessagesEscrow.MESSAGES;
-
       const setReciverReadCountNode = ref(database, childKey);
       if (setReciverReadCountNode) {
         onValue(setReciverReadCountNode, (snapshot) => {
           if (
             ReciverId &&
-            window.location.pathname === "/escrow-offer-buy" ||  window.location.pathname === `/escrow-seller/${ReciverId}`
+            window.location.pathname === "/escrow" ||  window.location.pathname === `/escrow/${ReciverId}` ||  window.location.pathname === `/escrow/${escrowId}`
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();
               setUnReadCountZero(
                 //CHAT_ROOM,
+                escrowId,
                 userData?.account,
                 ReciverId
               );
@@ -87,7 +79,7 @@ export const MessageList = (props) => {
 
   useEffect(() => {
     mainFunction();
-  }, [ReciverId]);
+  }, [escrowId , ReciverId]);
 
   useEffect(() => {
     if (scrollBottom) {
@@ -104,8 +96,8 @@ export const MessageList = (props) => {
     downloadLink.download = file.name;
     downloadLink.click();
   }
+  
   return (
-
     <PerfectScrollbar id="scrollBottom" options={{ suppressScrollX: true }}>
       {messages &&
         messages.map((message, index) => (

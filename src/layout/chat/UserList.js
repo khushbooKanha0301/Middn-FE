@@ -9,6 +9,7 @@ import { database } from "../../helper/config";
 import { firebaseMessages } from "../../helper/chatMessage";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 import { firebaseStatus } from "../../helper/statusManage";
+import { root } from "glamor";
 //const CHAT_ROOM = "chat/chat_room/";
 
 export const UserList = (props) => {
@@ -53,7 +54,7 @@ export const UserList = (props) => {
         if (snapshot && snapshot.val()) {
           let rootKey = Object.keys(snapshot.val())
             .filter(function (item) {
-              return (
+               return (
                 item !== userData?.account &&
                 userIds.find(function (ele) {
                   return ele.id === item;
@@ -70,6 +71,7 @@ export const UserList = (props) => {
                 ...finduser,
               };
             });
+          
           const latestUser = rootKey
             .sort(function (x, y) {
               return x.lastUpdateAt - y.lastUpdateAt;
@@ -100,37 +102,37 @@ export const UserList = (props) => {
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
           const userIds = Object.keys(snapshot.val())
-            .filter((element) => {
-              return element.includes(userData?.account);
-            })
-            .map((object) => {
-              var name = userData?.account;
-              const messages = snapshot.val()[object]?.messages;
+          .filter((element) => {
+            return element.includes(userData?.account);
+          })
+          .map((object) => {
+            var name = userData?.account;
+            const messages = snapshot.val()[object]?.messages;
 
-              const unreadCount = name
-                ? snapshot.val()[object]?.unreadcount
-                  ? snapshot.val()[object]?.unreadcount[name]
-                  : 0
-                : 0;
+            const unreadCount = name
+              ? snapshot.val()[object]?.unreadcount
+                ? snapshot.val()[object]?.unreadcount[name]
+                : 0
+              : 0;
 
-              const id = object
-                .replace(userData?.account + "_", "")
-                .replace("_" + userData?.account, "");
+            const id = object
+              .replace(userData?.account + "_", "")
+              .replace("_" + userData?.account, "");
 
-              let messageNode = messages[Object.keys(messages).pop()];
-              const lastUpdateAt = Object.keys(messages).pop();
-              return {
-                id: id,
-                unreadCount: unreadCount,
-                last_message:
-                  messageNode && messageNode.file
-                    ? messageNode.file?.name
-                    : messageNode.message
-                    ? messageNode.message
-                    : "",
-                lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
-              };
-            });
+            let messageNode = messages[Object.keys(messages).pop()];
+            const lastUpdateAt = Object.keys(messages).pop();
+            return {
+              id: id,
+              unreadCount: unreadCount,
+              last_message:
+                messageNode && messageNode.file
+                  ? messageNode.file?.name
+                  : messageNode.message
+                  ? messageNode.message
+                  : "",
+              lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
+            };
+          });
           if (userIds) {
             getAllFirebaseUser(userIds);
           }

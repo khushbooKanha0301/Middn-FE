@@ -1,94 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Col, Row, Button } from "react-bootstrap";
-import { Escrows } from "./Escrows";
+// import { Escrows } from "./Escrows";
 import { DotedIcon } from "./SVGIcon";
 import { PlusIcon } from "./SVGIcon";
 import CreateEscrowView from "../layout/escrow/CreateEscrow";
 import { userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import LoginView from "../component/Login";
-
-const escrows = [
-  {
-    id: "1",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-1.png"),
-    time: "14m ago",
-  },
-  {
-    id: "2",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-2.png"),
-    time: "14m ago",
-  },
-  {
-    id: "3",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-3.png"),
-    time: "14m ago",
-  },
-  {
-    id: "4",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-4.png"),
-    time: "14m ago",
-  },
-  {
-    id: "5",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-5.png"),
-    time: "14m ago",
-  },
-  {
-    id: "6",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-6.png"),
-    time: "14m ago",
-  },
-  {
-    id: "7",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-1.png"),
-    time: "14m ago",
-  },
-
-  {
-    id: "8",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-2.png"),
-    time: "14m ago",
-  },
-  {
-    id: "9",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-3.png"),
-    time: "14m ago",
-  },
-  {
-    id: "10",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-4.png"),
-    time: "14m ago",
-  },
-  {
-    id: "11",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-5.png"),
-    time: "14m ago",
-  },
-  {
-    id: "12",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-6.png"),
-    time: "14m ago",
-  },
-  {
-    id: "13",
-    name: "Gabriel Erickson",
-    img: require("../content/images/escrows-1.png"),
-    time: "14m ago",
-  },
-];
+import jwtAxios from "../service/jwtAxios";
+import { database } from "../helper/config";
+import { firebaseStatus } from "../helper/statusManage";
+import { get, ref } from "firebase/database";
+import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
+let divSize = 0;
 
 function getWidth() {
   let width = Math.max(
@@ -104,46 +29,77 @@ function getWidth() {
   return width;
 }
 
-let divSize = 0;
+function getCount(width) {
+  let userDisplayCalChange = 6;
+
+  if (width > 1300 && width <= 1500) {
+    userDisplayCalChange = 7;
+  } else if (width > 701 && width <= 1299) {
+    userDisplayCalChange = 5;
+  } else if (width > 550 && width <= 700) {
+    userDisplayCalChange = 3;
+  } else if (width > 400 && width <= 500) {
+    userDisplayCalChange = 2;
+  }
+
+  return userDisplayCalChange;
+}
 
 export const LatestsEscrows = () => {
+  const navigate = useNavigate();
   let width = getWidth();
-
-  let userDisplayCal = width / 225;
-  const [escrowslist, setescrowslist] = React.useState(0);
-  const [userDisplayCount, setDisplayCount] = React.useState(userDisplayCal);
+  let userDisplayCal = getCount(width);
+  const [userDisplayCount, setDisplayCount] = useState(userDisplayCal);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-
   const acAddress = useSelector(userDetails);
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
+  const [escrows, setEscrow] = useState([]);
+  const [userStatuses, setUserStatuses] = useState([]);
 
-  const [userList, setUserList] = React.useState(
-    escrows.filter((item, index) => index < userDisplayCount)
+  const [userList, setUserList] = useState(
+    escrows?.filter((item, index) => index < userDisplayCount)
   );
+
+  useEffect(() => {
+    setUserList(escrows.slice(0, userDisplayCal));
+  }, [escrows]); 
+  
+
   const loadMoreData = () => {
-    setUserList(escrows);
-    setescrowslist(escrows.length);
+    setUserList(prevUserList => [...prevUserList, ...escrows.slice(prevUserList.length)]);
   };
 
-  const handleResize = () => {
-    let width = getWidth();
-    let userDisplayCalChange = width / 225;
-    divSize = width;
-
-    setTimeout(() => {
-      if (
-        divSize === width &&
-        Math.trunc(userDisplayCalChange) !== Math.trunc(userDisplayCount)
-      ) {
-        setDisplayCount(userDisplayCalChange);
-        setUserList(
-          escrows.filter((item, index) => index < userDisplayCalChange)
+  const getAllEscrow = async () => {
+    try {
+      setUserStatuses([]);
+      let res;
+      if (acAddress.authToken) {
+        res = await jwtAxios.get(
+          `/escrows/getAllOpenEscrows/${acAddress?.account}`
         );
+        setEscrow(res.data?.data);
+        let statuses = await Promise.all(
+          res.data?.data.map(async (e) => {
+            const starCountRef = ref(
+              database,
+              firebaseStatus.CHAT_USERS + e.trade_address
+            );
+            const snapshot = await get(starCountRef);
+            return snapshot.exists() ? snapshot.val()?.isOnline : 4;
+          })
+        );
+        setUserStatuses(statuses);
       }
-    }, 500);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  useEffect(() => {
+    getAllEscrow();
+  }, [acAddress]);
 
   const createEscrowModalToggle = () => {
     if (acAddress.authToken) {
@@ -157,9 +113,10 @@ export const LatestsEscrows = () => {
     setIsSign(false);
   };
 
-  React.useEffect(() => {
-    window.addEventListener("resize", handleResize);
-  });
+  const openEscrow = (e) => {
+    navigate(`/escrow/${e._id}`);
+  };
+
   return (
     <>
       <Card className="cards-dark latests-escrows">
@@ -169,29 +126,85 @@ export const LatestsEscrows = () => {
           </Card.Title>
           <Row>
             <Col className="col-auto">
-              <Button variant="link" onClick={createEscrowModalToggle}>
-                <span className="see-more ms-0">
-                  <PlusIcon width="34" height="26" />
-                </span>
-                <span className="create-escrow-text">Create Escrow</span>
-              </Button>
+              <Box sx={{ overflowX: "auto" }}>
+                <Box sx={{ width: "max-content" }}>
+                  {acAddress?.authToken && (
+                    <>
+                      {userList.map((item, index) => (
+                        <Button
+                          variant="link"
+                          className="dashboard-escrows"
+                          onClick={() => openEscrow(item)}
+                        >
+                          <img
+                            src={
+                              item?.newImage
+                                ? item?.newImage
+                                : require("../content/images/avatar.png")
+                            }
+                            alt={require("../content/images/avatar.png")}
+                          />
+                          {userStatuses[index] === 1 && (
+                            <div className="chat-status"></div>
+                          )}
+                          {userStatuses[index] === 2 && (
+                            <div className="chat-status-absent"></div>
+                          )}
+                          {userStatuses[index] === 3 && (
+                            <div className="chat-status-offline"></div>
+                          )}
+                          <p className="escrow-name">
+                            {item.user_name ? item.user_name : "John Doe"}
+                          </p>
+                        </Button>
+                      ))}
 
-              <Button variant="link">
-                <span className="see-more">
-                  <DotedIcon width="34" height="26" />
-                </span>
-                See more
-              </Button>
+                      {escrows.length === userList.length ? (
+                        <Button
+                          variant="link"
+                          onClick={createEscrowModalToggle}
+                        >
+                          <span className="see-more ms-0">
+                            <PlusIcon width="34" height="26" />
+                          </span>
+                          <span className="create-escrow-text">
+                            Create Escrow
+                          </span>
+                        </Button>
+                      ) : (
+                        <Button variant="link" onClick={loadMoreData}>
+                          <span className="see-more">
+                            <DotedIcon width="34" height="26" />
+                          </span>
+                          See more
+                        </Button>
+                      )}
+                    </>
+                  )}
+                  {!acAddress?.authToken && (
+                    <>
+                      <Button variant="link" onClick={createEscrowModalToggle}>
+                        <span className="see-more ms-0">
+                          <PlusIcon width="34" height="26" />
+                        </span>
+                        <span className="create-escrow-text">
+                          Create Escrow
+                        </span>
+                      </Button>
+                    </>
+                  )}
+                </Box>
+              </Box>
             </Col>
           </Row>
         </Card.Body>
       </Card>
       {modalShow && (
         <LoginView
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        handleaccountaddress={handleAccountAddress}
-        isSign={isSign}
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          handleaccountaddress={handleAccountAddress}
+          isSign={isSign}
         />
       )}
       <CreateEscrowView

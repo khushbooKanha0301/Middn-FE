@@ -28,7 +28,7 @@ export const Chat = () => {
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
   const [ReciverId, setReciverId] = useState(null);
 
-  var scrollBottom = document.getElementById("scrollBottom");
+  let scrollBottom = document.getElementById("scrollBottom");
 
   useEffect(() => {
     window.localStorage.removeItem("user");
@@ -196,6 +196,7 @@ export const Chat = () => {
         receiverData?.id &&
         noError == true
       ) {
+        
         sendMessage(
           messageText,
           userDetailsAll?.wallet_address,

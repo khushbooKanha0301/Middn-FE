@@ -12,9 +12,7 @@ import TraderProfileComponent from "./layout/TraderProfileComponent";
 import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
 import EscrowDetails from "./layout/escrow/EscrowDetails";
-import EscrowPay from "./layout/escrow/EscrowPay";
 import EscrowSeller from "./layout/escrow/EscrowSeller";
-import EscrowBuySell from "./layout/escrow/EscrowBuySell";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
 import ProtectedRoute from "./PrivateRoute";
@@ -35,6 +33,7 @@ import { firebaseMessagesActive } from "./helper/userStatus";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
+import EscrowBuyer from "./layout/escrow/EscrowBuySell";
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -52,7 +51,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["182.232.137.198" , "122.176.225.39"]; // Add blocked IPs here
+  const allowedIPs = ["182.232.137.198" , "103.239.146.251", "106.214.119.105"]; // Add blocked IPs here
 
   const fetchIPAddress = async () => {
     try {
@@ -273,7 +272,6 @@ export const App = () => {
                     </>
                   }
                 />
-
                 <Route path="/" element={<HomePageComponent />} />
                 <Route
                   path="/settings"
@@ -291,13 +289,12 @@ export const App = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/escrow-details/:id" element={<EscrowDetails />} />
-                <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} />
-                <Route path="/escrow-offer-buy" element={<EscrowPay />} />
-                <Route
-                  path="/escrow-seller/:address"
-                  element={<EscrowSeller />}
-                />
+                <Route path="/escrow/details/:id" element={<EscrowDetails />} />
+                {/* <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} />
+                <Route path="/escrow-seller/:address" element={<EscrowSeller />}/> */}
+                <Route path="/escrow/:id" element={<EscrowSeller />} />
+                <Route path="/escrow" element={<EscrowBuyer />}/>
+                {/* <Route path="/escrow/:id" element={<EscrowSeller />} /> */}
                 <Route
                   path="/profile/:address"
                   element={
@@ -319,7 +316,7 @@ export const App = () => {
                   }
                 />
                 <Route
-                  path="/escrow"
+                  path="/escrows"
                   element={
                     // <ProtectedRoute>
                     <EscrowComponent />

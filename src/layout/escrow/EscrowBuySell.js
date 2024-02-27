@@ -1,9 +1,7 @@
-import { debounce } from "lodash";
-import React, { useCallback, useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Col, Row, Card, Form, Button } from "react-bootstrap";
-import { countryInfo } from "../../component/countryData";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";
 import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
@@ -13,14 +11,15 @@ import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { onValue, ref } from "firebase/database";
 
-// USD , EUR , AUD , GBP
-function EscrowDetails() {
+export const EscrowBuyer = () => {
+  const location = useLocation();
+  const { state } = location;
+  const id = state?.id;
   const dispatch = useDispatch();
   const [currentPre, setCurrentPre] = useState("USD");
   const [currentCurrency, setCurrentCurrencyPre] = useState("MID");
   const [escrows, setEscrow] = useState(null);
   const acAddress = useSelector(userDetails);
-  const { id } = useParams();
   const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -30,26 +29,11 @@ function EscrowDetails() {
   const [amount, setAmount] = useState(0);
   const [readyForPayment, setReadyForPayment] = useState(true);
   const [cryptoAmount, setCryptoAmount] = useState(0);
-
   const networks = [{ value: "Polygon Chain", label: "Polygon Chain" }, 
   { value: "Ethereum", label: "Ethereum" }];
   const [network, setNetwork] = useState("Polygon Chain");
-  
   const [otherStatus, setUserStatus] = useState(null);
-
-  // const getAllEscrow = async () => {
-  //   try {
-  //     const res = await jwtAxios.get(`/auth/getCryptoDetails`);
-  //     setCrypto(res?.data?.data); // Update the state with the new array
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getAllEscrow();
-  // }, []);
-
+ 
   const handleGlobalClick = (event) => {
     // Close dropdowns if the click is outside of them
     if (
@@ -62,24 +46,17 @@ function EscrowDetails() {
       setShowOptions(false);
     }
   };
-
+ 
   useEffect(() => {
     // Add global click event listener
     document.addEventListener("click", handleGlobalClick);
-
+ 
     // Remove the event listener when the component unmounts
     return () => {
       document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
-
-  const currencyCountry = () => {
-    const result = countryInfo.find(
-      (item) => item.currency.code === currentPre
-    );
-    return result?.flag;
-  };
-
+ 
   const handleButtonClick = async (address) => {
     if (!amount) {
       dispatch(notificationFail("Please Enter Correct Amount."));
@@ -94,20 +71,31 @@ function EscrowDetails() {
       return false;
     }
     const conversationRate = cryptoAmount || "0";
+    
     const reqData = {
       user_address: address,
+      trade_address: acAddress?.account, // login user,
       escrow_id: id,
+      escrow_type: escrows.escrow_type,
       amount: amount,
       country_currency: currentPre,
       crypto_currency: currentCurrency,
       conversation_amount: String(conversationRate),
+      trade_status: 1
     };
-
+ 
     await jwtAxios
       .post(`/trade/createTrade`, reqData)
       .then((escrowResult) => {
         if (escrowResult?.data?.newTrade) {
-          navigate("/escrow-offer-buy", { state: { userAddress: address } });
+
+          navigate(`/escrow/${id}`);
+          // if(escrows.escrow_type === "buyer"){
+          //   // navigate(`/escrow/${address}`, {state :  { escrow_id :  id } });
+          // } 
+          // else {
+          //   navigate(`/escrow/${id}`, { state: { userAddress: address, escrow_id: id } });
+          // }
         } else {
           dispatch(notificationFail("Something went wrong"));
         }
@@ -124,11 +112,11 @@ function EscrowDetails() {
         }
       });
   };
-
+ 
   const handleFilterTypeChange = (value) => {
     setTypeFilter((prevType) => (prevType === value ? null : value));
   };
-
+ 
   useEffect(() => {
     jwtAxios
       .get(`/escrows/getEscrowsById/${id}`)
@@ -138,36 +126,17 @@ function EscrowDetails() {
       .catch((err) => {
         console.log(err);
       });
-  }, [acAddress.authToken]);
-
+  }, [acAddress?.authToken]);
+ 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
-   
   };
-
+ 
   const handleSelectedClick = (value) => {
     setNetwork(value);
     setShowOptions(false);
   };
-
-  const toggleCurrencyOptions = () => {
-    setShowCurrencyOptions(!showCurrencyOptions);
-    setShowOptions(false);
-  };
-
-  const onChangeAmount = useCallback(
-    debounce(async (data) => {
-      const res = await jwtAxios
-        .post(`auth/getCryptoAmountDetails`, data)
-        .then((response) => {
-          return response?.data;
-        });
-
-      setCryptoAmount(res.amount);
-    }, 500),
-    []
-  );
-
+  
   const handleChangeAmount = (value) => {
     if (currentCurrency && currentPre) {
       setAmount(value);
@@ -176,29 +145,17 @@ function EscrowDetails() {
         usdAmount: usdAmount,
         cryptoSymbol: currentCurrency,
         cryptoCountry: currentPre,
-      };
-      // onChangeAmount(data);
-
-      // if (value) {
-      //   if (value > 0) {
-      //     setReadyForPayment(false);
-      //   } else {
-      //     setReadyForPayment(true);
-      //     dispatch(notificationFail("Please Enter Correct Amount"));
-      //   }
-      // } else {
-      //   setReadyForPayment(true);
-      // }
+      }; 
     }
   };
-
+ 
   const handledAmountFocus = () => {
     if (!currentCurrency) {
       setReadyForPayment(true);
       dispatch(notificationFail("Please Select Crypto Currency"));
     }
   };
-
+ 
   useEffect(() => {
     if (escrows && escrows?.user_address) {
       const starCountRef = ref(
@@ -209,9 +166,8 @@ function EscrowDetails() {
         setUserStatus(snapshot.val()?.isOnline);
       });
     }
-  
   }, [escrows]);
-
+ 
   return (
     <div className="escrow-details">
       <Row>
@@ -294,15 +250,15 @@ function EscrowDetails() {
                 <div class="limit-txt">Limit: </div>
                 <div class="limit-txt-right">0.1-0.6 MID</div>
               </div>
-
+ 
               <div className="d-flex main-limit mb-2">
                 <h6>Detail</h6>
               </div>
-
+ 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right-amount">Payment Information</div>
               </div>
-
+ 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Amount to transfer to Middn </div>
                 <div class="limit-txt-left-amount">
@@ -310,7 +266,7 @@ function EscrowDetails() {
                   {currentCurrency ? currentCurrency : "MID"}
                 </div>
               </div>
-
+ 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Invoice Amount</div>
                 <div class="limit-txt-left">
@@ -318,14 +274,14 @@ function EscrowDetails() {
                   {currentCurrency ? currentCurrency : "MID"}
                 </div>
               </div>
-
+ 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Escrow fees </div>
                 <div class="limit-txt-left color-free">
                  FREE
                 </div>
               </div>
-
+ 
               <div className="d-flex main-limit">
                 <div class="limit-txt-right">Total</div>
                 <div class="limit-txt-left">
@@ -350,7 +306,7 @@ function EscrowDetails() {
                   </div>
                 </Form.Group>
               </div>
-
+ 
               <div className="edit-btn ">
                 <>
                   <Button
@@ -397,34 +353,34 @@ function EscrowDetails() {
                   <span>(100%, 500+)</span>
                 </div>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="card-txt-left">Location</span>
                 <strong class="card-txt">🇺🇸 United States</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="card-txt-left">Trades</span>
                 <strong class="card-txt">1029</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="card-txt-left">Trading partners</span>
                 <strong class="card-txt">720</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="card-txt-left">Feedback score</span>
                 <strong class="card-txt">99%</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="card-txt-left">Typical finalization time</span>
                 <strong class="card-txt">20 minutes</strong>
               </div>
             </Card.Body>
           </Card>
-
+ 
           <Card className="cards-dark">
             <Card.Body>
               <Card.Title as="h2">Summary</Card.Title>
@@ -432,22 +388,22 @@ function EscrowDetails() {
                 <span class="summery-txt-left">Price</span>
                 <strong class="summery-txt">{amount || "0" }{" "} MID</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Limit</span>
                 <strong class="summery-txt">0.1-0.6 MID</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Payment methods</span>
                 <strong class="summery-txt">MID</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Network</span>
                 <strong class="summery-txt">{network || "Polygon Chain"}</strong>
               </div>
-
+ 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
                 <span class="summery-txt-left">Time constraints</span>
                 <strong class="summery-txt">24 Hours</strong>
@@ -458,6 +414,6 @@ function EscrowDetails() {
       </Row>
     </div>
   );
-}
+ }
 
-export default EscrowDetails;
+export default EscrowBuyer;

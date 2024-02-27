@@ -2,28 +2,13 @@ import React, { useRef, useState, useEffect } from "react";
 import { onValue, ref } from "firebase/database";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useDispatch, useSelector } from "react-redux";
+import { Col, Row, Card, Nav, OverlayTrigger, Tooltip, Button, Accordion, Tab } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { database } from "../../helper/config";
 import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
-import { useNavigate } from "react-router-dom";
-import {
-  Col,
-  Row,
-  Card,
-  Nav,
-  OverlayTrigger,
-  Tooltip,
-  Button,
-  Accordion,
-  Tab,
-} from "react-bootstrap";
-import {
-  CheckIcon,
-  SimpleDotedIcon,
-  SimpleTrashIcon,
-  TrashIcon,
-} from "../../component/SVGIcon";
+import { CheckIcon, SimpleDotedIcon, SimpleTrashIcon, TrashIcon } from "../../component/SVGIcon";
 
 export const AccountSetting = () => {
   const userRef = useRef(null);
@@ -35,7 +20,8 @@ export const AccountSetting = () => {
   const navigate = useNavigate();
 
   const getChatUser = (user) => {
-    navigate(`/escrow-seller/${user.senderId}`);
+    // navigate(`/escrow/${user.escrowId}`);
+    navigate(`/escrow/${user.escrowId}`, { state: { userAddress: user.senderId, escrow_id: user.escrowId } });
   };
 
   useEffect(() => {
@@ -63,24 +49,25 @@ export const AccountSetting = () => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
         if (snapshot && snapshot.val()) {
-          let rootKey = Object.keys(snapshot.val())
-            .filter(function (item) {
+          let rootKey = userIds.filter(function (ele) {
               return (
-                item !== userData?.account &&
-                userIds.find(function (ele) {
+                ele.senderId !== userData?.account &&
+                Object.keys(snapshot.val())
+                .filter(function (item) {
                   return ele.senderId === item;
                 })
-              );
-            })
-            .map((object) => {
-              let finduser = userIds.find(function (ele) {
-                return ele.senderId === object;
-              });
-              return {
-                ...snapshot.val()[object],
-                ...finduser,
-              };
-            });
+                .map((object) => {
+                  let finduser =  userIds.find(function (ele) {
+                    return ele.senderId === object;
+                  });
+                  return {
+                    ...snapshot.val()[object],
+                    ...finduser,
+                  };
+                })
+              )
+           })
+          
           const latestUser = rootKey
             .sort(function (x, y) {
               return x.lastUpdateAt - y.lastUpdateAt;
@@ -98,24 +85,20 @@ export const AccountSetting = () => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const userIds = Object.keys(snapshot.val())
-            .filter((element) => {
-              return element.includes(userData?.account);
-            })
-            .map((object) => {
-              let name = userData?.account;
+          const userIds = Object.values(snapshot.val())
+          .flatMap((e) => {
+            return Object.keys(e).map((object) => {
               const senderId = object.split("_")[1];
               const ReciverId = object.split("_")[0];
-
-              let messages = snapshot.val()[object]?.messages;
-              let unreadCount = name
-                ? snapshot.val()[object]?.unreadcount
-                  ? snapshot.val()[object]?.unreadcount[name]
+              const name = userData?.account;
+              const messages = e[object]?.messages;
+              const unreadCount = name
+                ? e[object]?.unreadcount
+                  ? e[object]?.unreadcount[name]
                   : 0
                 : 0;
 
-              let id = object
-                .replace(userData?.account + "_", "")
+              const id = object.replace(userData?.account + "_", "")
                 .replace("_" + userData?.account, "");
 
               let messageNode = messages[Object.keys(messages).pop()];
@@ -126,6 +109,7 @@ export const AccountSetting = () => {
                   id: id,
                   senderId: senderId,
                   ReciverId: ReciverId,
+                  escrowId: messageNode.escrowId,
                   unreadCount: unreadCount,
                   last_message:
                     messageNode && messageNode.file
@@ -135,9 +119,12 @@ export const AccountSetting = () => {
                       : "",
                   lastUpdateAt: lastUpdateAt ? lastUpdateAt : 0,
                 };
+              } else {
+                return null; // Return null for elements that don't meet the condition
               }
-              return {}
             });
+          })
+          .filter((user) => user !== null);
 
           if (userIds) {
             getAllFirebaseUser(userIds);
@@ -153,35 +140,16 @@ export const AccountSetting = () => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const allunreadCount = Object.keys(snapshot.val())
-            .filter((element) => {
-                return element.includes(userData?.account);
-            })
-            ?.map((object) => {
-              const ReciverId = object.split("_")[0];
+          const unreadCount = Object.values(snapshot.val())
+          .filter((e) => {
+            return Object.keys(e).some((element) => {
+              const ReciverId = element.split("_")[0];
               const name = userData?.account;
-              if (ReciverId === name) {
-                return (
-                  name &&
-                  snapshot &&
-                  snapshot.val() &&
-                  snapshot.val()[object] &&
-                  snapshot.val()[object]?.unreadcount &&
-                  snapshot.val()[object]?.unreadcount[name] > 0
-                )
-              } 
-              return false;
-              // const name = acAddress?.account;
-            
+              return ReciverId === name && e[element]?.unreadcount && e[element]?.unreadcount[name] > 0;
             });
-           
-            if (allunreadCount.some(Boolean)) {
-              // If at least one element is true, indicating not empty
-              setNotificationCount(allunreadCount.filter(Boolean).length);
-            } else {
-              // If all elements are false, indicating empty
-              setNotificationCount(0);
-            }
+          });
+          
+          setNotificationCount(unreadCount.length);
         }
       });
     }
@@ -298,8 +266,7 @@ export const AccountSetting = () => {
                             allusers?.map((user, index) => (
                               <li
                                 key={index}
-                                className={`active
-                            }${user?.unreadCount > 0 ? "unreaded-msg" : ""}`}
+                                className={`active}${user?.unreadCount > 0 ? "unreaded-msg" : ""}`}
                                 onClick={() => getChatUser(user)}
                               >
                                 <div className="chat-image">

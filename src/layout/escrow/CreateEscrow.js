@@ -570,7 +570,7 @@ export const CreateEscrowView = (props) => {
                 <Form.Control
                   ref={escrowLinkRef}
                   type="text"
-                  value={`app.middn.com/join-transaction/${escrowNumber}`}
+                  value={`https://app.middn.com/escrow/${escrowNumber}`}
                   readOnly
                 />
               </Form.Group>
