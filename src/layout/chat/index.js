@@ -1,9 +1,10 @@
 import Picker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
+import { Nav , NavDropdown } from "react-bootstrap";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { IoIosCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { BackArrow, LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
+import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon } from "../../component/SVGIcon";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import ChatLoader from "./ChatLoader";
@@ -13,9 +14,11 @@ import MessageList from "./MessageList";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import UserList from "./UserList";
 import { notificationFail } from "../../store/slices/notificationSlice";
+import ReportUserView from "../../component/ReportUser";
+import jwtAxios from "../../service/jwtAxios";
 
 export const Chat = () => {
-  const [userName, setUserName] = useState(null);
+  const [user, setUser] = useState("");
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   const [showSmily, setShowSmily] = useState(false);
@@ -27,7 +30,9 @@ export const Chat = () => {
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
   const [ReciverId, setReciverId] = useState(null);
-
+  const [reportModelOpen, setReportModelOpen] = useState(false);
+  const [reportModelData, setReportModelData] = useState({ id: null, status: null });
+  
   let scrollBottom = document.getElementById("scrollBottom");
 
   useEffect(() => {
@@ -38,14 +43,19 @@ export const Chat = () => {
   useEffect(() => {
     if (ReciverId) {
       setMessageText("");
+      setUser(receiverData)
     }
   }, [ReciverId]);
 
+  useEffect(() => {
+    dispatch(setIsChatPage({ user : user , isChatOpen: true}));
+  }, [user]);
+  
   const smilyOpen = () => {
     setShowSmily(!showSmily);
   };
 
-  const ref = useRef(null);
+  const userRef = useRef(null);
   const { onClickOutside } = <Picker />;
 
   const handleTextChange = (event) => {
@@ -125,7 +135,7 @@ export const Chat = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (ref.current && !ref.current.contains(event.target)) {
+      if (userRef.current && !userRef.current.contains(event.target)) {
         onClickOutside && onClickOutside();
       }
     };
@@ -196,25 +206,49 @@ export const Chat = () => {
         receiverData?.id &&
         noError == true
       ) {
-        
-        sendMessage(
-          messageText,
-          userDetailsAll?.wallet_address,
-          receiverData?.id,
-          messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
-          file
-        );
-        // e.target.elements.content.value = "";
-        setMessageFile("");
-        setMessageText("");
+        try {
+          const reqData = {
+            report_from_user_address: userDetailsAll?.wallet_address,
+            report_to_user_address: receiverData?.id
+          }
+          const result = await jwtAxios.post(`/users/getUserStatusToMessage`, reqData);
+ 
+          if (result?.data?.reportUser) {
+             
+              sendMessage(
+                result?.data?.reportUser?.userStatus,
+                messageText,
+                userDetailsAll?.wallet_address,
+                receiverData?.id,
+                messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
+                file
+              );
+              // e.target.elements.content.value = "";
+              setMessageFile("");
+              setMessageText("");
+
+          } else {
+              dispatch(notificationFail("Something went wrong"));
+              return null; // Return null or some other default value
+          }
+      } catch (error) {
+          console.error("Error fetching user status:", error);
+          dispatch(notificationFail("Error fetching user status"));
+          return null; // Return null or some other default value
+      }
       } 
     }
   }
-  
+
+  const modalToggle =(id, status) => {
+    setReportModelOpen(!reportModelOpen);
+    setReportModelData({ id, status });
+  };
+
   return (
     <div className="chat-view">
       {loader ? (
-        <ChatLoader username={userName} />
+        <ChatLoader/>
       ) : (
         <Row>
           <UserList setLoader={setLoader} setReciverId={setReciverId} />
@@ -240,6 +274,41 @@ export const Chat = () => {
                     {receiverData &&
                       `${receiverData?.fname_alias || "John"}  ${receiverData?.lname_alias || "Doe"}`}
                   </p>
+                  {receiverData ? 
+                  <>
+                    {(user?.userStatus || receiverData?.userStatus) ? 
+                    <>
+                      <Nav as="ul">
+                        <NavDropdown
+                          as="li"
+                          title={
+                            <SimpleDotedIcon width="20" height="20" />
+                          }
+                          id="nav-dropdown"
+                        >
+                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Unblock")}>
+                          UnBlock user
+                          </NavDropdown.Item>
+                        </NavDropdown>
+                      </Nav>
+                    </> : 
+                    <>
+                      <Nav as="ul">
+                        <NavDropdown
+                          as="li"
+                          title={
+                            <SimpleDotedIcon width="20" height="20" />
+                          }
+                          id="nav-dropdown"
+                        >
+                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Block")}>
+                          Block user
+                          </NavDropdown.Item>
+                        </NavDropdown>
+                      </Nav>
+                    </>}
+                  </>
+                  : null}
                 </div>
                 <div className="chat-box-list">
                   <ul>
@@ -337,6 +406,13 @@ export const Chat = () => {
           </Col>
         </Row>
       )}
+      <ReportUserView
+        show={reportModelOpen}
+        onHide={() => setReportModelOpen(false)}
+        id={reportModelData.id}
+        status={reportModelData.status}
+        setUser={setUser}
+      /> 
     </div>
   );
 };

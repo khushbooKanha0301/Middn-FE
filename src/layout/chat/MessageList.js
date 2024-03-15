@@ -14,8 +14,7 @@ import { firebaseMessages } from "../../helper/chatMessage";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
-export const MessageList = (props) => {
-  const { ReciverId } = props;
+export const MessageList = () => {
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
@@ -55,18 +54,35 @@ export const MessageList = (props) => {
             if (snapshot.val()) {
               const values = snapshot.val();
               setUnReadCountZero(
-                //CHAT_ROOM,
                 userData?.account,
                 window.localStorage.getItem("user")
               );
               const nhuhbu = Object.values(values).filter(
-                (o1) =>
-                  (o1.reciverID === window.localStorage.getItem("user") &&
-                    o1.senderID === userData?.account) ||
-                  (o1.senderID === window.localStorage.getItem("user") &&
-                    o1.reciverID === userData?.account)
+                (o1) => {
+
+                  return o1.senderID === userData?.account || o1.userStatus === false;
+                  // if(o1.senderID === userData?.account)
+                  // {
+                  //   return(
+                  //   ((o1.reciverID === window.localStorage.getItem("user") &&
+                  //   o1.senderID === userData?.account) ||
+                  //   (o1.senderID === window.localStorage.getItem("user") &&
+                  //     o1.reciverID === userData?.account))
+                  //   )
+                  // } else {
+                  //   return (
+                  //     o1.userStatus === false &&
+                  //     ((o1.reciverID === window.localStorage.getItem("user") &&
+                  //       o1.senderID === userData?.account) ||
+                  //       (o1.senderID === window.localStorage.getItem("user") &&
+                  //         o1.reciverID === userData?.account))
+                  //   );
+                  // }
+                }
               );
+             
               if (nhuhbu.length > 0) {
+                console.log("nhuhbu ", nhuhbu);
                 setMessages(nhuhbu);
               }
             }
@@ -76,9 +92,7 @@ export const MessageList = (props) => {
             }
           }
         });
-      } else {
-
-      }
+      } 
     }
   };
 
@@ -117,7 +131,7 @@ export const MessageList = (props) => {
                           ? receiverData?.imageUrl
                           : require("../../content/images/avatar.png")
                       }
-                      alt="Gabriel  Erickson"
+                      alt="Gabriel Erickson"
                     />
                   </div>
                   <div>

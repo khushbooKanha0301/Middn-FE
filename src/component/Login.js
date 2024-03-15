@@ -55,7 +55,7 @@ export const LoginView = (props) => {
       if (storageProvider == "injected") {
         if (!window.ethereum) {
           dispatch(
-            notificationFail("Please Install Meta Mask in Your system ")
+            notificationFail("Please Install Meta Mask in Your system")
           );
           return false;
         }
@@ -265,41 +265,41 @@ export const LoginView = (props) => {
     }
   }, [ethereum, userData.authToken, userData.address]);
 
-  useEffect(() => {
-    if (chainId) {
-      SetUserChainId(chainId);
-    }
-  }, [chainId]);
-  ethereum &&
-    ethereum.on("chainChanged", (networkId) => {
-      if (userchainId !== null && userchainId !== networkId) {
-        setNewChainId(Web3.utils.hexToNumber(networkId));
-      }
-    });
+  // useEffect(() => {
+  //   if (chainId) {
+  //     SetUserChainId(chainId);
+  //   }
+  // }, [chainId]);
+  // ethereum &&
+  //   ethereum.on("chainChanged", (networkId) => {
+  //     if (userchainId !== null && userchainId !== networkId) {
+  //       setNewChainId(Web3.utils.hexToNumber(networkId));
+  //     }
+  //   });
 
-  useEffect(() => {
-    const checkChain = async () => {
-      if (newChainId) {
-        const isChainSupported = await isChainIdSupported(newChainId);
-        if (!isChainSupported) {
-          await disconnect();
-          props.setTwoFAModal(false);
-          dispatch(
-            notificationFail(
-              "Network is unsupoorted, please switch to another network"
-            )
-          );
-        } else if (
-          newChainId &&
-          userchainId !== null &&
-          userchainId !== newChainId
-        ) {
-          dispatch(notificationSuccess("Network changed successfully !"));
-        }
-      }
-    };
-    checkChain();
-  }, [newChainId]);
+  // useEffect(() => {
+  //   const checkChain = async () => {
+  //     if (newChainId) {
+  //       const isChainSupported = await isChainIdSupported(newChainId);
+  //       if (!isChainSupported) {
+  //         await disconnect();
+  //         props.setTwoFAModal(false);
+  //         dispatch(
+  //           notificationFail(
+  //             "Network is unsupoorted, please switch to another network"
+  //           )
+  //         );
+  //       } else if (
+  //         newChainId &&
+  //         userchainId !== null &&
+  //         userchainId !== newChainId
+  //       ) {
+  //         dispatch(notificationSuccess("Network changed successfully !"));
+  //       }
+  //     }
+  //   };
+  //   checkChain();
+  // }, [newChainId]);
 
   useEffect(() => {
     props.handleaccountaddress(accountAddress);
@@ -414,9 +414,9 @@ export const LoginView = (props) => {
     }
   }, [address, userData?.account]);
 
-  const isChainIdSupported = async (chainId) => {
-    return web3Connectors?.injected?.supportedChainIds?.includes(chainId);
-  };
+  // const isChainIdSupported = async (chainId) => {
+  //   return web3Connectors?.injected?.supportedChainIds?.includes(chainId);
+  // };
 
   const submitHandler = async (event) => {
     event.preventDefault();
@@ -433,8 +433,8 @@ export const LoginView = (props) => {
         setProvider("walletConnect");
         break;
       case "meta_mask":
-        let provider;
-        let currentChainId;
+        //let provider;
+       // let currentChainId;
         if (!window.ethereum) {
           dispatch(
             notificationFail("Please Install Meta Mask in Your system ")
@@ -442,24 +442,24 @@ export const LoginView = (props) => {
           return false;
         }
 
-        if (window.ethereum && !window.ethereum.providers) {
-          currentChainId = Web3.utils.hexToNumber(window.ethereum.chainId);
-        } else {
-          provider = window.ethereum.providers.find(
-            (provider) => provider.isMetaMask
-          );
-          currentChainId = Web3.utils.hexToNumber(provider.chainId);
-        }
-        const isChainSupported = await isChainIdSupported(currentChainId);
+        // if (window.ethereum && !window.ethereum.providers) {
+        //   currentChainId = Web3.utils.hexToNumber(window.ethereum.chainId);
+        // } else {
+        //   provider = window.ethereum.providers.find(
+        //     (provider) => provider.isMetaMask
+        //   );
+        //   currentChainId = Web3.utils.hexToNumber(provider.chainId);
+        // }
+        //const isChainSupported = await isChainIdSupported(currentChainId);
 
-        if (!isChainSupported) {
-          dispatch(
-            notificationFail(
-              "Network is unsupoorted, please switch to another network"
-            )
-          );
-          return false;
-        }
+        // if (!isChainSupported) {
+        //   dispatch(
+        //     notificationFail(
+        //       "Network is unsupoorted, please switch to another network"
+        //     )
+        //   );
+        //   return false;
+        // }
 
         await activateInjectedProvider("injected");
         activate(web3Connectors.injected);

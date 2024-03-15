@@ -43,8 +43,8 @@ export const MessageList = (props) => {
       if (setReciverReadCountNode) {
         onValue(setReciverReadCountNode, (snapshot) => {
           if (
-            ReciverId &&
-            window.location.pathname === "/escrow" ||  window.location.pathname === `/escrow/${ReciverId}` ||  window.location.pathname === `/escrow/${escrowId}`
+            ReciverId 
+           // window.location.pathname === "/escrow" ||  window.location.pathname === `/escrow/${ReciverId}` ||  window.location.pathname === `/escrow/${escrowId}`
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();

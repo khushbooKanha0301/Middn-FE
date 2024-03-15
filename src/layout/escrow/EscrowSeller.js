@@ -4,28 +4,30 @@ import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
-import { BackArrow, LinkSimpleIcon, SmileyIcon } from "../../component/SVGIcon";
+import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon , EyeIcon} from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import {
   converImageToBase64,
   sendMessage,
 } from "../../helper/firebaseConfigEscrow";
+import { Nav , NavDropdown } from "react-bootstrap";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
-import { useParams, useLocation } from "react-router-dom";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import jwtAxios from "../../service/jwtAxios";
 import { get, ref, set, update } from "firebase/database";
 import { database } from "../../helper/config";
 import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 
-export const EscrowSeller = () => {
-  //   const location = useLocation();
-  //   const { state } = location;
-  //   const escrow_id = state?.escrow_id;
+import Swal from "sweetalert2/src/sweetalert2.js";
+import { firebaseStatus } from "../../helper/statusManage";
 
-  const { id } = useParams();
+
+export const EscrowSeller = (props) => {
+  const [user, setUser] = useState({});
+  console.log("user ", user); 
+  const { id } = props;
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const acAddress = useSelector(userGetFullDetails);
@@ -42,7 +44,8 @@ export const EscrowSeller = () => {
   const [messageText, setMessageText] = useState("");
   const [messageFile, setMessageFile] = useState("");
   const [escrowLoading, setEscrowLoading] = useState(false);
- 
+  const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
+  
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
     return () => {
@@ -195,6 +198,7 @@ export const EscrowSeller = () => {
           acAddress?.wallet_address,
           receiverAddress,
           id,
+          escrow?.escrow_type,
           messageText,
           messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
           file
@@ -204,6 +208,54 @@ export const EscrowSeller = () => {
         setMessageText("");
       }
     }
+  };
+
+  const modalToggle = async (id, status) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `Do you want to ${status} this user?`,
+      showCancelButton: true,
+      confirmButtonColor: "red",
+      cancelButtonColor: "#808080",
+      confirmButtonText: "Yes",
+      customClass: {
+        popup: "suspend",
+      },
+    }).then(async (result) => {
+      let user;
+      if(status === 'Block'){
+        user = {
+          userStatus: true
+        }
+      } else {
+        user = {
+          userStatus: false
+        }
+      }
+      jwtAxios
+        .put(`/users/userBlocked/${id}`, user)
+        .then(async (res) => {
+          Swal.fire(`${status}!`, "This User has been Blocked ...", "danger");
+          const userRef = ref(database, firebaseStatus?.CHAT_USERS + id);
+          await update(userRef, user);
+          const updatedSnapshot = await get(userRef);
+          setUser(prevData => ({
+            ...prevData,
+            userStatus: updatedSnapshot.val()?.userStatus
+          }));
+        })
+        .catch((error) => {
+          if (typeof error == "string") {
+            dispatch(notificationFail(error));
+          }
+          if (error?.response?.data?.message === "") {
+            dispatch(notificationFail("Invalid "));
+          }
+          if (error?.response?.data?.message) {
+            dispatch(notificationFail(error?.response?.data?.message));
+          }
+        });
+    });
   };
 
   const addUserInFirebase = (address) => {
@@ -267,7 +319,7 @@ export const EscrowSeller = () => {
                   <div className="chat-box-pay">
                     <div className="chat-box-seller">
                       <div className="d-flex justify-content-between buyerBottom">
-                        <h3 className="text-white text-lg">
+                        <span className="text-white text-lg">
                           Contract :{" "}
                           <span className="font-bold">
                             {escrow?.user_address === acAddress?.wallet_address
@@ -278,8 +330,8 @@ export const EscrowSeller = () => {
                               ? "Buyer"
                               : "Seller"}
                           </span>{" "}
-                        </h3>
-                        <span className="px-4 rounded-deposite">
+                        </span>
+                        <span className="rounded-deposite">
                           Depositing
                         </span>
                       </div>
@@ -314,12 +366,12 @@ export const EscrowSeller = () => {
                         <strong class="card-txt">60 minutes</strong>
                       </div>
 
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <div className="d-flex justify-content-between align-items-center buyerBottomLast">
                         <span class="card-txt-left">Buyer release address</span>
                         <strong class="card-txt">0x...asd22A</strong>
                       </div>
                     </div>
-                    <div className="chat-box-btn">
+                    {/* <div className="chat-box-btn">
                       <button type="button" class="btn btn-primary escrowBtn">
                         Pay
                       </button>
@@ -328,7 +380,7 @@ export const EscrowSeller = () => {
                         You can cancel the contract once the depositing window
                         is expired
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </Card.Body>
               </Card>
@@ -342,6 +394,41 @@ export const EscrowSeller = () => {
                     {receiverData &&
                       `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
                   </p> */}
+                  {receiverData ? 
+                  <>
+                    {( receiverData?.userStatus) ? 
+                    <>
+                      <Nav as="ul">
+                        <NavDropdown
+                          as="li"
+                          title={
+                            <SimpleDotedIcon width="20" height="20" />
+                          }
+                          id="nav-dropdown"
+                        >
+                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Unblock")}>
+                          UnBlock user
+                          </NavDropdown.Item>
+                        </NavDropdown>
+                      </Nav>
+                    </> : 
+                    <>
+                      <Nav as="ul">
+                        <NavDropdown
+                          as="li"
+                          title={
+                            <SimpleDotedIcon width="20" height="20" />
+                          }
+                          id="nav-dropdown"
+                        >
+                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Block")}>
+                          Block user
+                          </NavDropdown.Item>
+                        </NavDropdown>
+                      </Nav>
+                    </>}
+                  </>
+                  : null} 
                   </div>
                   <div className="chat-box-list">
                     <ul>
@@ -368,7 +455,6 @@ export const EscrowSeller = () => {
                     <div
                       className="chat-action"
                       style={{ visibility: "visible" }}
-                      //   style={{ visibility: receiverData ? "visible" : "hidden" }}
                     >
                       {messageFile && (
                         <div className="attach">

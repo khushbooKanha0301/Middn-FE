@@ -15,21 +15,7 @@ export const Banner = () => {
     cardText = `Customize your profile and start sharing it, We secure the rest,
     your customers will love it`;
   }
-  // else if(userData.account !== "Connect Wallet" && userDetailsAll === undefined)
-  // {
-  //   cardTitle = "";
-  //   cardText = "";
-  // }
-  // else if(userData.account !== "Connect Wallet" && userDetailsAll?.is_2FA_login_verified !== false && (userData.account == userDetailsAll?.wallet_address))
-  // {
-  //   cardTitle = "Begin building your reputation.";
-  //   cardText = `A whole new experience for trading.
-  //   Show everyone that you are a trustworthy person.`;
-  // }
   else{
-    // cardTitle = "Time to build your reputation";
-    // cardText = `Customize your profile and start sharing it, We secure the rest,
-    // your customers will love it`;
     cardTitle = "Begin building your reputation.";
     cardText = `A whole new experience for trading.
     Show everyone that you are a trustworthy person.`;

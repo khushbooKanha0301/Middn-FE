@@ -145,7 +145,7 @@ export const checkAuth = createAsyncThunk(
             firebaseStatus?.CHAT_USERS + userData?.account
           );
           get(userRef)
-            .then((snapshot) => {
+            .then(async (snapshot) => {
               set(userRef, {
                 wallet_address: userData.account,
                 fname_alias: userData.fname_alias || "John",
@@ -154,6 +154,7 @@ export const checkAuth = createAsyncThunk(
                 lastActive: Date.now(),
                 isOnline: 1,
               });
+              const uer =  await get(userRef)
             })
             .catch((error) => {
               console.error("Error adding/updating user in Firebase:", error);

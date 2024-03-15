@@ -18,6 +18,7 @@ export const setFirebaseChatMessage = async (
   messageType,
   firebaseRootKey,
   escrowId,
+  escrow_type,
   reciverID,
   senderID,
   file
@@ -35,6 +36,7 @@ export const setFirebaseChatMessage = async (
       serverTime,
       messageType,
       escrowId,
+      escrow_type,
       senderID,
       reciverID,
       file
@@ -51,6 +53,7 @@ function convertMessageObj(
   sendTime,
   messageType,
   escrowId,
+  escrow_type,
   senderID,
   reciverID,
   file
@@ -63,6 +66,7 @@ function convertMessageObj(
       senderID: senderID,
       reciverID: reciverID,
       escrowId:escrowId,
+      escrow_type:escrow_type,
       file: file,
     };
     return firebaseInsertRecordObject;
@@ -74,6 +78,7 @@ function convertMessageObj(
       senderID: senderID,
       reciverID: reciverID,
       escrowId:escrowId,
+      escrow_type:escrow_type,
       file: file,
     };
     return firebaseInsertRecordObject;
@@ -93,9 +98,6 @@ export const setUnReadCount = async ( escrowId, child, reciverID, senderID, isse
           let findUser = snapshot.val();
           unreadCount = findUser[reciverID];
         }
-      },
-      {
-        // onlyOnce: true,
       }
     );
   }
@@ -112,6 +114,7 @@ export const sendMessage = async (
   senderID,
   reciverID,
   escrowId,
+  escrow_type,
   message,
   messageType = messageTypes.TEXT,
   file = null
@@ -135,6 +138,7 @@ export const sendMessage = async (
             messageType,
             firebaseRootKey,
             escrowId,
+            escrow_type,
             reciverID,
             senderID,
             file
@@ -146,6 +150,8 @@ export const sendMessage = async (
             message,
             messageType,
             firebaseRootKey,
+            escrowId,
+            escrow_type,
             reciverID,
             senderID,
             file

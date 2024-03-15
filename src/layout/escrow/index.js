@@ -164,7 +164,8 @@ export const Escrow = () => {
 
   const onBuySellClick = async (escrow_id) => {
     if (acAddress.authToken) {
-      navigate("/escrow", { state: { id :  escrow_id } });
+      //navigate("/escrow", { state: { id :  escrow_id } });
+      navigate(`/escrow/${escrow_id}`);
     } else {
       setModalShow(true);
     }

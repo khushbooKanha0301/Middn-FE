@@ -1,35 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { useDispatch } from "react-redux";
 import {
   notificationFail,
   notificationSuccess,
 } from "../store/slices/notificationSlice";
 import jwtAxios from "../service/jwtAxios";
+import { useDispatch, useSelector } from "react-redux";
+import { userGetFullDetails } from "../store/slices/AuthSlice";
 
 export const ReportUserView = (props) => {
+  const { id, status , setUser} = props;
   const [reason, setReason] = useState(null);
   const dispatch = useDispatch();
-  const reasonChangeHandler = (e) => {
-    setReason(e.target.value);
-  };
+  const userData = useSelector(userGetFullDetails);
+
   useEffect(() => {
     if (props.show) {
       setReason("");
     }
   }, [props.show]);
+
+  const verifiedWith = (selectedReason) => {
+    if (selectedReason === reason) {
+      setReason("");
+    } else {
+      setReason(selectedReason);
+    }
+  };
+
   const submitHandler = async () => {
     if (!reason || reason == "") {
       dispatch(notificationFail("Please select any one reason"));
     } else {
       const reqData = {
-        to_report_user: props?.userAddress,
+        report_from_user_address: userData?.wallet_address,
+        to_report_user: id,
+        userStatus: status === "Block" ? true : false,
         reason,
       };
       await jwtAxios
         .post(`/users/reportUser`, reqData)
         .then((result) => {
-          if (result?.status) {
+          if (result) {
+            setUser(prevData => ({
+              ...prevData,
+              userStatus: result?.data?.reportUser?.userStatus
+            }));
             dispatch(notificationSuccess(result?.data?.message));
             props.onHide();
           }
@@ -68,101 +84,47 @@ export const ReportUserView = (props) => {
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
         <Form className="mt-4">
-          <Form.Group className="custom-input" onChange={reasonChangeHandler}>
-            <div
-              className={`top-form-check ${
-                reason === "Test 1" ? "active" : ""
-              }`}
-            >
-              {/* <Form.Check
-                value="Test 1"
-                label="Test 1"
-                name="group1"
-                type="radio"
-                checked={reason == "Test 1"}
-                id="reasonoption1"
-                readOnly
-              /> */}
+          <Form.Group className="custom-input">
+            {[1, 2, 3].map((num) => (
               <div
-                className="form-check"
-                // onClick={() => onChange("Test 1")}
+                key={`test${num}`}
+                className="document-issued form-check"
+                onClick={() => verifiedWith(`Test ${num}`)}
               >
                 <div
                   className={`form-check-input ${
-                    reason === "Test 1" ? "checked" : ""
+                    reason === `Test ${num}` ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">Test 1</label>
+                <label className="form-check-label">
+                  <>Test {num}</>
+                </label>
               </div>
-              <span className="checkmark"></span>
-            </div>
-            <div
-              className={`top-form-check ${
-                reason === "Test 2" ? "active" : ""
-              }`}
-            >
-              {/* <Form.Check
-                value="Test 2"
-                readOnly
-                label="Test 2"
-                name="group1"
-                type="radio"
-                checked={reason == "Test 2"}
-                id="reasonoption2"
-              /> */}
-               <div
-                className="form-check"
-                // onClick={() => onChange("Test 1")}
-              >
-                <div
-                  className={`form-check-input ${
-                    reason === "Test 2" ? "checked" : ""
-                  }`}
-                />
-                <label class="form-check-label">Test 2</label>
-              </div>
+            ))}
+          </Form.Group>
 
-              <span className="checkmark"></span>
-            </div>
-            <div
-              className={`top-form-check ${
-                reason === "Test 3" ? "active" : ""
-              }`}
-            >
-              {/* <Form.Check
-                value="Test 3"
-                readOnly
-                label="Test 3"
-                name="group1"
-                type="radio"
-                checked={reason == "Test 3"}
-                id="reasonoption3"
-              /> */}
-              <div
-                className="form-check"
-                // onClick={() => onChange("Test 1")}
-              >
-                <div
-                  className={`form-check-input ${
-                    reason === "Test 3" ? "checked" : ""
-                  }`}
-                />
-                <label class="form-check-label">Test 3</label>
-              </div>
-              <span className="checkmark"></span>
-            </div>
-          </Form.Group>
-          <Form.Group className="form-group">
+          <Form.Group className="custom-input">
             <Form.Label className="mb-1">Other reason</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Other reason"
-              onChange={reasonChangeHandler}
-              value={
-                ["Test 1", "Test 2", "Test 3"].includes(reason) ? "" : reason
-              }
-            />
+            <div
+              className="document-issued form-check"
+              onClick={() => verifiedWith("Other reason")}
+            >
+              <div
+                className={`form-check-input ${
+                  reason === "Other reason" ? "checked" : ""
+                }`}
+              />
+              <Form.Control
+                className="reportUser"
+                type="text"
+                name="reason"
+                placeholder="Other reason"
+                onChange={(e) => setReason(e.target.value)}
+                value={reason === "Other reason" ? "" : reason}
+              />
+            </div>
           </Form.Group>
+
           <div className="form-action-group">
             <Button variant="primary" onClick={submitHandler}>
               Submit

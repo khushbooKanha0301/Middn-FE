@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Col, Placeholder, Row } from 'react-bootstrap'
 
-const ChatLoader = (props) => {
+const ChatLoader = () => {
   return (
     <Row>
     <Col lg="4">

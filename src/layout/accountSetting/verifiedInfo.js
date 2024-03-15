@@ -19,12 +19,9 @@ export const VerifiedInfo = () => {
   const dispatch = useDispatch();
   const [modalShow, setModalShow] = useState(false);
   const userData = useSelector(userGetFullDetails);
-  console.log("userData ", userData);
   const [modalKycShow, setModalKYCShow] = useState(false);
   const [kycSubmitted, setKYCSubmitted] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
-
-  console.log(userData.fname);
 
   const modalKycToggle = async () => {
     await jwtAxios

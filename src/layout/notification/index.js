@@ -20,8 +20,7 @@ export const AccountSetting = () => {
   const navigate = useNavigate();
 
   const getChatUser = (user) => {
-    // navigate(`/escrow/${user.escrowId}`);
-    navigate(`/escrow/${user.escrowId}`, { state: { userAddress: user.senderId, escrow_id: user.escrowId } });
+    navigate(`/escrow/${user.escrowId}`, { state: { userAddress: user.senderId , key : "sidebar"} });
   };
 
   useEffect(() => {
@@ -45,7 +44,7 @@ export const AccountSetting = () => {
   }, [userData.authToken]);
 
   const getAllFirebaseUser = (userIds) => {
-    if (userIds) {
+   if (userIds) {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_USERS);
       onValue(starCountRef, (snapshot) => {
         if (snapshot && snapshot.val()) {

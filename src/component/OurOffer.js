@@ -48,6 +48,7 @@ export const OurOffer = () => {
                             </div>
                             <Card.Title as="h5">Share Offer</Card.Title>
                             <Card.Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit</Card.Text>
+                            <Button variant="primary" onClick={createEscrowModalToggle}>Create Escrow</Button>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -59,6 +60,7 @@ export const OurOffer = () => {
                             </div>
                             <Card.Title as="h5">Increase your stats</Card.Title>
                             <Card.Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit</Card.Text>
+                            <Button variant="primary" onClick={createEscrowModalToggle}>Create Escrow</Button>
                         </Card.Body>
                     </Card>
                 </Col>

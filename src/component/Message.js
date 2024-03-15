@@ -57,6 +57,7 @@ export const MessageView = (props) => {
         await addUserInFirebase(usergetdata);
         await addUserInFirebase(otheruser);
         await sendMessage(
+          false,
           content,
           usergetdata?.wallet_address,
           otheruser?.wallet_address,

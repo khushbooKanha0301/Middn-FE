@@ -1,7 +1,9 @@
+import "react-toastify/dist/ReactToastify.css";
 import React, { useEffect, useLayoutEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import { Container } from "react-bootstrap";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "./component/Sidebar";
 import Header from "./component/Header";
 import LoginView from "./component/Login";
@@ -12,11 +14,10 @@ import TraderProfileComponent from "./layout/TraderProfileComponent";
 import ChatComponent from "./layout/ChatComponent";
 import EscrowComponent from "./layout/EscrowComponent";
 import EscrowDetails from "./layout/escrow/EscrowDetails";
-import EscrowSeller from "./layout/escrow/EscrowSeller";
+import Escrows from "./layout/escrow/Escrows";
 import TradeHistoryComponent from "./layout/TradeHistoryComponent";
 import HelpCenterComponent from "./layout/HelpCenterComponent";
 import ProtectedRoute from "./PrivateRoute";
-import { useDispatch, useSelector } from "react-redux";
 import {
   getCountryDetails,
   logoutAuth,
@@ -24,8 +25,7 @@ import {
   userGetData,
   userGetFullDetails,
 } from "./store/slices/AuthSlice";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import { get, ref, update, onValue } from "firebase/database";
 import { database } from "./helper/config";
 import { firebaseStatus } from "./helper/statusManage";
@@ -33,7 +33,6 @@ import { firebaseMessagesActive } from "./helper/userStatus";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
-import EscrowBuyer from "./layout/escrow/EscrowBuySell";
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -51,7 +50,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["182.232.137.198" , "103.239.146.251", "106.214.119.105"]; // Add blocked IPs here
+  const allowedIPs = ["182.232.137.198" , "2405:201:3008:8933:c9d:4ce9:a088:e055", "106.214.119.105"]; // Add blocked IPs here
 
   const fetchIPAddress = async () => {
     try {
@@ -122,6 +121,7 @@ export const App = () => {
               lastActive: Date.now(),
               isOnline: 1,
             });
+
           }
         });
       };
@@ -163,6 +163,7 @@ export const App = () => {
           const lastActive = snapshot.val()?.lastActive;
           const isOnline = snapshot.val()?.isOnline;
           const now = Date.now();
+          // 1 hour
           const timeWindow = 1 * 60 * 60 * 1000;
           const timeDifference = now - lastActive;
           const isMoreThan30Minutes = timeDifference > timeWindow;
@@ -170,7 +171,8 @@ export const App = () => {
           if (isMoreThan30Minutes) {
             updateOffline();
           }
-
+          
+          // 15 min
           const timeWindowAbsent = 15 * 60 * 1000;
           const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
           if (isMoreThan5Minutes && isOnline != 2) {
@@ -239,7 +241,7 @@ export const App = () => {
   }, [acAddress?.userid]);
 
 
-  if (allowedIPs.includes(ipAddress) && isIpGetted) {
+  //if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (
       <div>
         <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
@@ -290,11 +292,8 @@ export const App = () => {
                   }
                 />
                 <Route path="/escrow/details/:id" element={<EscrowDetails />} />
-                {/* <Route path="/escrow-buyer/:id" element={<EscrowBuySell />} />
-                <Route path="/escrow-seller/:address" element={<EscrowSeller />}/> */}
-                <Route path="/escrow/:id" element={<EscrowSeller />} />
-                <Route path="/escrow" element={<EscrowBuyer />}/>
-                {/* <Route path="/escrow/:id" element={<EscrowSeller />} /> */}
+                <Route path="/escrow/:id" element={<Escrows />} />
+                {/* <Route path="/escrow" element={<Escrows />}/> */}
                 <Route
                   path="/profile/:address"
                   element={
@@ -353,9 +352,9 @@ export const App = () => {
         />
       </div>
     );
-  } else if (error) {
-    return <h1 class="accessMsg">{error.message}</h1>;
-  }
+  // } else if (error) {
+  //   return <h1 class="accessMsg">{error.message}</h1>;
+  // }
 };
 
 export default App;

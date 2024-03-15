@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Card, Col, Row, Button } from "react-bootstrap";
-// import { Escrows } from "./Escrows";
 import { DotedIcon } from "./SVGIcon";
 import { PlusIcon } from "./SVGIcon";
 import CreateEscrowView from "../layout/escrow/CreateEscrow";
@@ -13,7 +12,6 @@ import { firebaseStatus } from "../helper/statusManage";
 import { get, ref } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
-let divSize = 0;
 
 function getWidth() {
   let width = Math.max(
@@ -49,57 +47,53 @@ export const LatestsEscrows = () => {
   const navigate = useNavigate();
   let width = getWidth();
   let userDisplayCal = getCount(width);
-  const [userDisplayCount, setDisplayCount] = useState(userDisplayCal);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const acAddress = useSelector(userDetails);
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
-  const [escrows, setEscrow] = useState([]);
-  const [userStatuses, setUserStatuses] = useState([]);
+  // const [escrows, setEscrow] = useState([]);
+  // const [userStatuses, setUserStatuses] = useState([]);
+  //const [userList, setUserList] = useState([]);
 
-  const [userList, setUserList] = useState(
-    escrows?.filter((item, index) => index < userDisplayCount)
-  );
-
-  useEffect(() => {
-    setUserList(escrows.slice(0, userDisplayCal));
-  }, [escrows]); 
+  // useEffect(() => {
+  //   setUserList(escrows.slice(0, userDisplayCal));
+  // }, [escrows]); 
   
 
-  const loadMoreData = () => {
-    setUserList(prevUserList => [...prevUserList, ...escrows.slice(prevUserList.length)]);
-  };
+  // const loadMoreData = () => {
+  //   setUserList(prevUserList => [...prevUserList, ...escrows.slice(prevUserList.length)]);
+  // };
 
-  const getAllEscrow = async () => {
-    try {
-      setUserStatuses([]);
-      let res;
-      if (acAddress.authToken) {
-        res = await jwtAxios.get(
-          `/escrows/getAllOpenEscrows/${acAddress?.account}`
-        );
-        setEscrow(res.data?.data);
-        let statuses = await Promise.all(
-          res.data?.data.map(async (e) => {
-            const starCountRef = ref(
-              database,
-              firebaseStatus.CHAT_USERS + e.trade_address
-            );
-            const snapshot = await get(starCountRef);
-            return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-          })
-        );
-        setUserStatuses(statuses);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // const getAllEscrow = async () => {
+  //   try {
+  //     setUserStatuses([]);
+  //     let res;
+  //     if (acAddress.authToken) {
+  //       res = await jwtAxios.get(
+  //         `/escrows/getAllOpenEscrows/${acAddress?.account}`
+  //       );
+  //       setEscrow(res.data?.data);
+  //       let statuses = await Promise.all(
+  //         res.data?.data.map(async (e) => {
+  //           const starCountRef = ref(
+  //             database,
+  //             firebaseStatus.CHAT_USERS + e.trade_address
+  //           );
+  //           const snapshot = await get(starCountRef);
+  //           return snapshot.exists() ? snapshot.val()?.isOnline : 4;
+  //         })
+  //       );
+  //       setUserStatuses(statuses);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
-  useEffect(() => {
-    getAllEscrow();
-  }, [acAddress]);
+  // useEffect(() => {
+  //   getAllEscrow();
+  // }, [acAddress]);
 
   const createEscrowModalToggle = () => {
     if (acAddress.authToken) {
@@ -113,9 +107,9 @@ export const LatestsEscrows = () => {
     setIsSign(false);
   };
 
-  const openEscrow = (e) => {
-    navigate(`/escrow/${e._id}`);
-  };
+  // const openEscrow = (e) => {
+  //   navigate(`/escrow/${e._id}`, { state: { userAddress: e._id , key : "sidebar"} });
+  // };
 
   return (
     <>
@@ -125,12 +119,29 @@ export const LatestsEscrows = () => {
             Your Latests Escrows
           </Card.Title>
           <Row>
-            <Col className="col-auto">
+            <Col className="col-12">
               <Box sx={{ overflowX: "auto" }}>
-                <Box sx={{ width: "max-content" }}>
+                <Box sx={{display: "flex", alignItems: "start" }} >
                   {acAddress?.authToken && (
                     <>
-                      {userList.map((item, index) => (
+                        <Button
+                          variant="link"
+                          onClick={createEscrowModalToggle}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center'}}
+                        >
+                          <span className="see-more ms-0">
+                            <PlusIcon width="34" height="26" />
+                          </span>
+                          <span className="create-escrow-text">
+                            Create Escrow
+                          </span>
+                        </Button>
+
+                      {/* {userList.map((item, index) => (
                         <Button
                           variant="link"
                           className="dashboard-escrows"
@@ -157,12 +168,17 @@ export const LatestsEscrows = () => {
                             {item.user_name ? item.user_name : "John Doe"}
                           </p>
                         </Button>
-                      ))}
+                      ))} */}
 
-                      {escrows.length === userList.length ? (
+                      {/* {escrows.length === userList.length ? (
                         <Button
                           variant="link"
                           onClick={createEscrowModalToggle}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center'}}
                         >
                           <span className="see-more ms-0">
                             <PlusIcon width="34" height="26" />
@@ -178,9 +194,10 @@ export const LatestsEscrows = () => {
                           </span>
                           See more
                         </Button>
-                      )}
+                      )} */}
                     </>
                   )}
+
                   {!acAddress?.authToken && (
                     <>
                       <Button variant="link" onClick={createEscrowModalToggle}>

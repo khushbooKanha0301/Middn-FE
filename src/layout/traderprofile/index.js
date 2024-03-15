@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Col, Row, Card, Button, Tabs, Tab, Nav } from "react-bootstrap";
+import { Col, Row, Card, Button, Tabs, Tab } from "react-bootstrap";
 import EditProfileView from "../../component/EditProfile";
 import MessageView from "../../component/Message";
-import {
-  InstagramIcon,
-  TelegramIcon,
-  MessageIcon,
-  SimpleCheckIcon,
-  TwitterIcon,
-} from "../../component/SVGIcon";
+import { InstagramIcon, TelegramIcon, MessageIcon, SimpleCheckIcon, TwitterIcon } from "../../component/SVGIcon";
 import { useSelector } from "react-redux";
 import { userDetails, userGetData, userGetFullDetails } from "../../store/slices/AuthSlice";
 import LoginView from "../../component/Login";
@@ -22,7 +16,7 @@ import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { onValue, ref, get } from "firebase/database";
-import ReviewTransactionView from "../../component/ReviewTransaction";
+import ReportUserView from "../../component/ReportUser";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
 import KYCVerification from "../../component/KYCVerification";
@@ -33,32 +27,31 @@ function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export const TraderProfile = (props) => {
-  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
+export const TraderProfile = () => {
+  let PageSize = 5;
   const dispatch = useDispatch();
-  const [country, setCountry] = useState();
+  const userData = useSelector(userDetails);
+  let loginuserdata = useSelector(userGetFullDetails);
+  const navigate = useNavigate();
   const [modalShow, setModalShow] = useState(false);
+  const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [connectWalletmodalShow, setconnectWalletModalShow] = useState(false);
+  const countryDetails = useSelector((state) => state.auth.countryDetails);
+
   const modalToggle = () => setModalShow(!modalShow);
   const connectWalletModalToggle = () =>
     setconnectWalletModalShow(!connectWalletmodalShow);
 
   const [reportModalShow, setReportModalShow] = useState(false);
   const reportModalToggle = () => setReportModalShow(!reportModalShow);
+
   const [editProfileModalShow, setEditProfileModalShow] = useState(false);
   const editProfileModalToggle = () =>
     setEditProfileModalShow(!editProfileModalShow);
-  const userData = useSelector(userDetails);
 
-  const createEscrowModalToggle = () => {
-    if (userData.authToken) {
-      setCreateEscrowModalShow(!createEscrowModalShow);
-    } else {
-      setconnectWalletModalShow(true);
-    }
-  };
-
-  let loginuserdata = useSelector(userGetFullDetails);
+  const [country, setCountry] = useState();
+  const [user, setUser] = useState("");
+  
   const [countryCode, setCountryCode] = useState("");
   const isAuth = userData.authToken;
   const [isSign, setIsSign] = useState(null);
@@ -66,8 +59,6 @@ export const TraderProfile = (props) => {
   const { address } = useParams();
   const [isAuthAddress, setisAuthAddress] = useState(true);
   const [otherUserData, setOtherUserData] = useState({});
-  const countryDetails = useSelector((state) => state.auth.countryDetails);
-  const navigate = useNavigate();
   const [modalKycShow, setModalKYCShow] = useState(false);
   const [kycSubmitted, setKYCSubmitted] = useState(false);
   const [escrowLoading, setEscrowLoading] = useState(true);
@@ -76,7 +67,14 @@ export const TraderProfile = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [otherStatus, setUserStatus] = useState(null);
   const [userStatuses, setUserStatuses] = useState([]);
-  let PageSize = 5;
+
+  const createEscrowModalToggle = () => {
+    if (userData.authToken) {
+      setCreateEscrowModalShow(!createEscrowModalShow);
+    } else {
+      setconnectWalletModalShow(true);
+    }
+  };
 
   const modalKycToggle = async () => {
     await jwtAxios
@@ -309,7 +307,6 @@ export const TraderProfile = (props) => {
                       : otherUserData
                       ? otherUserData.bio
                       : ""}
-                    {/* {otherUserData.bio? getMessageContent(otherUserData) : ""} */}
                   </p>
                   <div className="profile-btn">
                     {userData && userData.account === "Connect Wallet" ? (
@@ -750,11 +747,17 @@ export const TraderProfile = (props) => {
         onHide={() => setModalShow(false)}
         otheruser={otherUserData ? otherUserData : ""}
       />
-      <ReviewTransactionView
+      {/* <ReviewTransactionView
         show={reportModalShow}
         onHide={() => setReportModalShow(false)}
-        // userAddress={address}
-      />
+      /> */}
+      <ReportUserView
+        show={reportModalShow}
+        onHide={() => setReportModalShow(false)}
+        id={address}
+        status={"Unblock"}
+        setUser={setUser}
+      /> 
       <EditProfileView
         show={editProfileModalShow}
         onHide={() => setEditProfileModalShow(false)}

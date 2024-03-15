@@ -47,6 +47,7 @@ export const Sidebar = (props) => {
   const [activeKey, setActiveKey] = useState();
   const [escrows, setEscrow] = useState([]);
   const [userStatuses, setUserStatuses] = useState([]);
+ 
   const [userList, setUserList] = useState(
     escrows.filter((item, index) => index < userDisplayCount)
   );
@@ -70,31 +71,20 @@ export const Sidebar = (props) => {
     setTimeout(() => {
       if (divSize === height) {
         setUserDisplayCount(userDisplayCal);
-        setUserList(escrows.filter((item, index) => index < userDisplayCal));
+        setUserList(escrows.filter((item, index) => index < userDisplayCount));
       }
     }, 500);
   };
 
   const getAllEscrow = async () => {
     try {
-      setUserStatuses([]);
       let res;
       if (acAddress.authToken) {
         res = await jwtAxios.get(
           `/escrows/getAllOpenEscrows/${acAddress?.account}`
         );
         setEscrow(res.data?.data);
-        let statuses = await Promise.all(
-          res.data?.data.map(async (e) => {
-            const starCountRef = ref(
-              database,
-              firebaseStatus.CHAT_USERS + e.trade_address
-            );
-            const snapshot = await get(starCountRef);
-            return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-          })
-        );
-        setUserStatuses(statuses);
+        handleMouseMove();
       }
     } catch (err) {
       console.error(err);
@@ -105,13 +95,33 @@ export const Sidebar = (props) => {
     getAllEscrow();
   }, [acAddress]);
 
+  const handleMouseMove = async () => {
+    let statuses = await Promise.all(
+      escrows?.map(async (e) => {
+        const starCountRef = ref(
+          database,
+          firebaseStatus.CHAT_USERS + (e.trade_address)
+        );
+        const snapshot = await get(starCountRef);
+        return snapshot.exists() ? snapshot.val()?.isOnline : 4;
+    }))
+
+    setUserStatuses(statuses);
+  }
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-  });
+    const intervalId = setInterval(handleMouseMove,  10000);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearInterval(intervalId);
+    };
+  }, [acAddress]);
 
   const loadMoreData = () => {
-    getAllEscrow();
     setUserList(escrows);
+    handleMouseMove()
   };
 
   const handleResizePage = () => {
@@ -126,8 +136,6 @@ export const Sidebar = (props) => {
   };
 
   useEffect(() => {
-    getAllEscrow();
-    // Update the active key based on the current URL
     setActiveKey(location.pathname);
     if (props.isResponsive) {
       props.setIsOpen(false);
@@ -139,7 +147,7 @@ export const Sidebar = (props) => {
   };
 
   const openEscrow = (e) => {
-    navigate(`/escrow/${e._id}`);
+    navigate(`/escrow/${e._id}`, {state: { key : "sidebar"} });
   };
 
   return (
@@ -212,7 +220,7 @@ export const Sidebar = (props) => {
               <ul className="active-trader">
                 {userList.map((item, index) => (
                   <li key={index} onClick={() => openEscrow(item)}>
-                    <div>
+                    <div className="tradeName">
                       <img
                         src={
                           item?.newImage
@@ -225,15 +233,13 @@ export const Sidebar = (props) => {
                         {item.user_name ? item.user_name : "John Doe"}
                       </span>
                     </div>
-                    {(userStatuses[index] === 1 ||
-                      userStatuses[index] === true) && (
+                    {(userStatuses[index] === 1) && (
                       <div className="sidebar-left-dot"></div>
                     )}
                     {userStatuses[index] === 2 && (
                       <div className="sidebar-left-dot-absent"></div>
                     )}
-                    {(userStatuses[index] === 3 ||
-                      userStatuses[index] === false) && (
+                    {(userStatuses[index] === 3) && (
                       <div className="sidebar-left-dot-offline"></div>
                     )}
                   </li>
