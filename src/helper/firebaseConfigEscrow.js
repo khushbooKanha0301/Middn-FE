@@ -106,7 +106,7 @@ export const setUnReadCount = async ( escrowId, child, reciverID, senderID, isse
   let updates = {};
   updates[reciverID] = unreadCount || 1;
   updates[senderID] = 0;
-  set(ref(database, childKey), updates);
+  update(ref(database, childKey), updates)
 };
 
 // onSend is use for send message
@@ -119,14 +119,12 @@ export const sendMessage = async (
   messageType = messageTypes.TEXT,
   file = null
 ) => {
-  //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowId);
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
   get(child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey))
     .then((snapshot) => {
       if (snapshot.val()) {
       } else {
         firebaseRootKey = generateFirebaseChatRootKey(reciverID, senderID);
-        //firebaseRootKey = generateFirebaseEscrowRootKey(escrowId);
       }
 
       fetch("https://worldtimeapi.org/api/ip")
@@ -175,13 +173,11 @@ export function getBase64(file) {
 //for set UnreadCountZero when first time enter in chat screen
 export const setUnReadCountZero = async (escrowId, senderID, reciverID) => {
    let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
-  //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowID);
   await get(
     child(ref(database), firebaseMessagesEscrow.CHAT_ROOM + escrowId + '/' + firebaseRootKey)
   ).then((snapshot) => {
     if (snapshot.val()) {
     } else {
-      //let firebaseRootKey = generateFirebaseEscrowRootKey(escrowID);
       firebaseRootKey = generateFirebaseChatRootKey(reciverID, senderID);
     }
   });
@@ -190,7 +186,6 @@ export const setUnReadCountZero = async (escrowId, senderID, reciverID) => {
     "/" +
     firebaseMessagesEscrow.UN_READ_COUNT;
   await update(ref(database, childKey), {
-    //[reciverID]: 0,
     [senderID]: 0
   });
 };
