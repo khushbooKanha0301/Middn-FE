@@ -42,6 +42,7 @@ export const EscrowSeller = (props) => {
     acAddress?.wallet_address === escrow?.user_address
       ? escrow?.trade_address
       : escrow?.user_address;
+
   const userRef = useRef(null);
   const fileInputRef = useRef(null);
   const { onClickOutside } = <Picker />;
@@ -326,13 +327,18 @@ export const EscrowSeller = (props) => {
                       <span className="text-white text-lg">
                         Contract :{" "}
                         <span className="font-bold">
-                          {escrow?.user_address === acAddress?.wallet_address
-                            ? escrow?.escrow_type === "seller"
-                              ? "Seller"
-                              : "Buyer"
-                            : escrow?.escrow_type === "seller"
-                            ? "Buyer"
-                            : "Seller"}
+                          {escrowLoading && (
+                            <>
+                              {escrow?.user_address ===
+                              acAddress?.wallet_address
+                                ? escrow?.escrow_type === "seller"
+                                  ? "Seller"
+                                  : "Buyer"
+                                : escrow?.escrow_type === "seller"
+                                ? "Buyer"
+                                : "Seller"}
+                            </>
+                          )}
                         </span>{" "}
                       </span>
                       <span className="rounded-deposite">Depositing</span>
@@ -396,7 +402,7 @@ export const EscrowSeller = (props) => {
                     {receiverData &&
                       `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
                   </p> */}
-                  {receiverData ? (
+                  {/* {receiverData ? (
                     <>
                       {receiverData?.userStatus ? (
                         <>
@@ -436,7 +442,7 @@ export const EscrowSeller = (props) => {
                         </>
                       )}
                     </>
-                  ) : null}
+                  ) : null} */}
                 </div>
                 <div className="chat-box-list">
                   <ul>

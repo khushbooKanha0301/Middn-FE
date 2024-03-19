@@ -50,7 +50,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["182.232.137.198" , "2405:201:3008:8933:c9d:4ce9:a088:e055", "106.214.119.105"]; // Add blocked IPs here
+  const allowedIPs = ["122.170.167.48", "49.229.164.8"]; 
 
   const fetchIPAddress = async () => {
     try {
@@ -241,7 +241,7 @@ export const App = () => {
   }, [acAddress?.userid]);
 
 
-  //if (allowedIPs.includes(ipAddress) && isIpGetted) {
+  if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (
       <div>
         <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
@@ -352,9 +352,9 @@ export const App = () => {
         />
       </div>
     );
-  // } else if (error) {
-  //   return <h1 class="accessMsg">{error.message}</h1>;
-  // }
+  } else if (error) {
+    return <h1 class="accessMsg">{error.message}</h1>;
+  }
 };
 
 export default App;

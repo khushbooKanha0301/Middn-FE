@@ -755,7 +755,7 @@ export const TraderProfile = () => {
         show={reportModalShow}
         onHide={() => setReportModalShow(false)}
         id={address}
-        status={"Unblock"}
+        status={"Block"}
         setUser={setUser}
       /> 
       <EditProfileView

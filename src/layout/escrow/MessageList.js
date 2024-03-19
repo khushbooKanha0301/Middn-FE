@@ -11,8 +11,11 @@ import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
 export const MessageList = (props) => {
   const { ReciverId , escrowId} = props;
+ console.log("ReciverId ", ReciverId);
+ console.log("escrowId ", escrowId);
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
+ console.log("messages ", messages);
   var scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatEscrowReducer?.MessageUser);
@@ -44,16 +47,10 @@ export const MessageList = (props) => {
         onValue(setReciverReadCountNode, (snapshot) => {
           if (
             ReciverId &&
-            window.location.pathname === "/escrow" ||  window.location.pathname === `/escrow/${ReciverId}` ||  window.location.pathname === `/escrow/${escrowId}`
+            window.location.pathname === `/escrow/${ReciverId}` ||  window.location.pathname === `/escrow/${escrowId}`
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();
-              setUnReadCountZero(
-                //CHAT_ROOM,
-                escrowId,
-                userData?.account,
-                ReciverId
-              );
               const nhuhbu = Object.values(values).filter(
                 (o1) =>
                   (o1.reciverID === ReciverId &&
@@ -64,6 +61,12 @@ export const MessageList = (props) => {
               if (nhuhbu.length > 0) {
                 setMessages(nhuhbu);
               }
+              setUnReadCountZero(
+                //CHAT_ROOM,
+                escrowId,
+                userData?.account,
+                ReciverId
+              );
             }
           } else {
             if (window.location.pathname !== "/escrow") {
@@ -78,6 +81,7 @@ export const MessageList = (props) => {
   };
 
   useEffect(() => {
+    setMessages([])
     mainFunction();
   }, [escrowId , ReciverId]);
 
