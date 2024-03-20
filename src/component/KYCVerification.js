@@ -393,8 +393,8 @@ export const KYCVerification = (props) => {
 
   return (
     <Modal
-      {...rest}
-      dialogClassName="login-modal"
+      {...rest}      
+      dialogClassName="login-modal kyc-verify-model"
       backdropClassName="login-modal-backdrop"
       aria-labelledby="contained-modal"
       backdrop="static"
@@ -645,7 +645,7 @@ export const KYCVerification = (props) => {
                 </div>
               </Form.Group>
               <h4>Use a valid government-issued document</h4>
-              <p>
+              <p className="mb-4">
                 Only the following documents listed below will be accepted, all
                 other documents will be rejected.
               </p>

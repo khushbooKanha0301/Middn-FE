@@ -111,11 +111,11 @@ export const Sidebar = (props) => {
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-    //const intervalId = setInterval(handleMouseMove,  10000);
+    const intervalId = setInterval(handleMouseMove,  10000);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      //clearInterval(intervalId);
+      clearInterval(intervalId);
     };
   }, [acAddress]);
 

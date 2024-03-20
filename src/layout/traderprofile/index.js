@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Col, Row, Card, Button, Tabs, Tab } from "react-bootstrap";
+import { Col, Row, Card, Button, Tabs, Tab, Nav } from "react-bootstrap";
 import EditProfileView from "../../component/EditProfile";
 import MessageView from "../../component/Message";
-import { InstagramIcon, TelegramIcon, MessageIcon, SimpleCheckIcon, TwitterIcon } from "../../component/SVGIcon";
+import {
+  InstagramIcon,
+  TelegramIcon,
+  MessageIcon,
+  SimpleCheckIcon,
+  TwitterIcon,
+} from "../../component/SVGIcon";
 import { useSelector } from "react-redux";
 import { userDetails, userGetData, userGetFullDetails } from "../../store/slices/AuthSlice";
 import LoginView from "../../component/Login";
@@ -16,23 +22,25 @@ import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { onValue, ref, get } from "firebase/database";
-import ReportUserView from "../../component/ReportUser";
+import ReviewTransactionView from "../../component/ReviewTransaction";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
 import KYCVerification from "../../component/KYCVerification";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import { Link } from "react-router-dom";
+import { Box } from "@mui/material";
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export const TraderProfile = () => {
+export const TraderProfile = (props) => {
   let PageSize = 5;
   const dispatch = useDispatch();
   const userData = useSelector(userDetails);
   let loginuserdata = useSelector(userGetFullDetails);
   const navigate = useNavigate();
+  const [country, setCountry] = useState();
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [connectWalletmodalShow, setconnectWalletModalShow] = useState(false);
@@ -49,9 +57,6 @@ export const TraderProfile = () => {
   const editProfileModalToggle = () =>
     setEditProfileModalShow(!editProfileModalShow);
 
-  const [country, setCountry] = useState();
-  const [user, setUser] = useState("");
-  
   const [countryCode, setCountryCode] = useState("");
   const isAuth = userData.authToken;
   const [isSign, setIsSign] = useState(null);
@@ -67,7 +72,6 @@ export const TraderProfile = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [otherStatus, setUserStatus] = useState(null);
   const [userStatuses, setUserStatuses] = useState([]);
-
   const createEscrowModalToggle = () => {
     if (userData.authToken) {
       setCreateEscrowModalShow(!createEscrowModalShow);
@@ -85,7 +89,7 @@ export const TraderProfile = () => {
             response.data?.User?.is_verified === 2) ||
           response.data?.User?.kyc_completed === false ||
           response.data?.User?.kyc_completed == undefined
-         
+
         ) {
           setModalKYCShow(!modalShow);
         } else {
@@ -103,7 +107,7 @@ export const TraderProfile = () => {
     }
   }, [userData?.userid]);
 
-  
+
   useEffect(() => {
     if (loginuserdata) {
       getActiveEscrows();
@@ -225,171 +229,177 @@ export const TraderProfile = () => {
             {loader ? (
               <ProfileLoader />
             ) : (
-              <Row className="g-0">
-                <Col xs="2">
-                  {isAuthAddress ? (
-                    <Button
-                      variant="link"
-                      className="profile-image"
-                      onClick={editProfileModalToggle}
-                    >
-                      <img
-                        src={
-                          loginuserdata?.imageUrl
-                            ? loginuserdata?.imageUrl
-                            : require("../../content/images/avatar.png")
-                        }
-                        alt={
-                          loginuserdata?.imageUrl
-                            ? loginuserdata?.imageUrl
-                            : "No Profile"
-                        }
-                      />
-                      {otherStatus === 1 && (
-                        <div className="profile-status"></div>
-                      )}
-                      {otherStatus === 2 && (
-                        <div className="profile-status-absent"></div>
-                      )}
-                      {otherStatus === 3 && (
-                        <div className="profile-status-offline"></div>
-                      )}
-                    </Button>
-                  ) : (
-                    <Button variant="link" className="profile-image">
-                      <img
-                        src={
-                          otherUserData?.imageUrl
-                            ? otherUserData?.imageUrl
-                            : require("../../content/images/avatar.png")
-                        }
-                        alt={"No Profile"}
-                      />
-                      {otherStatus === 1 && (
-                        <div className="profile-status"></div>
-                      )}
-                      {otherStatus === 2 && (
-                        <div className="profile-status-absent"></div>
-                      )}
-                      {otherStatus === 3 && (
-                        <div className="profile-status-offline"></div>
-                      )}
-                    </Button>
-                  )}
-                </Col>
+              <Row className="g-0">              
                 <Col>
-                  <h1>
-                    {isAuthAddress
-                      ? loginuserdata &&
-                        loginuserdata.fname_alias +
-                          " " +
-                          loginuserdata.lname_alias
-                      : otherUserData
-                      ? otherUserData.fname_alias +
-                        " " +
-                        otherUserData.lname_alias
-                      : ""}
-                    <span className="verify-status">
-                      <SimpleCheckIcon width="16" height="12" />
-                    </span>
-                  </h1>
-                  <div className="about-profile">
-                    <h6>
-                      <strong>0</strong> transactions
-                    </h6>
-                    <h6 className="feedback">
-                      <strong>0</strong> positive feedback
-                    </h6>
-                  </div>
-                  <p>
-                    {isAuthAddress
-                      ? loginuserdata && loginuserdata.bio
-                      : otherUserData
-                      ? otherUserData.bio
-                      : ""}
-                  </p>
-                  <div className="profile-btn">
-                    {userData && userData.account === "Connect Wallet" ? (
-                      <>
+                  <Box sx={{display:"flex"}}>
+                    <Box sx={{mr:{xs:"19px", md:"25px"}}}>
+                      {isAuthAddress ? (
                         <Button
-                          variant="primary"
-                          onClick={connectWalletModalToggle}
-                        >
-                          <MessageIcon width="18" height="16" />
-                          Message{" "}
-                        </Button>
-                        <Button
-                          variant="danger"
-                          className="buttonspace"
-                          onClick={connectWalletModalToggle}
-                        >
-                          Report User
-                        </Button>
-                      </>
-                    ) : isAuthAddress && isAuth ? (
-                      <>
-                        <Button
-                          variant="secondary"
-                          className="auth-btn"
+                          variant="link"
+                          className="profile-image"
                           onClick={editProfileModalToggle}
                         >
-                          Edit Profile{" "}
-                        </Button>
-
-                        {(loginuserdata?.kyc_completed === true || kycSubmitted === true) &&
-                          ((loginuserdata?.is_verified === 1 && kycSubmitted === false) ? (
-                            <Button variant="success" className="buttonspace auth-btn" disabled>
-                               KYC approved
-                            </Button>
-                          ) : (loginuserdata?.is_verified === 2 && kycSubmitted === false) ? (
-                            <Button variant="primary" className="buttonspace auth-btn" onClick={modalKycToggle}>
-                              Verification
-                            </Button>
-                          ) : (loginuserdata?.is_verified === 0 || kycSubmitted === true) ? (
-                            <Button variant="warning" className="buttonspace auth-btn" disabled>
-                              KYC Under Review
-                            </Button>
-                          ) : null)}
-
-                        {(loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed === undefined )&&
-                          kycSubmitted === false && (
-                            <Button
-                              variant="primary"
-                              className="buttonspace auth-btn"
-                              onClick={modalKycToggle}
-                            >
-                              Verification
-                            </Button>
+                          <img
+                            src={
+                              loginuserdata?.imageUrl
+                                ? loginuserdata?.imageUrl
+                                : require("../../content/images/avatar.png")
+                            }
+                            alt={
+                              loginuserdata?.imageUrl
+                                ? loginuserdata?.imageUrl
+                                : "No Profile"
+                            }
+                          />
+                          {otherStatus === 1 && (
+                            <div className="profile-status"></div>
                           )}
-                      </>
-                    ) : (
-                      <>
-                        <Button variant="primary" onClick={modalToggle}>
-                          <MessageIcon width="18" height="16" />
-                          Message
+                          {otherStatus === 2 && (
+                            <div className="profile-status-absent"></div>
+                          )}
+                          {otherStatus === 3 && (
+                            <div className="profile-status-offline"></div>
+                          )}
                         </Button>
-                        <Button
-                          variant="danger"
-                          className="buttonspace"
-                          onClick={reportModalToggle}
-                        >
-                          Report User
+                      ) : (
+                        <Button variant="link" className="profile-image">
+                          <img
+                            src={
+                              otherUserData?.imageUrl
+                                ? otherUserData?.imageUrl
+                                : require("../../content/images/avatar.png")
+                            }
+                            alt={"No Profile"}
+                          />
+                          {otherStatus === 1 && (
+                            <div className="profile-status"></div>
+                          )}
+                          {otherStatus === 2 && (
+                            <div className="profile-status-absent"></div>
+                          )}
+                          {otherStatus === 3 && (
+                            <div className="profile-status-offline"></div>
+                          )}
                         </Button>
-                      </>
-                    )}
-                  </div>
-                  <p>Social media</p>
-                  <div className="social-btn">
-                    <Button variant="link">
-                      <InstagramIcon width="32" height="32" />
-                    </Button>
-                    <Button variant="link">
-                      <TwitterIcon width="32" height="32" />
-                    </Button>
-                    <Button variant="link">
-                      <TelegramIcon width="32" height="32" />
-                    </Button>
-                  </div>
+                      )}
+                    </Box>
+                    <Box>
+                      <h1>
+                        {isAuthAddress
+                          ? loginuserdata &&
+                          loginuserdata.fname_alias +
+                          " " +
+                          loginuserdata.lname_alias
+                          : otherUserData
+                            ? otherUserData.fname_alias +
+                            " " +
+                            otherUserData.lname_alias
+                            : ""}
+                        <span className="verify-status">
+                          <SimpleCheckIcon width="16" height="12" />
+                        </span>
+                      </h1>
+                      <div className="about-profile">
+                        <h6>
+                          <strong>0</strong> transactions
+                        </h6>
+                        <h6 className="feedback">
+                          <strong>0</strong> positive feedback
+                        </h6>
+                      </div>
+                    </Box>
+                  </Box>
+                  <Box className="ButtonSocialLink">
+                    <p>
+                      {isAuthAddress
+                        ? loginuserdata && loginuserdata.bio
+                        : otherUserData
+                          ? otherUserData.bio
+                          : ""}
+                    </p>
+                    <div className="profile-btn">
+                      {userData && userData.account === "Connect Wallet" ? (
+                        <>
+                          <Button
+                            variant="primary"
+                            onClick={connectWalletModalToggle}
+                          >
+                            <MessageIcon width="18" height="16" />
+                            Message{" "}
+                          </Button>
+                          <Button
+                            variant="danger"
+                            className="buttonspace"
+                            onClick={connectWalletModalToggle}
+                          >
+                            Report User
+                          </Button>
+                        </>
+                      ) : isAuthAddress && isAuth ? (
+                        <>
+                          <Button
+                            variant="secondary"
+                            className="auth-btn"
+                            onClick={editProfileModalToggle}
+                          >
+                            Edit Profile{" "}
+                          </Button>
+
+                          {(loginuserdata?.kyc_completed === true || kycSubmitted === true) &&
+                            ((loginuserdata?.is_verified === 1 && kycSubmitted === false) ? (
+                              <Button variant="success" className="buttonspace auth-btn" disabled>
+                                KYC approved
+                              </Button>
+                            ) : (loginuserdata?.is_verified === 2 && kycSubmitted === false) ? (
+                              <Button variant="primary" className="buttonspace auth-btn" onClick={modalKycToggle}>
+                                Verification
+                              </Button>
+                            ) : (loginuserdata?.is_verified === 0 || kycSubmitted === true) ? (
+                              <Button variant="warning" className="buttonspace auth-btn" disabled>
+                                KYC Under Review
+                              </Button>
+                            ) : null)}
+
+                          {(loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed === undefined) &&
+                            kycSubmitted === false && (
+                              <Button
+                                variant="primary"
+                                className="buttonspace auth-btn"
+                                onClick={modalKycToggle}
+                              >
+                                Verification
+                              </Button>
+                            )}
+                        </>
+                      ) : (
+                        <>
+                          <Button variant="primary" onClick={modalToggle}>
+                            <MessageIcon width="18" height="16" />
+                            Message
+                          </Button>
+                          <Button
+                            variant="danger"
+                            className="buttonspace"
+                            onClick={reportModalToggle}
+                          >
+                            Report User
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    <p>Social media</p>
+                    <div className="social-btn">
+                      <Button variant="link">
+                        <InstagramIcon width="32" height="32" />
+                      </Button>
+                      <Button variant="link">
+                        <TwitterIcon width="32" height="32" />
+                      </Button>
+                      <Button variant="link">
+                        <TelegramIcon width="32" height="32" />
+                      </Button>
+                    </div>
+                  </Box>
                 </Col>
               </Row>
             )}
@@ -400,7 +410,7 @@ export const TraderProfile = () => {
         ) : (
           <Col lg="4">
             <Card className="cards-dark">
-              <Card.Body>
+              <Card.Body className="informationBody">
                 <Card.Title as="h2">Information</Card.Title>
                 <div className="profile-information">
                   <Row className="align-items-center g-0">
@@ -527,12 +537,12 @@ export const TraderProfile = () => {
                             {/* <span className="circle"></span> */}
                             {(userStatuses[i] === 0 ||
                               userStatuses[i] === false) && (
-                              <div className="chat-status-offline"></div>
-                            )}
+                                <div className="chat-status-offline"></div>
+                              )}
                             {(userStatuses[i] === 1 ||
                               userStatuses[i] === true) && (
-                              <div className="chat-status"></div>
-                            )}
+                                <div className="chat-status"></div>
+                              )}
                             {userStatuses[i] === 2 && (
                               <div className="chat-status-absent"></div>
                             )}
@@ -546,16 +556,16 @@ export const TraderProfile = () => {
                         </div>
                       </div>
                       <div className="actions profile-action text-center">
-                
-                      {userData &&
-                        userData.account === escrow.user_address && (
-                          <Link
-                            className="action"
-                            to={`/escrow/details/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Details</Button>
-                          </Link>
-                        )}
+
+                        {userData &&
+                          userData.account === escrow.user_address && (
+                            <Link
+                              className="action"
+                              to={`/escrow/details/${escrow?._id}`}
+                            >
+                              <Button variant="primary">Details</Button>
+                            </Link>
+                          )}
                       </div>
                     </div>
                   ))}
@@ -747,17 +757,10 @@ export const TraderProfile = () => {
         onHide={() => setModalShow(false)}
         otheruser={otherUserData ? otherUserData : ""}
       />
-      {/* <ReviewTransactionView
+      <ReviewTransactionView
         show={reportModalShow}
         onHide={() => setReportModalShow(false)}
-      /> */}
-      <ReportUserView
-        show={reportModalShow}
-        onHide={() => setReportModalShow(false)}
-        id={address}
-        status={"Block"}
-        setUser={setUser}
-      /> 
+      />
       <EditProfileView
         show={editProfileModalShow}
         onHide={() => setEditProfileModalShow(false)}
