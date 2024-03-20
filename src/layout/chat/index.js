@@ -4,7 +4,7 @@ import { Nav , NavDropdown } from "react-bootstrap";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { IoIosCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon , EyeIcon} from "../../component/SVGIcon";
+import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon } from "../../component/SVGIcon";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import ChatLoader from "./ChatLoader";
@@ -15,7 +15,7 @@ import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import UserList from "./UserList";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import ReportUserView from "../../component/ReportUser";
-
+import jwtAxios from "../../service/jwtAxios";
 
 export const Chat = () => {
   const [user, setUser] = useState("");
@@ -206,18 +206,36 @@ export const Chat = () => {
         receiverData?.id &&
         noError == true
       ) {
-    
-        sendMessage(
-          user?.userStatus,
-          messageText,
-          userDetailsAll?.wallet_address,
-          receiverData?.id,
-          messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
-          file
-        );
-        // e.target.elements.content.value = "";
-        setMessageFile("");
-        setMessageText("");
+        try {
+          const reqData = {
+            report_from_user_address: userDetailsAll?.wallet_address,
+            report_to_user_address: receiverData?.id
+          }
+          const result = await jwtAxios.post(`/users/getUserStatusToMessage`, reqData);
+ 
+          if (result?.data?.reportUser) {
+             
+              sendMessage(
+                result?.data?.reportUser?.userStatus,
+                messageText,
+                userDetailsAll?.wallet_address,
+                receiverData?.id,
+                messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
+                file
+              );
+              // e.target.elements.content.value = "";
+              setMessageFile("");
+              setMessageText("");
+
+          } else {
+              dispatch(notificationFail("Something went wrong"));
+              return null; // Return null or some other default value
+          }
+      } catch (error) {
+          console.error("Error fetching user status:", error);
+          dispatch(notificationFail("Error fetching user status"));
+          return null; // Return null or some other default value
+      }
       } 
     }
   }
@@ -393,6 +411,7 @@ export const Chat = () => {
         onHide={() => setReportModelOpen(false)}
         id={reportModelData.id}
         status={reportModelData.status}
+        setUser={setUser}
       /> 
     </div>
   );

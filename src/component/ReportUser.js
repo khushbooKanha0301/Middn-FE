@@ -7,10 +7,9 @@ import {
 import jwtAxios from "../service/jwtAxios";
 import { useDispatch, useSelector } from "react-redux";
 import { userGetFullDetails } from "../store/slices/AuthSlice";
-import { Box } from "@mui/material";
 
 export const ReportUserView = (props) => {
-  const { id, status } = props;
+  const { id, status , setUser} = props;
   const [reason, setReason] = useState(null);
   const dispatch = useDispatch();
   const userData = useSelector(userGetFullDetails);
@@ -39,11 +38,14 @@ export const ReportUserView = (props) => {
         userStatus: status === "Block" ? true : false,
         reason,
       };
-      console.log("=======" , reqData)
       await jwtAxios
         .post(`/users/reportUser`, reqData)
         .then((result) => {
-          if (result?.status) {
+          if (result) {
+            setUser(prevData => ({
+              ...prevData,
+              userStatus: result?.data?.reportUser?.userStatus
+            }));
             dispatch(notificationSuccess(result?.data?.message));
             props.onHide();
           }
@@ -102,27 +104,25 @@ export const ReportUserView = (props) => {
           </Form.Group>
 
           <Form.Group className="custom-input">
-            <Box className="other-reason">
-              <Form.Label className="mb-1">Other reason</Form.Label>
+            <Form.Label className="mb-1">Other reason</Form.Label>
+            <div
+              className="document-issued form-check"
+              onClick={() => verifiedWith("Other reason")}
+            >
               <div
-                className="document-issued form-check"
-                onClick={() => verifiedWith("Other")}
-              >
-                <div
-                  className={`form-check-input ${
-                    reason === "Other" ? "checked" : ""
-                  }`}
-                />
-                <Form.Control
-                  className=""
-                  type="text"
-                  name="reason"
-                  placeholder="Other reason"
-                  onChange={(e) => setReason(e.target.value)}
-                  value={reason === "Other reason" ? "" : reason}
-                />
-              </div>
-            </Box>
+                className={`form-check-input ${
+                  reason === "Other reason" ? "checked" : ""
+                }`}
+              />
+              <Form.Control
+                className="reportUser"
+                type="text"
+                name="reason"
+                placeholder="Other reason"
+                onChange={(e) => setReason(e.target.value)}
+                value={reason === "Other reason" ? "" : reason}
+              />
+            </div>
           </Form.Group>
 
           <div className="form-action-group">

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState , useEffect } from "react";
 import { Col, Row, Button, Nav } from "react-bootstrap";
 import { TrashIcon } from "../../component/SVGIcon";
 import Select from "react-select";
 import CreateEscrowView from "../escrow/CreateEscrow";
 import { TableLoader } from "../../helper/Loader";
-import { Box } from "@mui/material";
 
 
 const data = [
@@ -44,7 +43,7 @@ export const TradeHistory = () => {
     <div className="trade-history-view">
       <h1>Trade History</h1>
       <Row className="justify-content-between align-items-center">
-        <Col md="auto default-active-keys">
+        <Col lg="auto default-active-keys">
           <Nav defaultActiveKey="all" as="ul" className="filter-btn">
             <Nav.Item as="li">
               <Nav.Link eventKey="all">All</Nav.Link>
@@ -57,27 +56,25 @@ export const TradeHistory = () => {
             </Nav.Item>
           </Nav>
         </Col>
-        <Col md="auto">
-          <Box className="searchDeleteRow">
-            <Select
-              defaultValue={selectedOptionStatus}
-              value={selectedOptionStatus}
-              className="select-dropdown"
-              isSearchable={false}              
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              classNamePrefix="select-dropdown"
-              options={data}
-              onChange={handleChangeStatus}
-              getOptionLabel={(e) => (
-                <div className="selected-dropdown">{e.text}</div>
-              )}
-            />
-            <Button variant="dark">
-              <TrashIcon width="35" height="35" />
-            </Button>
-          </Box>
+        <Col lg="auto">
+          <Select
+            defaultValue={selectedOptionStatus}
+            value={selectedOptionStatus}
+            className="select-dropdown"
+            isSearchable={false}
+            components={{
+              IndicatorSeparator: () => null,
+            }}
+            classNamePrefix="select-dropdown"
+            options={data}
+            onChange={handleChangeStatus}
+            getOptionLabel={(e) => (
+              <div className="selected-dropdown">{e.text}</div>
+            )}
+          />
+          <Button variant="dark">
+            <TrashIcon width="35" height="35" />
+          </Button>
         </Col>
       </Row>
 
@@ -96,9 +93,9 @@ export const TradeHistory = () => {
             <div className="flex-table-body tradeListBody">
               <div className="trade-price">
                 <div className="d-flex align-items-center">
-                  <div className="customCheckbox" onClick={toggleCheckbox}>
+                  <div className="customCheckbox"  onClick={toggleCheckbox}>
                     {/* <input type="checkbox" /> */}
-                    <div className={`check ${isChecked ? "checked" : ""}`} />
+                     <div className={`check ${isChecked ? "checked" : ""}`} />
                   </div>
                   <div className="content ms-3">
                     <h6>15.490546893758 ETH</h6>

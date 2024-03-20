@@ -4,18 +4,14 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
-import {
-  database,
-  generateFirebaseChatRootKey
-} from "../../helper/config";
+import { database, generateFirebaseChatRootKey } from "../../helper/config";
 
 import { firebaseMessages } from "../../helper/chatMessage";
 
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
-export const MessageList = (props) => {
-  const { ReciverId } = props;
+export const MessageList = () => {
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
@@ -40,7 +36,8 @@ export const MessageList = (props) => {
         }
       });
 
-      const childKey = firebaseMessages.CHAT_ROOM +
+      const childKey =
+        firebaseMessages.CHAT_ROOM +
         firebaseRootKey +
         "/" +
         firebaseMessages.MESSAGES;
@@ -54,36 +51,43 @@ export const MessageList = (props) => {
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();
-              console.log("values ", values);
-
               setUnReadCountZero(
                 userData?.account,
                 window.localStorage.getItem("user")
               );
-              const nhuhbu = Object.values(values).filter(
-                (o1) => {
-                  return (
-                    o1.userStatus === false &&
-                    ((o1.reciverID === window.localStorage.getItem("user") &&
-                      o1.senderID === userData?.account) ||
-                      (o1.senderID === window.localStorage.getItem("user") &&
-                        o1.reciverID === userData?.account))
-                  );
-                }
-              );
-              console.log(nhuhbu)
+              const nhuhbu = Object.values(values).filter((o1) => {
+                return (
+                  o1.senderID === userData?.account || o1.userStatus === false
+                );
+                // if(o1.senderID === userData?.account)
+                // {
+                //   return(
+                //   ((o1.reciverID === window.localStorage.getItem("user") &&
+                //   o1.senderID === userData?.account) ||
+                //   (o1.senderID === window.localStorage.getItem("user") &&
+                //     o1.reciverID === userData?.account))
+                //   )
+                // } else {
+                //   return (
+                //     o1.userStatus === false &&
+                //     ((o1.reciverID === window.localStorage.getItem("user") &&
+                //       o1.senderID === userData?.account) ||
+                //       (o1.senderID === window.localStorage.getItem("user") &&
+                //         o1.reciverID === userData?.account))
+                //   );
+                // }
+              });
+
               if (nhuhbu.length > 0) {
                 setMessages(nhuhbu);
               }
             }
           } else {
             if (window.location.pathname !== "/chat") {
-              window.localStorage.removeItem("user")
+              window.localStorage.removeItem("user");
             }
           }
         });
-      } else {
-
       }
     }
   };
@@ -108,7 +112,6 @@ export const MessageList = (props) => {
     downloadLink.click();
   }
   return (
-
     <PerfectScrollbar id="scrollBottom" options={{ suppressScrollX: true }}>
       {messages &&
         messages.map((message, index) => (
@@ -128,7 +131,7 @@ export const MessageList = (props) => {
                   </div>
                   <div>
                     <div className="name">
-                      {receiverData?.fname_alias}{" "}{receiverData?.lname_alias}
+                      {receiverData?.fname_alias} {receiverData?.lname_alias}
                       <span>{Timestamp(message?.sendTime * 1000)}</span>
                     </div>
                     {message?.message !== "" && (
@@ -197,7 +200,6 @@ export const MessageList = (props) => {
                 </>
               )}
             </li>
-
           </>
         ))}
     </PerfectScrollbar>

@@ -84,7 +84,7 @@ export const Statistics = () => {
               <div className="transaction-label font-family-inter">Total Transaction</div>
             </div>
             <div className="divider"></div>
-            <div className="transaction-wrapper-month">
+            <div className="transaction-wrapper">
               <ThisMonth />
             </div>
           </div>

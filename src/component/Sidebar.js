@@ -43,11 +43,13 @@ export const Sidebar = (props) => {
   let userDisplayCal = getCount(height);
   const location = useLocation();
   const acAddress = useSelector(userDetails);
+  console.log("acAddress ", acAddress);
   const [userDisplayCount, setUserDisplayCount] = useState(userDisplayCal);
   const [activeKey, setActiveKey] = useState();
   const [escrows, setEscrow] = useState([]);
+  console.log("escrows ", escrows);
   const [userStatuses, setUserStatuses] = useState([]);
- 
+
   const [userList, setUserList] = useState(
     escrows.filter((item, index) => index < userDisplayCount)
   );
@@ -100,28 +102,29 @@ export const Sidebar = (props) => {
       escrows?.map(async (e) => {
         const starCountRef = ref(
           database,
-          firebaseStatus.CHAT_USERS + (e.trade_address)
+          firebaseStatus.CHAT_USERS + e.trade_address
         );
         const snapshot = await get(starCountRef);
         return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-    }))
+      })
+    );
 
     setUserStatuses(statuses);
-  }
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-    const intervalId = setInterval(handleMouseMove,  10000);
+    //const intervalId = setInterval(handleMouseMove,  10000);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      clearInterval(intervalId);
+      //clearInterval(intervalId);
     };
   }, [acAddress]);
 
   const loadMoreData = () => {
     setUserList(escrows);
-    handleMouseMove()
+    handleMouseMove();
   };
 
   const handleResizePage = () => {
@@ -147,7 +150,7 @@ export const Sidebar = (props) => {
   };
 
   const openEscrow = (e) => {
-    navigate(`/escrow/${e._id}`, {state: { key : "sidebar"} });
+    navigate(`/escrow/${e._id}`, { state: { key: "sidebar" } });
   };
 
   return (
@@ -230,16 +233,28 @@ export const Sidebar = (props) => {
                         alt={require("../content/images/avatar.png")}
                       />
                       <span className="menu-hide">
-                        {item.user_name ? item.user_name : "John Doe"}
+                        {acAddress?.account === item?.trade_address ? (
+                          <>
+                            {item?.user_escrow_name
+                              ? item?.user_escrow_name
+                              : "John Doe"}
+                          </>
+                        ) : (
+                          <>
+                            {item.user_trade_name
+                              ? item.user_trade_name
+                              : "John Doe"}
+                          </>
+                        )}
                       </span>
                     </div>
-                    {(userStatuses[index] === 1) && (
+                    {userStatuses[index] === 1 && (
                       <div className="sidebar-left-dot"></div>
                     )}
                     {userStatuses[index] === 2 && (
                       <div className="sidebar-left-dot-absent"></div>
                     )}
-                    {(userStatuses[index] === 3) && (
+                    {userStatuses[index] === 3 && (
                       <div className="sidebar-left-dot-offline"></div>
                     )}
                   </li>

@@ -4,13 +4,19 @@ import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
-import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon , EyeIcon} from "../../component/SVGIcon";
+import {
+  BackArrow,
+  LinkSimpleIcon,
+  SmileyIcon,
+  SimpleDotedIcon,
+  EyeIcon,
+} from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import {
   converImageToBase64,
   sendMessage,
 } from "../../helper/firebaseConfigEscrow";
-import { Nav , NavDropdown } from "react-bootstrap";
+import { Nav, NavDropdown } from "react-bootstrap";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
@@ -23,10 +29,8 @@ import { firebaseMessagesEscrow } from "../../helper/configEscrow";
 import Swal from "sweetalert2/src/sweetalert2.js";
 import { firebaseStatus } from "../../helper/statusManage";
 
-
 export const EscrowSeller = (props) => {
   const [user, setUser] = useState({});
-  console.log("user ", user); 
   const { id } = props;
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
@@ -38,6 +42,7 @@ export const EscrowSeller = (props) => {
     acAddress?.wallet_address === escrow?.user_address
       ? escrow?.trade_address
       : escrow?.user_address;
+
   const userRef = useRef(null);
   const fileInputRef = useRef(null);
   const { onClickOutside } = <Picker />;
@@ -45,7 +50,7 @@ export const EscrowSeller = (props) => {
   const [messageFile, setMessageFile] = useState("");
   const [escrowLoading, setEscrowLoading] = useState(false);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
-  
+
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
     return () => {
@@ -223,14 +228,14 @@ export const EscrowSeller = (props) => {
       },
     }).then(async (result) => {
       let user;
-      if(status === 'Block'){
+      if (status === "Block") {
         user = {
-          userStatus: true
-        }
+          userStatus: true,
+        };
       } else {
         user = {
-          userStatus: false
-        }
+          userStatus: false,
+        };
       }
       jwtAxios
         .put(`/users/userBlocked/${id}`, user)
@@ -239,9 +244,9 @@ export const EscrowSeller = (props) => {
           const userRef = ref(database, firebaseStatus?.CHAT_USERS + id);
           await update(userRef, user);
           const updatedSnapshot = await get(userRef);
-          setUser(prevData => ({
+          setUser((prevData) => ({
             ...prevData,
-            userStatus: updatedSnapshot.val()?.userStatus
+            userStatus: updatedSnapshot.val()?.userStatus,
           }));
         })
         .catch((error) => {
@@ -311,67 +316,70 @@ export const EscrowSeller = (props) => {
 
   return (
     <>
-        <div className="escrowPay">
-          <Row>
-            <Col lg="4">
-              <Card className="cards-dark">
-                <Card.Body>
-                  <div className="chat-box-pay">
-                    <div className="chat-box-seller">
-                      <div className="d-flex justify-content-between buyerBottom">
-                        <span className="text-white text-lg">
-                          Contract :{" "}
-                          <span className="font-bold">
-                            {escrow?.user_address === acAddress?.wallet_address
-                              ? escrow?.escrow_type === "seller"
-                                ? "Seller"
-                                : "Buyer"
-                              : escrow?.escrow_type === "seller"
-                              ? "Buyer"
-                              : "Seller"}
-                          </span>{" "}
-                        </span>
-                        <span className="rounded-deposite">
-                          Depositing
-                        </span>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">Price</span>
-                        <strong class="card-txt">105,02 BNB</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">You are buying</span>
-                        <strong class="card-txt">1 BTC</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">You must send</span>
-                        <strong class="card-txt">105,02 BNB</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">Location</span>
-                        <strong class="card-txt">Anywhere</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">Depositing window</span>
-                        <strong class="card-txt">29:42</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottom">
-                        <span class="card-txt-left">Payment window</span>
-                        <strong class="card-txt">60 minutes</strong>
-                      </div>
-
-                      <div className="d-flex justify-content-between align-items-center buyerBottomLast">
-                        <span class="card-txt-left">Buyer release address</span>
-                        <strong class="card-txt">0x...asd22A</strong>
-                      </div>
+      <div className="escrowPay">
+        <Row>
+          <Col lg="4">
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="chat-box-pay">
+                  <div className="chat-box-seller">
+                    <div className="d-flex justify-content-between buyerBottom">
+                      <span className="text-white text-lg">
+                        Contract :{" "}
+                        <span className="font-bold">
+                          {escrowLoading && (
+                            <>
+                              {escrow?.user_address ===
+                              acAddress?.wallet_address
+                                ? escrow?.escrow_type === "seller"
+                                  ? "Seller"
+                                  : "Buyer"
+                                : escrow?.escrow_type === "seller"
+                                ? "Buyer"
+                                : "Seller"}
+                            </>
+                          )}
+                        </span>{" "}
+                      </span>
+                      <span className="rounded-deposite">Depositing</span>
                     </div>
-                    {/* <div className="chat-box-btn">
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">Price</span>
+                      <strong class="card-txt">105,02 BNB</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">You are buying</span>
+                      <strong class="card-txt">1 BTC</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">You must send</span>
+                      <strong class="card-txt">105,02 BNB</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">Location</span>
+                      <strong class="card-txt">Anywhere</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">Depositing window</span>
+                      <strong class="card-txt">29:42</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottom">
+                      <span class="card-txt-left">Payment window</span>
+                      <strong class="card-txt">60 minutes</strong>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center buyerBottomLast">
+                      <span class="card-txt-left">Buyer release address</span>
+                      <strong class="card-txt">0x...asd22A</strong>
+                    </div>
+                  </div>
+                  {/* <div className="chat-box-btn">
                       <button type="button" class="btn btn-primary escrowBtn">
                         Pay
                       </button>
@@ -381,57 +389,63 @@ export const EscrowSeller = (props) => {
                         is expired
                       </span>
                     </div> */}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col lg="8">
-              <Card className="cards-dark chat-box">
-                <Card.Body>
-                  <div className="d-flex items-center justify-content-between pe-4">
-                    <Card.Title as="h2">Chatbox</Card.Title>
-                    {/* <p className="text-white">
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col lg="8">
+            <Card className="cards-dark chat-box">
+              <Card.Body>
+                <div className="d-flex items-center justify-content-between pe-4">
+                  <Card.Title as="h2">Chatbox</Card.Title>
+                  {/* <p className="text-white">
                     {receiverData &&
                       `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
                   </p> */}
-                  {receiverData ? 
-                  <>
-                    {( receiverData?.userStatus) ? 
+                  {/* {receiverData ? (
                     <>
-                      <Nav as="ul">
-                        <NavDropdown
-                          as="li"
-                          title={
-                            <SimpleDotedIcon width="20" height="20" />
-                          }
-                          id="nav-dropdown"
-                        >
-                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Unblock")}>
-                          UnBlock user
-                          </NavDropdown.Item>
-                        </NavDropdown>
-                      </Nav>
-                    </> : 
-                    <>
-                      <Nav as="ul">
-                        <NavDropdown
-                          as="li"
-                          title={
-                            <SimpleDotedIcon width="20" height="20" />
-                          }
-                          id="nav-dropdown"
-                        >
-                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Block")}>
-                          Block user
-                          </NavDropdown.Item>
-                        </NavDropdown>
-                      </Nav>
-                    </>}
-                  </>
-                  : null} 
-                  </div>
-                  <div className="chat-box-list">
-                    <ul>
+                      {receiverData?.userStatus ? (
+                        <>
+                          <Nav as="ul">
+                            <NavDropdown
+                              as="li"
+                              title={<SimpleDotedIcon width="20" height="20" />}
+                              id="nav-dropdown"
+                            >
+                              <NavDropdown.Item
+                                onClick={() =>
+                                  modalToggle(receiverData?.id, "Unblock")
+                                }
+                              >
+                                UnBlock user
+                              </NavDropdown.Item>
+                            </NavDropdown>
+                          </Nav>
+                        </>
+                      ) : (
+                        <>
+                          <Nav as="ul">
+                            <NavDropdown
+                              as="li"
+                              title={<SimpleDotedIcon width="20" height="20" />}
+                              id="nav-dropdown"
+                            >
+                              <NavDropdown.Item
+                                onClick={() =>
+                                  modalToggle(receiverData?.id, "Block")
+                                }
+                              >
+                                Block user
+                              </NavDropdown.Item>
+                            </NavDropdown>
+                          </Nav>
+                        </>
+                      )}
+                    </>
+                  ) : null} */}
+                </div>
+                <div className="chat-box-list">
+                  <ul>
                     {escrowLoading && (
                       <MessageList
                         ReciverId={receiverAddress}
@@ -439,95 +453,95 @@ export const EscrowSeller = (props) => {
                         escrowId={id}
                       />
                     )}
-                    </ul>
-                    {showSmily && (
-                      <div userRef={emojiPickerRef} className="emoji-picker">
-                        <Picker
-                          onEmojiClick={onEmojiClick}
-                          autoFocusSearch={true}
-                          className="emoji-popup"
-                          theme="dark"
-                          lazyLoadEmojis={true}
-                        />
-                      </div>
-                    )}
+                  </ul>
+                  {showSmily && (
+                    <div userRef={emojiPickerRef} className="emoji-picker">
+                      <Picker
+                        onEmojiClick={onEmojiClick}
+                        autoFocusSearch={true}
+                        className="emoji-popup"
+                        theme="dark"
+                        lazyLoadEmojis={true}
+                      />
+                    </div>
+                  )}
 
-                    <div
-                      className="chat-action"
-                      style={{ visibility: "visible" }}
-                    >
-                      {messageFile && (
-                        <div className="attach">
-                          <div className="flex items-center justify-between px-2 py-1  border rounded-full shadow-md fileClass">
-                            <div className="flex items-center space-x-2">
-                              {RenderIcon(messageFile.name)}
-                              <span className=" truncate">
-                                {messageFile.name}
-                              </span>
-                              <IoIosCloseCircle
-                                style={{ fontSize: "25px", marginLeft: "14px" }}
-                                onClick={handleDeselctImage}
-                              />
-                              <div className="file-size">
-                                {messageFile?.size &&
-                                  formateSize(messageFile?.size)}
-                              </div>
+                  <div
+                    className="chat-action"
+                    style={{ visibility: "visible" }}
+                  >
+                    {messageFile && (
+                      <div className="attach">
+                        <div className="flex items-center justify-between px-2 py-1  border rounded-full shadow-md fileClass">
+                          <div className="flex items-center space-x-2">
+                            {RenderIcon(messageFile.name)}
+                            <span className=" truncate">
+                              {messageFile.name}
+                            </span>
+                            <IoIosCloseCircle
+                              style={{ fontSize: "25px", marginLeft: "14px" }}
+                              onClick={handleDeselctImage}
+                            />
+                            <div className="file-size">
+                              {messageFile?.size &&
+                                formateSize(messageFile?.size)}
                             </div>
                           </div>
                         </div>
-                      )}
-
-                      <div className="messsge">
-                        <div className="button-container">
-                          <Button variant="link" onClick={() => smilyOpen()}>
-                            <SmileyIcon width="20" height="20" />
-                          </Button>
-                          <Button
-                            variant="link"
-                            className="ms-3"
-                            onClick={handleButtonClick}
-                          >
-                            <LinkSimpleIcon width="20" height="20" />
-                          </Button>
-                        </div>
-
-                        <Form
-                          className="input-container"
-                          onSubmit={(e) => {
-                            onSubmit(e);
-                          }}
-                        >
-                          <input
-                            userRef={fileInputRef}
-                            type="file"
-                            onChange={handleFileSelection}
-                            style={{ display: "none" }}
-                          />
-
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Send a message…"
-                            name="content"
-                            value={messageText}
-                            onChange={handleTextChange}
-                            onKeyPress={handleInputKeyPress}
-                            onFocus={handleInputFocus}
-                            autoComplete="off"
-                          />
-
-                          <Button variant="primary" type="submit" size="sm">
-                            Send
-                          </Button>
-                        </Form>
                       </div>
+                    )}
+
+                    <div className="messsge">
+                      <div className="button-container">
+                        <Button variant="link" onClick={() => smilyOpen()}>
+                          <SmileyIcon width="20" height="20" />
+                        </Button>
+                        <Button
+                          variant="link"
+                          className="ms-3"
+                          onClick={handleButtonClick}
+                        >
+                          <LinkSimpleIcon width="20" height="20" />
+                        </Button>
+                      </div>
+
+                      <Form
+                        className="input-container"
+                        onSubmit={(e) => {
+                          onSubmit(e);
+                        }}
+                      >
+                        <input
+                          userRef={fileInputRef}
+                          type="file"
+                          onChange={handleFileSelection}
+                          style={{ display: "none" }}
+                        />
+
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Send a message…"
+                          name="content"
+                          value={messageText}
+                          onChange={handleTextChange}
+                          onKeyPress={handleInputKeyPress}
+                          onFocus={handleInputFocus}
+                          autoComplete="off"
+                        />
+
+                        <Button variant="primary" type="submit" size="sm">
+                          Send
+                        </Button>
+                      </Form>
                     </div>
                   </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        </div>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </>
   );
 };
