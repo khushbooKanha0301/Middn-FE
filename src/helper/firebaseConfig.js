@@ -77,7 +77,7 @@ function convertMessageObj(
     return firebaseInsertRecordObject;
   }
 }
-export const setUnReadCount = async ( userStatus , child, reciverID, senderID, isset) => {
+export const setUnReadCount = async (userStatus , child, reciverID, senderID, isset) => {
   let unreadCount = 0;
   let childKey = firebaseMessages.CHAT_ROOM + child + "/" + firebaseMessages.UN_READ_COUNT;
   const setReciverReadCountNode = ref(database, childKey);
@@ -116,6 +116,7 @@ export const sendMessage = async (
   messageType = messageTypes.TEXT,
   file = null
 ) => {
+ 
   let firebaseRootKey = generateFirebaseChatRootKey(senderID, reciverID);
   get(child(ref(database), firebaseMessages.CHAT_ROOM + firebaseRootKey))
     .then((snapshot) => {

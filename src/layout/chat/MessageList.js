@@ -51,36 +51,19 @@ export const MessageList = () => {
           ) {
             if (snapshot.val()) {
               const values = snapshot.val();
-              setUnReadCountZero(
-                userData?.account,
-                window.localStorage.getItem("user")
-              );
               const nhuhbu = Object.values(values).filter((o1) => {
                 return (
                   o1.senderID === userData?.account || o1.userStatus === false
-                );
-                // if(o1.senderID === userData?.account)
-                // {
-                //   return(
-                //   ((o1.reciverID === window.localStorage.getItem("user") &&
-                //   o1.senderID === userData?.account) ||
-                //   (o1.senderID === window.localStorage.getItem("user") &&
-                //     o1.reciverID === userData?.account))
-                //   )
-                // } else {
-                //   return (
-                //     o1.userStatus === false &&
-                //     ((o1.reciverID === window.localStorage.getItem("user") &&
-                //       o1.senderID === userData?.account) ||
-                //       (o1.senderID === window.localStorage.getItem("user") &&
-                //         o1.reciverID === userData?.account))
-                //   );
-                // }
-              });
+                )
+              })
 
               if (nhuhbu.length > 0) {
                 setMessages(nhuhbu);
               }
+              setUnReadCountZero(
+                userData?.account,
+                window.localStorage.getItem("user")
+              )
             }
           } else {
             if (window.location.pathname !== "/chat") {
@@ -88,6 +71,8 @@ export const MessageList = () => {
             }
           }
         });
+      } else {
+
       }
     }
   };

@@ -49,7 +49,7 @@ export const Sidebar = (props) => {
   const [escrows, setEscrow] = useState([]);
   console.log("escrows ", escrows);
   const [userStatuses, setUserStatuses] = useState([]);
-
+ 
   const [userList, setUserList] = useState(
     escrows.filter((item, index) => index < userDisplayCount)
   );
@@ -106,11 +106,10 @@ export const Sidebar = (props) => {
         );
         const snapshot = await get(starCountRef);
         return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-      })
-    );
+    }))
 
     setUserStatuses(statuses);
-  };
+  }
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);

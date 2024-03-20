@@ -7,6 +7,7 @@ import {
 import jwtAxios from "../service/jwtAxios";
 import { useDispatch, useSelector } from "react-redux";
 import { userGetFullDetails } from "../store/slices/AuthSlice";
+import { Box } from "@mui/material";
 
 export const ReportUserView = (props) => {
   const { id, status , setUser} = props;
@@ -104,25 +105,27 @@ export const ReportUserView = (props) => {
           </Form.Group>
 
           <Form.Group className="custom-input">
-            <Form.Label className="mb-1">Other reason</Form.Label>
-            <div
-              className="document-issued form-check"
-              onClick={() => verifiedWith("Other reason")}
-            >
+            <Box className="other-reason">
+              <Form.Label className="mb-1">Other reason</Form.Label>
               <div
-                className={`form-check-input ${
-                  reason === "Other reason" ? "checked" : ""
-                }`}
-              />
-              <Form.Control
-                className="reportUser"
-                type="text"
-                name="reason"
-                placeholder="Other reason"
-                onChange={(e) => setReason(e.target.value)}
-                value={reason === "Other reason" ? "" : reason}
-              />
-            </div>
+                className="document-issued form-check"
+                onClick={() => verifiedWith("Other")}
+              >
+                <div
+                  className={`form-check-input ${
+                    reason === "Other" ? "checked" : ""
+                  }`}
+                />
+                <Form.Control
+                  className=""
+                  type="text"
+                  name="reason"
+                  placeholder="Other reason"
+                  onChange={(e) => setReason(e.target.value)}
+                  value={reason === "Other reason" ? "" : reason}
+                />
+              </div>
+            </Box>
           </Form.Group>
 
           <div className="form-action-group">
