@@ -43,11 +43,9 @@ export const Sidebar = (props) => {
   let userDisplayCal = getCount(height);
   const location = useLocation();
   const acAddress = useSelector(userDetails);
-  console.log("acAddress ", acAddress);
   const [userDisplayCount, setUserDisplayCount] = useState(userDisplayCal);
   const [activeKey, setActiveKey] = useState();
   const [escrows, setEscrow] = useState([]);
-  console.log("escrows ", escrows);
   const [userStatuses, setUserStatuses] = useState([]);
  
   const [userList, setUserList] = useState(

@@ -113,7 +113,8 @@ body {
 .cards-dark {
     border-radius: 20px;
     border: 0;
-    .unverified-info{
+
+    .unverified-info {
         color: red;
     }
 
@@ -144,23 +145,22 @@ body {
                 text-decoration: none;
             }
         }
-      }
 
-    .card-text {
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 23px;
-        color: rgba($color: $white, $alpha: 0.6);
-        margin-bottom: 24px;
+        .card-text {
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 23px;
+            color: rgba($color: $white, $alpha: 0.6);
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            padding: 16px;
+            color: $modalContent;
+            width: 100%;
+        }
     }
-
-    .btn-primary {
-        padding: 16px;
-        color: $modalContent;
-        width: 100%;
-    }
- }
-
+}
 
 .banner {
     margin-top: 39px;
@@ -208,12 +208,14 @@ body {
                 margin-bottom: 50px;
             }
 
-            max-width: 460px;
-
             .btn-primary {
                 padding: 12px 20px;
                 color: $bg-color;
                 border-radius: 12px;
+
+                @include media-breakpoint-down(md) {
+                    padding: 13px;
+                }
             }
 
             .card-title {
@@ -245,6 +247,10 @@ body {
                 font-size: 16px;
                 line-height: 29px;
                 letter-spacing: -0.01em;
+
+                @include media-breakpoint-down(md) {
+                    margin-bottom: 16px;
+                }
             }
         }
     }
@@ -291,6 +297,10 @@ body {
 
                 svg {
                     stroke: $black;
+                }
+
+                @include media-breakpoint-down(md) {
+                    margin-bottom: 20px;
                 }
             }
 
@@ -376,6 +386,10 @@ body {
             line-height: 24px;
             color: $white;
             margin-bottom: 41.5px;
+
+            @include media-breakpoint-down(md) {
+                margin-bottom: 24px;
+            }
         }
 
         .col-fixed {
@@ -498,7 +512,6 @@ body {
         }
 
         .card-title {
-            font-weight: 500;
             font-size: 18px;
             color: $white;
             margin-bottom: 0;
@@ -561,6 +574,14 @@ body {
                     color: $green-color;
                     padding-bottom: 16px;
                     border-bottom: 1px solid rgba(240, 243, 246, 0.1);
+
+                    @include media-breakpoint-down(md) {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        width: 204px;
+                        padding-bottom: 10px;
+                    }
                 }
 
                 .month-arrow {
@@ -598,6 +619,7 @@ body {
                         width: 204px;
                     }
                 }
+
             }
 
             .transaction-chart {
@@ -691,7 +713,6 @@ body {
 
             .col {
                 &+.col {
-
                     border-left: 1px solid rgba(240, 243, 246, 0.1);
 
                     @include media-breakpoint-down(md) {
@@ -731,9 +752,6 @@ body {
         }
 
         .card-title {
-            font-weight: 500;
-            font-size: 18px;
-            color: $white;
             margin-bottom: 26px;
         }
 
@@ -1003,7 +1021,8 @@ body {
                 object-fit: cover;
                 margin-right: 16px;
             }
-            .tradeName{
+
+            .tradeName {
                 display: flex;
             }
 
@@ -1013,12 +1032,14 @@ body {
                 border-radius: 50%;
                 background-color: $green-dark;
             }
+
             .sidebar-left-dot-absent {
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
                 background-color: $orange-color;
             }
+
             .sidebar-left-dot-offline {
                 width: 8px;
                 height: 8px;
@@ -1028,7 +1049,7 @@ body {
         }
     }
 
-    
+
 
     .btn-link {
         margin: 16px 20px;
@@ -1151,6 +1172,11 @@ body {
     @include media-breakpoint-up(xxl) {
         padding-left: 64px;
         padding-right: 64px;
+    }
+
+    @include media-breakpoint-down(md) {
+        padding-left: 24px;
+        padding-right: 24px;
     }
 }
 
@@ -1348,7 +1374,7 @@ body {
                 }
             }
         }
-       
+
         .items {
             padding-left: 0px;
             padding-right: 0px;
@@ -1474,47 +1500,99 @@ body {
 
     .react-datepicker-popper {
         padding-top: 0;
-    
+
         .react-datepicker {
             &__triangle {
                 display: none;
             }
-    
-            &--outside-month {
-              color: transparent;
-              pointer-events: none;
-            }
-          }
-    
-          &__navigation {
-            top: 24px;
-    
-            &--previous {
-              left: 20px;
-            }
-    
-            &--next {
-              right: 20px;
-            }
-    
-            &-icon {
-              &::before {
-                width: 6px;
-                height: 6px;
-                border-color: #777e90;
-                border-width: 1.5px 1.5px 0 0;
-              }
-            }
-          }
-    
-          background-color: #24262c;
-          border: none;
-          box-shadow: 0px 40px 32px -24px rgba(15, 15, 15, 0.12);
-          border-radius: 16px;
-          padding: 24px;
-        }
-}
 
+            &__header {
+                border-radius: 16px 16px 0 0;
+                border-bottom-width: 0;
+                background-color: transparent;
+                padding: 0;
+            }
+
+            &__current-month {
+                font-weight: 500;
+                font-size: 16px;
+                line-height: 24px;
+                color: #fcfcfd;
+            }
+
+            &__day-names {
+                margin-top: 12px;
+            }
+
+            &__day-name {
+                padding: 0;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 24px;
+                color: #777e91;
+                text-align: center;
+                margin: 0;
+                width: 40px;
+            }
+
+            &__month {
+                margin: 15px 0 0;
+            }
+
+            &__day {
+                width: 40px;
+                height: 40px;
+                margin: 0;
+                padding: 0;
+                line-height: 40px;
+                font-weight: 500;
+                font-size: 14px;
+                color: #fcfcfd;
+                border-radius: 40px;
+
+                &--today,
+                &--selected,
+                &--keyboard-selected,
+                &:hover {
+                    background: #fcfcfd;
+                    color: #24262d;
+                }
+
+                &--outside-month {
+                    color: transparent;
+                    pointer-events: none;
+                }
+            }
+
+            &__navigation {
+                top: 24px;
+
+                &--previous {
+                    left: 20px;
+                }
+
+                &--next {
+                    right: 20px;
+                }
+
+                &-icon {
+                    &::before {
+                        width: 6px;
+                        height: 6px;
+                        border-color: #777e90;
+                        border-width: 1.5px 1.5px 0 0;
+                    }
+                }
+            }
+
+            background-color: #24262c;
+            border: none;
+            box-shadow: 0px 40px 32px -24px rgba(15, 15, 15, 0.12);
+            border-radius: 16px;
+            padding: 24px;
+        }
+    }
+}
 
 .account-setting {
     margin-top: 24px;
@@ -1707,7 +1785,8 @@ body {
                     fill: $cards-bg;
                 }
             }
-            .crossmark{
+
+            .crossmark {
                 width: 19px;
                 height: 19px;
                 border-radius: 50%;
@@ -1832,7 +1911,7 @@ body {
         }
 
         .card-body {
-            padding: 32px 14px;           
+            padding: 32px 14px;
 
             .card-title {
                 font-weight: 500;
@@ -1841,6 +1920,7 @@ body {
                 color: $white;
                 margin-bottom: 16px;
                 padding-left: 19px;
+
                 @include media-breakpoint-down(md) {
                     padding-left: 0px !important;
                 }
@@ -2507,6 +2587,7 @@ body {
 
                     .accordion-text {
                         color: rgba(255, 255, 255, 0.5) !important;
+
                         @include media-breakpoint-down(md) {
                             font-size: 13px;
                             font-weight: 700;
@@ -2585,7 +2666,6 @@ body {
             border: none;
 
             @include media-breakpoint-down(md) {
-                margin-bottom: 16px;
                 width: 62px;
             }
 
@@ -2610,6 +2690,11 @@ body {
                 border: 2px solid $white;
                 right: 0px;
                 top: 4px;
+
+                @include media-breakpoint-down(md) {
+                    width: 14px;
+                    height: 14px;
+                }
             }
 
             .profile-status-offline {
@@ -2621,6 +2706,8 @@ body {
                 border: 2px solid $white;
                 right: 0px;
                 top: 4px;
+
+
             }
 
             .profile-status-absent {
@@ -2663,6 +2750,20 @@ body {
 
                 svg {
                     fill: $white;
+                }
+            }
+
+            @include media-breakpoint-down(md) {
+                font-size: 24px;
+                line-height: 36px;
+                margin-bottom: 8px;
+
+                .verify-status {
+                    flex: 0 0 20px;
+                    height: 20px;
+                    width: 20px;
+                    padding: 5px;
+                    margin-left: 9px;
                 }
             }
         }
@@ -2712,7 +2813,6 @@ body {
                 color: $nav-title;
                 margin-bottom: 0;
                 word-wrap: break-word;
-                min-height: 48px;
                 overflow: hidden;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
@@ -2728,6 +2828,11 @@ body {
             &.profile-skeleton-container {
                 max-width: 345px;
                 margin-bottom: 2px;
+            }
+
+            @include media-breakpoint-down(md) {
+                max-width: 100%;
+                min-height: auto !important;
             }
         }
 
@@ -2863,11 +2968,6 @@ body {
         margin-top: 74px;
         margin-bottom: 48px;
 
-        @include media-breakpoint-down(md) {
-            margin-top: 24px;
-            margin-bottom: 24px;
-        }
-
         .nav-item {
             margin-right: 49px;
 
@@ -2899,6 +2999,19 @@ body {
                     &::after {
                         @include gradientmenu(263.76deg, $green-lite, $green-medium);
                     }
+                }
+            }
+        }
+
+        @include media-breakpoint-down(md) {
+            margin: 32px 0;
+
+            .nav-item {
+                width: 50%;
+                margin: 0;
+
+                button {
+                    width: 100%;
                 }
             }
         }
@@ -3078,38 +3191,38 @@ body {
             .nav {
                 align-items: center;
                 margin-bottom: 12px;
-        
+
                 .nav-item {
                     padding-left: 10px;
                     padding-right: 10px;
-        
+
                     &:last-child {
                         padding-right: 0;
                     }
-        
+
                     @include media-breakpoint-up(xl) {
                         // padding-left: 10px;
                         // padding-right: 10px;
-        
+
                         &.login-menu {
                             padding-left: 8px;
                             padding-right: 8px;
                         }
-        
+
                         &:last-child {
                             padding-left: 8px;
                             padding-right: 0px;
                         }
                     }
-        
+
                     .nav-link {
                         padding: 0;
                     }
-        
+
                     svg {
                         stroke: $nav-title;
                     }
-        
+
                     .user-name {
                         border: 1px solid $white;
                         border-radius: 43px;
@@ -3122,7 +3235,7 @@ body {
                         min-width: 140px;
                         height: 50px;
                     }
-        
+
                     .login-btn {
                         justify-content: center;
                         align-items: center;
@@ -3135,7 +3248,7 @@ body {
                         cursor: pointer;
                         display: inline-block;
                     }
-        
+
                     .notification-badge {
                         width: 16px;
                         height: 16px;
@@ -3150,20 +3263,20 @@ body {
                         margin-left: 6px;
                         top: -15px;
                         font-size: 12px;
-        
+
                         @include media-breakpoint-down(md) {
                             margin-left: 0;
                         }
                     }
-        
+
                     .dropdown-toggle {
                         padding: 0;
-        
+
                         &::after {
                             display: none;
                         }
                     }
-        
+
                     .dropdown-menu {
                         border-radius: 16px;
                         background-color: $dropdownbg;
@@ -3173,7 +3286,7 @@ body {
                         transform: unset !important;
                         right: 0 !important;
                         left: auto !important;
-        
+
                         &::before {
                             content: '';
                             position: absolute;
@@ -3183,7 +3296,7 @@ body {
                             top: -10px;
                             right: 20px;
                         }
-        
+
                         .dropdown-item {
                             justify-content: center;
                             font-weight: 500;
@@ -3194,23 +3307,23 @@ body {
                             border-bottom: 1px solid $divider-line;
                             display: flex;
                             align-items: center;
-        
+
                             svg {
                                 stroke: $svg-stroke;
                                 margin-right: 16px;
                             }
-        
+
                             &:hover {
                                 background-color: transparent;
                             }
                         }
                     }
                 }
-               
+
                 .items {
                     padding-left: 0px;
                     padding-right: 0px;
-        
+
                     &:last-child {
                         padding-right: 0;
                     }
@@ -3442,15 +3555,21 @@ body {
                             display: flex;
                             margin-bottom: 24px;
 
+                            @include media-breakpoint-down(md) {
+                                margin-bottom: 16px;
+                            }
+
                             .chat-image {
                                 margin-right: 16px;
                                 position: relative;
-                                width: 71px;
+
+                                @include media-breakpoint-down(md) {
+                                    margin-right: 6px;
+                                }
 
                                 img {
                                     border-radius: 50%;
                                     height: 71px;
-                                    object-fit: cover;
                                     width: 71px;
                                     object-fit: cover;
 
@@ -3500,7 +3619,6 @@ body {
                                 text-align: right;
 
                                 .chat-comment {
-                                    display: inline-block;
                                     text-align: left;
                                     border-radius: 20px 20px 4px 20px;
 
@@ -3616,7 +3734,7 @@ body {
         }
     }
 
-  
+
 }
 
 .escrowPay {
@@ -3644,21 +3762,6 @@ body {
             }
         }
 
-        @include media-breakpoint-down(lg) {
-            // .col-lg-4 {
-            //     &.hide-mobile {
-            //         display: none;
-            //     }
-            // }
-
-            // .col-lg-8 {
-            //     display: none;
-
-            //     &.show-mobile {
-            //         display: block;
-            //     }
-            // }
-        }
     }
 
     .cards-dark {
@@ -3680,17 +3783,18 @@ body {
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 20px 40px 20px 35px;
 
             .buyerBottom {
-                margin-bottom: 20px;
+                margin-bottom: 18px;
             }
-            .buyerBottomLast{
+
+            .buyerBottomLast {
                 margin-bottom: 0;
             }
 
             .text-lg {
-                font-size: 1.125rem;
+                font-size: 1.02rem;
                 font-weight: 500;
                 // margin-top: 5px 
             }
@@ -3710,12 +3814,13 @@ body {
                 padding-left: 13px;
                 background-color: rgba(255, 194, 70, .18);
                 border-radius: 5px;
+                font-size: 13px;
             }
 
             .escrowBtn {
                 width: 100%;
                 padding: 12px;
-                margin-top: 20px;
+                // margin-top: 20px;
             }
 
             .card-title {
@@ -4110,28 +4215,13 @@ body {
         .chat-box-pay {
             display: flex;
             flex-direction: column;
-
-            // @include media-breakpoint-up(lg) {
-            //     height: calc(100vh - 300px);
-            // }
-
-            // @media screen and (max-width: 1366px),
-            // screen and (max-height: 700px) {
-            //     height: calc(100vh - 200px);
-            //     overflow: auto;
-            // }
-
-            // @include media-breakpoint-down(lg) {
-            //     height: calc(100vh - 270px);
-            // }
-
-            // @include media-breakpoint-down(md) {
-            //     height: calc(100vh - 50px);
-            // }
         }
 
     }
 
+    .seller-pay {
+        margin-top: 18px
+    }
 
 }
 
@@ -4233,16 +4323,13 @@ body {
         .card-body {
             padding: 22px;
 
-            .card-title {
-                font-weight: 500;
-                font-size: 18px;
-                line-height: 24px;
-                color: $white;
-                margin-bottom: 19px;
-            }
-
             .form-group {
                 padding: 14px 16px;
+
+                .form-label {
+                    color: #fff;
+                    opacity: 0.6;
+                }
             }
 
             .expired {
@@ -4457,6 +4544,7 @@ body {
 
     }
 
+
     .create-escrow {
         flex: 1;
         display: flex;
@@ -4522,7 +4610,14 @@ body {
         font-size: 24px;
         line-height: 24px;
         color: $white;
-        margin-bottom: 0px;
+        margin-bottom: 48px;
+
+        @include media-breakpoint-down(md) {
+            font-size: 32px;
+            line-height: 40px;
+            letter-spacing: -1px;
+            margin-bottom: 22px;
+        }
     }
 
     .btn-dark {
@@ -4542,8 +4637,7 @@ body {
         }
     }
 
-    .flex-table,
-    .filter-btn {
+    .flex-table {
         margin-top: 48px;
 
         @include media-breakpoint-down(md) {
@@ -4607,6 +4701,55 @@ body {
             }
         }
     }
+
+    .default-active-keys {
+        .filter-btn.nav {
+            @include media-breakpoint-down(md) {
+                margin: 0 -4px;
+            }
+
+            li {
+                @include media-breakpoint-down(md) {
+                    margin-top: 22px;
+                }
+
+                @include media-breakpoint-down(sm) {
+                    width: 33.33%;
+                    margin: 22px 0px 0 0;
+                    padding: 0 4px;
+
+                    .nav-link {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        .filter-btn {
+            margin: 0;
+        }
+    }
+
+    .select-dropdown {
+        margin: 0 0 0 0;
+    }
+
+    @include media-breakpoint-down(md) {
+        .searchDeleteRow {
+            display: flex;
+            margin: 22px 0 7px 0;
+
+            .select-dropdown {
+                width: 100%;
+
+                .select-dropdown__control {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+
 }
 
 .help-center-view {
@@ -5272,31 +5415,8 @@ body {
     }
 }
 
+
 @media screen and (max-width: 600px) {
-    .statistics {
-        .card-body {
-            .transaction-view {
-                .transaction {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    position: relative;
-
-                    .divider {
-                        height: 70px;
-                        width: 1px;
-                        background: rgba(240, 243, 246, 0.1);
-
-                    }
-
-                    .transaction-label {
-                        border-bottom: none;
-                        margin-bottom: 0;
-                    }
-                }
-            }
-        }
-    }
 
     .chat-view .cards-dark.chat-box .card-body .chat-box-list .chat-action .messsge .input-container .btn-primary {
         padding: 5px 12px;
@@ -5419,6 +5539,12 @@ body {
                     line-height: 23px;
                     color: rgba($color: $white, $alpha: 0.6);
                     margin-bottom: 0;
+
+                    @include media-breakpoint-down(md) {
+                        font-size: 13px;
+                        line-height: 24px;
+                        font-weight: 500;
+                    }
 
                     &.help-text {
                         font-size: 12px;
@@ -5818,11 +5944,12 @@ body {
                                         border-color: #94fc7d;
                                     }
                                 }
+
                                 &.checked {
                                     +.reportUser {
                                         border-color: #94fc7d;
-                                        
-                                        
+
+
                                     }
                                 }
                             }
@@ -5842,6 +5969,7 @@ body {
                                 cursor: pointer;
                                 transition: all 0.1s ease-in-out;
                             }
+
                             .reportUser {
                                 background: #202127;
                                 //border-radius: 8px;
@@ -5973,22 +6101,25 @@ body {
 
                     .form-group {
                         transition: all 0.1s ease-in-out;
-                        border: 1px solid transparent;                        
+                        border: 1px solid transparent;
                         margin-bottom: 24px;
+
                         &:focus-within {
                             border-color: #c6fa56;
-                            .form-control{
+
+                            .form-control {
                                 color: #fff !important;
                             }
                         }
                     }
 
-                    .row{
-                        .form-group{
+                    .row {
+                        .form-group {
                             margin-bottom: 16px;
-                            .form-control{                                
+
+                            .form-control {
                                 line-height: 40px;
-                                color:#AFB4C0;
+                                color: #AFB4C0;
                             }
                         }
                     }
@@ -6195,12 +6326,14 @@ body {
                 }
             }
         }
-        &.kyc-verify-model{
+
+        &.kyc-verify-model {
             .modal-content {
-                .modal-header{
+                .modal-header {
                     padding: 32px 32px 0;
                 }
-                .kyc-step{
+
+                .kyc-step {
                     padding: 24px 32px 32px;
                 }
             }
@@ -6397,9 +6530,11 @@ body {
         margin-left: 0 !important;
     }
 }
+
 .auth-btn {
     padding: 18px 43px
 }
+
 .kyc-margin {
     margin-right: 16px
 }
@@ -6505,11 +6640,12 @@ img.circle-data {
                     }
                 }
             }
-            .drop-start{
+
+            .drop-start {
                 position: relative;
                 margin-bottom: 16px;
             }
-        
+
             .dropdown-toggle {
                 background: rgba(255, 255, 255, 0.21);
                 align-items: center;
@@ -6525,9 +6661,10 @@ img.circle-data {
                     background: rgba(79, 79, 79, 0.21);
                 }
             }
-            .dropdown-toggle::after{
-                display : none;
-            } 
+
+            .dropdown-toggle::after {
+                display: none;
+            }
 
             .dropdown-menu {
                 position: absolute;
@@ -6549,15 +6686,15 @@ img.circle-data {
                     letter-spacing: -0.03em;
                     margin-bottom: 10px;
                 }
-        
+
                 .dropdown-divider {
                     border-top-color: #252729;
                     margin: 10px 0;
                 }
-        
+
                 .form-check {
                     margin-bottom: 10px;
-        
+
                     input {
                         width: 18px;
                         height: 18px;
@@ -6565,12 +6702,12 @@ img.circle-data {
                         background-color: #C4C4C4;
                         border: none;
                         box-shadow: none;
-        
+
                         &:checked {
                             background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
                         }
                     }
-        
+
                     .form-check-input {
                         width: 18px;
                         height: 18px;
@@ -6578,12 +6715,12 @@ img.circle-data {
                         background-color: #C4C4C4;
                         border: none;
                         box-shadow: none;
-        
+
                         &.checked {
                             background: #34363E url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 20%27%3e%3cpath fill=%27none%27 stroke=%27%237FFC8D%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 stroke-width=%273%27 d=%27m6 10 3 3 6-6%27/%3e%3c/svg%3e");
                         }
                     }
-        
+
                     label {
                         font-size: 13px;
                         line-height: 16px;
@@ -6608,6 +6745,7 @@ img.circle-data {
                     padding: 0;
                     display: flex;
                     width: 100%;
+
                     svg {
                         stroke: white;
                         margin-right: 8px;
@@ -7224,11 +7362,6 @@ aside.EmojiPickerReact.epr-main {
 }
 
 @media screen and (max-width: 767px) {
-    .transaction-wrapper {
-        width: 49%;
-        text-align: center;
-    }
-
     .table-pagination {
         flex-wrap: wrap;
         flex-direction: column-reverse;
@@ -7252,6 +7385,7 @@ aside.EmojiPickerReact.epr-main {
     .default-active-keys .select-dropdown {
         margin-top: 16px;
     }
+
 
     #profile-tab-tabpane-active-offers .flex-table {
         margin-top: 32px;
@@ -7449,14 +7583,18 @@ aside.EmojiPickerReact.epr-main {
         width: 110px;
         line-height: 18px;
         font-weight: 500;
-        font-size: 13px;
+        font-size: 12px;
     }
 
     .card-txt-left {
         color: #808191;
         font-weight: 500;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 18px;
+    }
+    .seller-p {
+        margin-top: -5px;
+        margin-bottom: 0rem;
     }
 
     .summery-txt {
@@ -7728,7 +7866,7 @@ aside.EmojiPickerReact.epr-main {
 
 .custom-input-seller {
     .form-check {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
 
         input {
             width: 18px;
@@ -7908,6 +8046,10 @@ aside.EmojiPickerReact.epr-main {
         background-color: $cards-bg;
         border-radius: 16px;
 
+        @include media-breakpoint-down(md) {
+            margin-bottom: 24px;
+        }
+
         .card-body {
             padding: 21px 24px;
 
@@ -8005,14 +8147,16 @@ aside.EmojiPickerReact.epr-main {
                     }
                 }
             }
+
             &.messageEscrow {
-                .card-body{
+                .card-body {
                     @include media-breakpoint-down(md) {
                         padding: 21px 24px;
-                        ul{
+
+                        ul {
                             margin-bottom: 0;
                         }
-                    }       
+                    }
                 }
             }
         }

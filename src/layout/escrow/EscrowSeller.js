@@ -31,6 +31,9 @@ import { firebaseStatus } from "../../helper/statusManage";
 
 export const EscrowSeller = (props) => {
   const [user, setUser] = useState({});
+  const [escrowType, setEscrowType] = useState(null);
+  const [escrowFund, setEscrowFund] = useState(null);
+  const [escrowCompleted, setEscrowCompleted] = useState(null);
   const { id } = props;
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
@@ -314,6 +317,19 @@ export const EscrowSeller = (props) => {
       });
   }, [acAddress?.authToken, id]);
 
+  const handleCheckboxChange = (filterType) => {
+    setEscrowType(filterType);
+  };
+
+  const handleCheckboxChangeFund = (filterType) => {
+    setEscrowFund(filterType);
+  };
+
+  const handleCheckboxChangeCompleted = (filterType) => {
+    setEscrowCompleted(filterType);
+  };
+   
+
   return (
     <>
       <div className="escrowPay">
@@ -391,6 +407,62 @@ export const EscrowSeller = (props) => {
                     </div> */}
                 </div>
               </Card.Body>
+            </Card>
+            <Card className="cards-dark seller-pay">
+              {/* <Card.Body>
+                <div className="chat-box-pay">
+                  <div className="d-flex justify-content-between buyerBottom">
+                    <span className="text-white text-lg">
+                    Status
+                    </span>
+                  </div>
+                  <Form.Group className="custom-input-seller">
+                  <div
+                    className="form-check"
+                    onClick={() => handleCheckboxChange("buyer")}
+                  >
+                    <div className={`form-check-input ${
+                        escrowType === "buyer" ? "checked" : ""
+                      }`}
+                    />
+                    <span class="card-txt-left">Buyer to make payment</span>
+                    <p className="seller-p"><strong class="card-txt">1 BTC</strong></p>
+                  </div>
+                  </Form.Group>
+                  <Form.Group className="custom-input-seller">
+                  <div
+                    className="form-check"
+                    onClick={() => handleCheckboxChangeFund("fund")}
+                  >
+                    <div className={`form-check-input ${
+                        escrowFund === "fund" ? "checked" : ""
+                      }`}
+                    />
+                    <span class="card-txt-left">The funds is locked in Middn</span>
+                    <p className="seller-p"><strong class="card-txt">1 BTC</strong></p>
+                  </div>
+                  </Form.Group>
+                  <Form.Group className="custom-input-seller">
+                  <div
+                    className="form-check"
+                    onClick={() => handleCheckboxChangeCompleted("completed")}
+                  >
+                    <div className={`form-check-input ${
+                        escrowCompleted === "completed" ? "checked" : ""
+                      }`}
+                    />
+                    <span class="card-txt-left">Check for Payment</span>
+                    <p className="seller-p"><strong class="card-txt">Completed</strong></p>
+                  </div>
+                  </Form.Group>
+
+                  <div className="chat-box-btn">
+                    <button type="button" class="btn btn-primary escrowBtn">
+                      Pay
+                    </button>
+                  </div>
+                </div>
+              </Card.Body> */}
             </Card>
           </Col>
           <Col lg="8">
