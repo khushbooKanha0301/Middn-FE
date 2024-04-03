@@ -276,7 +276,7 @@ export const CreateEscrowView = (props) => {
   return (
     <Modal
       {...props}
-      dialogClassName="login-modal"
+      dialogClassName="login-modal Createescrow"
       backdropClassName="login-modal-backdrop"
       aria-labelledby="contained-modal"
       backdrop="static"
@@ -308,7 +308,7 @@ export const CreateEscrowView = (props) => {
                           escrowType === "buyer" ? "selected" : ""
                         }`}
                       />
-                      <label class="form-check-label">Buyer</label>
+                      <label className="form-check-label">Buyer</label>
                     </div>
                   </Col>
                   <Col md="6">
@@ -321,7 +321,7 @@ export const CreateEscrowView = (props) => {
                           escrowType === "seller" ? "selected" : ""
                         }`}
                       />
-                      <label class="form-check-label">Seller</label>
+                      <label className="form-check-label">Seller</label>
                     </div>
                   </Col>
                 </Row>
@@ -423,7 +423,7 @@ export const CreateEscrowView = (props) => {
             <Modal.Header>
               <Modal.Title>Detail</Modal.Title>
             </Modal.Header>
-            <Modal.Body className="pt-2">
+            <Modal.Body className="pt-2 details-model-body">
               <p className="mb-4">
                 Tell us what you are selling and the description that best
                 characterizes the nature of that sale and provide the time you
@@ -498,7 +498,7 @@ export const CreateEscrowView = (props) => {
                   </Form.Group>
                 </Col>
               </Row>
-              <Form.Group className="form-group mt-2">
+              <Form.Group className="form-group mt-md-2">
                 <Form.Label>Description of Transaction</Form.Label>
                 <Form.Control
                   type="text"
@@ -508,7 +508,7 @@ export const CreateEscrowView = (props) => {
                   value={description}
                 />
               </Form.Group>
-              <h5 className="my-4">Time constraints</h5>
+              <h5 className="mb-3">Time constraints</h5>
               <Form.Group className="form-group">
                 <Form.Label>Process time</Form.Label>
                 {/* <Form.Select
@@ -544,7 +544,7 @@ export const CreateEscrowView = (props) => {
                   )}
                 </div>
               </Form.Group>
-              <div className="form-action-group">
+              <div className="form-action-group details-model-button-row">
                 <Button variant="primary" onClick={submitHandler}>
                   Create
                 </Button>
@@ -565,7 +565,7 @@ export const CreateEscrowView = (props) => {
                 Your secure link has been created, share it with your buyer to
                 start trading with the decentralized escrow.
               </p>
-              <Form.Group className="form-group">
+              <Form.Group className="form-group Your-Escrow-Link">
                 <Form.Label>Your Escrow Link</Form.Label>
                 <Form.Control
                   ref={escrowLinkRef}

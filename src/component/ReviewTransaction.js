@@ -34,7 +34,7 @@ export const ReviewTransactionView = (props) => {
             <div className={`top-form-check active`}>
               <div className="form-check">
                 <div className={`form-check-input checked`}/>
-                <label class="form-check-label">Hidden your name</label>
+                <label className="form-check-label">Hidden your name</label>
               </div>
               <span className="checkmark"></span>
             </div>

@@ -241,8 +241,8 @@ export const EscrowBuyer = (props) => {
               <Row>
                 <Col lg="12">
                   <div className="d-flex main-limit mb-3">
-                    <div class="limit-txt">Limit: </div>
-                    <div class="limit-txt-right">0.1-0.6 MID</div>
+                    <div className="limit-txt">Limit: </div>
+                    <div className="limit-txt-right">0.1-0.6 MID</div>
                   </div>
 
                   <div className="d-flex main-limit mb-2">
@@ -250,37 +250,37 @@ export const EscrowBuyer = (props) => {
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div class="limit-txt-right-amount">
+                    <div className="limit-txt-right-amount">
                       Payment Information
                     </div>
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div class="limit-txt-right">
+                    <div className="limit-txt-right">
                       Amount to transfer to Middn{" "}
                     </div>
-                    <div class="limit-txt-left-amount">
+                    <div className="limit-txt-left-amount">
                       {amount || "0"}{" "}
                       {currentCurrency ? currentCurrency : "MID"}
                     </div>
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div class="limit-txt-right">Invoice Amount</div>
-                    <div class="limit-txt-left">
+                    <div className="limit-txt-right">Invoice Amount</div>
+                    <div className="limit-txt-left">
                       {amount || "0"}{" "}
                       {currentCurrency ? currentCurrency : "MID"}
                     </div>
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div class="limit-txt-right">Escrow fees </div>
-                    <div class="limit-txt-left color-free">FREE</div>
+                    <div className="limit-txt-right">Escrow fees </div>
+                    <div className="limit-txt-left color-free">FREE</div>
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div class="limit-txt-right">Total</div>
-                    <div class="limit-txt-left">
+                    <div className="limit-txt-right">Total</div>
+                    <div className="limit-txt-left">
                       {amount || "0"}{" "}
                       {currentCurrency ? currentCurrency : "MID"}
                     </div>
@@ -296,7 +296,7 @@ export const EscrowBuyer = (props) => {
                             typeFilter === true ? "checked" : ""
                           }`}
                         />
-                        <label class="form-check-label" for="vehicle1">
+                        <label className="form-check-label" for="vehicle1">
                           I agree to Middin's escrow terms and conditions.
                         </label>
                       </div>
@@ -351,28 +351,28 @@ export const EscrowBuyer = (props) => {
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="card-txt-left">Location</span>
-                    <strong class="card-txt">🇺🇸 United States</strong>
+                    <span className="card-txt-left">Location</span>
+                    <strong className="card-txt">🇺🇸 United States</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="card-txt-left">Trades</span>
-                    <strong class="card-txt">1029</strong>
+                    <span className="card-txt-left">Trades</span>
+                    <strong className="card-txt">1029</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="card-txt-left">Trading partners</span>
-                    <strong class="card-txt">720</strong>
+                    <span className="card-txt-left">Trading partners</span>
+                    <strong className="card-txt">720</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="card-txt-left">Feedback score</span>
-                    <strong class="card-txt">99%</strong>
+                    <span className="card-txt-left">Feedback score</span>
+                    <strong className="card-txt">99%</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="card-txt-left">Typical finalization time</span>
-                    <strong class="card-txt">20 minutes</strong>
+                    <span className="card-txt-left">Typical finalization time</span>
+                    <strong className="card-txt">20 minutes</strong>
                   </div>
                 </Card.Body>
               </Card>
@@ -381,30 +381,30 @@ export const EscrowBuyer = (props) => {
                 <Card.Body>
                   <Card.Title as="h2">Summary</Card.Title>
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="summery-txt-left">Price</span>
-                    <strong class="summery-txt">{amount || "0"} MID</strong>
+                    <span className="summery-txt-left">Price</span>
+                    <strong className="summery-txt">{amount || "0"} MID</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="summery-txt-left">Limit</span>
-                    <strong class="summery-txt">0.1-0.6 MID</strong>
+                    <span className="summery-txt-left">Limit</span>
+                    <strong className="summery-txt">0.1-0.6 MID</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="summery-txt-left">Payment methods</span>
-                    <strong class="summery-txt">MID</strong>
+                    <span className="summery-txt-left">Payment methods</span>
+                    <strong className="summery-txt">MID</strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="summery-txt-left">Network</span>
-                    <strong class="summery-txt">
+                    <span className="summery-txt-left">Network</span>
+                    <strong className="summery-txt">
                       {network || "Polygon Chain"}
                     </strong>
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span class="summery-txt-left">Time constraints</span>
-                    <strong class="summery-txt">24 Hours</strong>
+                    <span className="summery-txt-left">Time constraints</span>
+                    <strong className="summery-txt">24 Hours</strong>
                   </div>
                 </Card.Body>
               </Card>

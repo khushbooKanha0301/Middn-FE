@@ -29,6 +29,8 @@ export const Chat = () => {
   const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
+ console.log("receiverData ", receiverData);
+  (receiverData?.id !== null) ? console.log("ok") : console.log("hello")
   const [ReciverId, setReciverId] = useState(null);
   const [reportModelOpen, setReportModelOpen] = useState(false);
   const [reportModelData, setReportModelData] = useState({ id: null, status: null });
@@ -254,7 +256,7 @@ export const Chat = () => {
           <UserList setLoader={setLoader} setReciverId={setReciverId} />
           <Col
             lg="8"
-            className={`${receiverData !== null ? "show-mobile" : ""}`}
+            className={`${receiverData?.id  ? "show-mobile" : "hide-mobile"}`}
           >
             <Card className="cards-dark chat-box">
               <Card.Body>
@@ -268,12 +270,8 @@ export const Chat = () => {
                     >
                       <BackArrow width={16} height={16} />
                     </Button>
-                    Chatbox
+                    <p>Messages</p>
                   </Card.Title>
-                  <p className="text-white">
-                    {receiverData &&
-                      `${receiverData?.fname_alias || "John"}  ${receiverData?.lname_alias || "Doe"}`}
-                  </p>
                   {receiverData ? 
                   <>
                     {(user?.userStatus || receiverData?.userStatus) ? 
@@ -395,7 +393,13 @@ export const Chat = () => {
                         />
 
                         <Button variant="primary" type="submit" size="sm">
-                          Send
+                          
+                          <span className="chat-send-btn">Send</span>
+                          <img
+                            className="chat-send-btn-icon"
+                            src={require("../../content/images/Frame.png")}
+                          />
+                      
                         </Button>
                       </Form>
                     </div>

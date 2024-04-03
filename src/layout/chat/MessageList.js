@@ -54,8 +54,8 @@ export const MessageList = () => {
               const nhuhbu = Object.values(values).filter((o1) => {
                 return (
                   o1.senderID === userData?.account || o1.userStatus === false
-                )
-              })
+                );
+              });
 
               if (nhuhbu.length > 0) {
                 setMessages(nhuhbu);
@@ -63,7 +63,7 @@ export const MessageList = () => {
               setUnReadCountZero(
                 userData?.account,
                 window.localStorage.getItem("user")
-              )
+              );
             }
           } else {
             if (window.location.pathname !== "/chat") {
@@ -72,7 +72,6 @@ export const MessageList = () => {
           }
         });
       } else {
-
       }
     }
   };

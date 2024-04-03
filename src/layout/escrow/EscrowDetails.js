@@ -128,7 +128,7 @@ function EscrowDetails() {
               <Col lg="8">
                 <Row>
                   <Col lg="12">
-                    <div className="designCheap">
+                    <div className="designCheap designCheapDetails">
                       <h4>{escrows?.object}</h4>
                       <p>{escrows?.description}</p>
                       <div className="edit-btn ">
@@ -169,7 +169,7 @@ function EscrowDetails() {
                           <p className="text-white mb-0">MID</p>
                         </div>
                         {/* <div className="country-select">
-                          <div class="form-select form-select-sm" />
+                          <div className="form-select form-select-sm" />
                         </div> */}
                       </div>
                     </Form.Group>
@@ -193,49 +193,49 @@ function EscrowDetails() {
                     </div> */}
 
                         <div className="country-select">
-                          <div class="form-select form-select-sm" />
+                          <div className="form-select form-select-sm" />
                         </div>
                       </div>
                     </Form.Group>
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg="12">
-                    <div className="d-flex main-limit mb-3">
-                      <div class="limit-txt">Limit: </div>
-                      <div class="limit-txt-right">800/4900 MID</div>
+                  <Col lg="12" className="mt-2 mt-md-0 details-main-limit">
+                    <div className="d-flex main-limit mid mb-3 limit">
+                      <div className="limit-txt">Limit: </div>
+                      <div className="limit-txt-right">800/4900 MID</div>
                     </div>
 
-                    <div className="d-flex main-limit mb-2">
+                    <div className="d-flex main-limit mid mb-2">
                       <h6>Detail</h6>
                     </div>
 
                     <div className="d-flex main-limit">
-                      <div class="limit-txt-right-amount">
+                      <div className="limit-txt-right-amount">
                         Payment Information
                       </div>
                     </div>
 
                     <div className="d-flex main-limit">
-                      <div class="limit-txt-right">
+                      <div className="limit-txt-right">
                         Amount to transfer to Middn{" "}
                       </div>
-                      <div class="limit-txt-left-amount">00 MID</div>
+                      <div className="limit-txt-left-amount">00 MID</div>
                     </div>
 
                     <div className="d-flex main-limit">
-                      <div class="limit-txt-right">Invoice Amount</div>
-                      <div class="limit-txt-left">00 MID</div>
+                      <div className="limit-txt-right">Invoice Amount</div>
+                      <div className="limit-txt-left">00 MID</div>
                     </div>
 
                     <div className="d-flex main-limit">
-                      <div class="limit-txt-right">Escrow fees </div>
-                      <div class="limit-txt-left">00 MID</div>
+                      <div className="limit-txt-right">Escrow fees </div>
+                      <div className="limit-txt-left">00 MID</div>
                     </div>
 
                     <div className="d-flex main-limit">
-                      <div class="limit-txt-right">Total</div>
-                      <div class="limit-txt-left">00 MID</div>
+                      <div className="limit-txt-right">Total</div>
+                      <div className="limit-txt-left">00 MID</div>
                     </div>
                     <div className="d-flex main-limit">
                       <Form.Group className="custom-input-seller">
@@ -248,7 +248,7 @@ function EscrowDetails() {
                               typeFilter == "Bike" ? "checked" : ""
                             }`}
                           />
-                          <label class="form-check-label" for="vehicle1">
+                          <label className="form-check-label" for="vehicle1">
                             I agree to Middin's escrow terms and conditions.
                           </label>
                         </div>

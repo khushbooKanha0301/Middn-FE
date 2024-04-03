@@ -71,11 +71,10 @@ export const GoogleAuth = () => {
   };
   return (
     <Card className="cards-dark mb-32">
-      <Card.Body>
+      <Card.Body className="two-f-a"> 
         <Card.Title as="h2">2FA</Card.Title>
         <div
-          className="ul-button-row
-      "
+          className="ul-button-row"
         >
           <ul className="two-fa mb-3">
             <li>
@@ -113,6 +112,65 @@ export const GoogleAuth = () => {
                 Deactive
               </Button>
             )}
+          </div>
+        </div>
+        <div
+          className="ul-button-row"
+        >
+          <ul className="two-fa mb-3">
+            <li>
+              <div className="two-fa-step">
+                <img
+                  src={require("../../content/images/mobile-device.png")}
+                  alt="Google Authentication"
+                />
+                <h4>SMS Authentication</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              </div>
+              <TwoFactorSetup
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                setIs2FAEnabled={setIs2FAEnabled}
+                secret={secret}
+                qrCodeUrl={qrCodeUrl}
+              />
+            </li>
+          </ul>
+
+          <div className="button-row">
+            <Button variant="primary">
+              Active
+            </Button>
+          </div>
+        </div>
+        <div
+          className="ul-button-row"
+        >
+          <ul className="two-fa mb-3">
+            <li>
+              <div className="two-fa-step">
+                <img
+                  src={require("../../content/images/mobile-device.png")}
+                  alt="Google Authentication"
+                />
+                <h4>Email Authentication</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                
+              </div>
+              <TwoFactorSetup
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                setIs2FAEnabled={setIs2FAEnabled}
+                secret={secret}
+                qrCodeUrl={qrCodeUrl}
+              />
+            </li>
+          </ul>
+
+          <div className="button-row">
+            <Button variant="danger" className="deactiveBtn">
+              Deactive
+            </Button>
           </div>
         </div>
       </Card.Body>

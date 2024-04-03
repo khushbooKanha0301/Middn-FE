@@ -496,9 +496,9 @@ export const LoginView = (props) => {
           <div className="middenLoader">
             <img src={require("../content/images/logo.png")} />
             <p>Login Success</p>
-            <div class="snippet" data-title="dot-flashing">
-              <div class="stage">
-                <div class="dot-flashing"></div>
+            <div className="snippet" data-title="dot-flashing">
+              <div className="stage">
+                <div className="dot-flashing"></div>
               </div>
             </div>
           </div>
@@ -508,7 +508,7 @@ export const LoginView = (props) => {
           {props.show && (
             <Modal
               {...props}
-              dialogClassName="login-modal"
+              dialogClassName="login-modal ConnectWallet"
               backdropClassName="login-modal-backdrop"
               aria-labelledby="contained-modal"
               backdrop="static"
@@ -550,7 +550,7 @@ export const LoginView = (props) => {
                             checkValue === "wallet_connect" ? "checked" : ""
                           }`}
                         />
-                        <label class="form-check-label">
+                        <label className="form-check-label">
                           <>
                             <img
                               src={require("../content/images/wallet-connect.png")}
@@ -588,7 +588,7 @@ export const LoginView = (props) => {
                             checkValue === "meta_mask" ? "checked" : ""
                           }`}
                         />
-                        <label class="form-check-label">
+                        <label className="form-check-label">
                           <>
                             <span>
                               <img
@@ -629,7 +629,7 @@ export const LoginView = (props) => {
                             checkValue === "coinbase_wallet" ? "checked" : ""
                           }`}
                         />
-                        <label class="form-check-label">
+                        <label className="form-check-label">
                           <>
                             <span>
                               <img
@@ -669,7 +669,7 @@ export const LoginView = (props) => {
                             checkValue === "fortmatic" ? "checked" : ""
                           }`}
                         />
-                        <label class="form-check-label">
+                        <label className="form-check-label">
                           <>
                             <span>
                               <img

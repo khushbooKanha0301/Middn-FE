@@ -18,7 +18,7 @@ export const ChangePasswordView = (props) => {
     return (
         <Modal
             {...props}
-            dialogClassName="login-modal"
+            dialogClassName="login-modal changePassword"
             backdropClassName="login-modal-backdrop"
             aria-labelledby="contained-modal"
             backdrop="static"
@@ -29,7 +29,7 @@ export const ChangePasswordView = (props) => {
                 <h4>Change Password</h4>
                 <p>Services will be disabled for 24 hours after you make this change to protect your account.</p>
                 <Form>
-                    <Form.Group className="form-group mt-4">
+                    <Form.Group className="form-group">
                         <Form.Label>Old Password</Form.Label>
                         <div className="d-flex justify-content-between align-items-center">
                             <Form.Control type={!isVisibleOldPass ? "password" : "text"} placeholder="Enter old password" />
@@ -38,7 +38,7 @@ export const ChangePasswordView = (props) => {
                             </span>
                         </div>
                     </Form.Group>
-                    <Form.Group className="form-group mt-4">
+                    <Form.Group className="form-group">
                         <Form.Label>New Password</Form.Label>
                         <div className="d-flex justify-content-between align-items-center">
                             <Form.Control type={!isVisibleNewPass ? "password" : "text"} placeholder="Enter new password" />
@@ -47,7 +47,7 @@ export const ChangePasswordView = (props) => {
                             </span>
                         </div>
                     </Form.Group>
-                    <Form.Group className="form-group mt-4">
+                    <Form.Group className="form-group">
                         <Form.Label>Confirm New Password</Form.Label>
                         <div className="d-flex justify-content-between align-items-center">
                             <Form.Control type={!isVisibleConfirmPass ? "password" : "text"} placeholder="Enter new password  again" />

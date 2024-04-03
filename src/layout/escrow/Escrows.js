@@ -16,8 +16,11 @@ export const Escrows = () => {
     const key = state?.key
    
     const acAddress = useSelector(userDetails);
+ console.log("acAddress ", acAddress?.account);
     const [isSeller, setIsSeller] = useState(false);
+ console.log("isSeller ", isSeller);
     const [isBuyer, setIsBuyer] = useState(false);
+ console.log("isBuyer ", isBuyer);
     const [escrowLoading, setEscrowLoading] = useState(false); 
     
     useEffect(() => {
@@ -28,6 +31,7 @@ export const Escrows = () => {
               .get(`/trade/getTradeByEscrow/${id}`)
               .then((res) => {
                 if (res.data?.data) {
+                  console.log("res.data?.data ", res.data?.data);
                   if(acAddress.account === res.data?.data?.user_address || acAddress.account === res.data?.data?.trade_address){
                     setIsSeller(true);
                     setEscrowLoading(true);
@@ -50,8 +54,8 @@ export const Escrows = () => {
         <>
             {acAddress && (
                 <>
-                    {escrowLoading  && (isSeller || (key === 'sidebar')) && <EscrowSeller id={id} />}
-                    {escrowLoading && isBuyer && <EscrowBuyer id={id} />}
+                    {escrowLoading  && (isSeller || (key === 'notification')) && <EscrowSeller id={id} />}
+                    {escrowLoading  && (isBuyer ) && <EscrowBuyer id={id} />}
                 </>
             )}
         </>

@@ -6,3 +6,4 @@ export const StarRating = (props) => {
         <Rating size={50} readOnly={true} initialValue={props.ratings} fillIcon={props.customIcon} emptyIcon={props.customEmptyIcon} className="start-rating" />
     )
 }
+export default StarRating;

@@ -104,10 +104,11 @@ export const Sidebar = (props) => {
         );
         const snapshot = await get(starCountRef);
         return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-    }))
+      })
+    );
 
     setUserStatuses(statuses);
-  }
+  };
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -214,7 +215,9 @@ export const Sidebar = (props) => {
             </Nav.Item>
           </Nav>
           <div className="divider"></div>
-          <div className="nav-title">Active Trader</div>
+          <div className="nav-title" style={{ marginBottom: "20px" }}>
+            Active Trader
+          </div>
           {acAddress?.authToken && (
             <>
               <ul className="active-trader">

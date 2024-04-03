@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Col, Row, Card, Button, Tabs, Tab } from "react-bootstrap";
+import { Col, Row, Card, Button, Tabs, Tab, Form } from "react-bootstrap";
 import EditProfileView from "../../component/EditProfile";
 import MessageView from "../../component/Message";
+import StarRating from "../../component/StarRating";
 import {
   InstagramIcon,
   TelegramIcon,
   MessageIcon,
   SimpleCheckIcon,
   TwitterIcon,
+  StarFillIcon,
+  StarEmptyIcon
 } from "../../component/SVGIcon";
 import { useSelector } from "react-redux";
-import { userDetails, userGetData, userGetFullDetails } from "../../store/slices/AuthSlice";
+import {
+  userDetails,
+  userGetData,
+  userGetFullDetails,
+} from "../../store/slices/AuthSlice";
 import LoginView from "../../component/Login";
 import { useNavigate, useParams } from "react-router-dom";
 import jwtAxios from "../../service/jwtAxios";
@@ -22,7 +29,8 @@ import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { onValue, ref, get } from "firebase/database";
-import ReviewTransactionView from "../../component/ReviewTransaction";
+// import ReviewTransactionView from "../../component/ReviewTransaction";
+import ReportUserView from "../../component/ReportUser";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
 import KYCVerification from "../../component/KYCVerification";
@@ -35,6 +43,7 @@ function capitalizeFirstLetter(str) {
 }
 
 export const TraderProfile = (props) => {
+  const [user, setUser] = useState("");
   let PageSize = 5;
   const dispatch = useDispatch();
   const userData = useSelector(userDetails);
@@ -50,12 +59,13 @@ export const TraderProfile = (props) => {
   const connectWalletModalToggle = () =>
     setconnectWalletModalShow(!connectWalletmodalShow);
 
-  const [reportModalShow, setReportModalShow] = useState(false);
-  const reportModalToggle = () => setReportModalShow(!reportModalShow);
-
+  // const [reportModalShow, setReportModalShow] = useState(false);
+  const [reportModelOpen, setReportModelOpen] = useState(false);
+  const reportModalToggle = () => setReportModelOpen(!reportModelOpen);
+  const [reportModelData, setReportModelData] = useState({ id: null, status: null });
   const [editProfileModalShow, setEditProfileModalShow] = useState(false);
   const editProfileModalToggle = () =>
-    setEditProfileModalShow(!editProfileModalShow);  
+    setEditProfileModalShow(!editProfileModalShow);
   const [countryCode, setCountryCode] = useState("");
   const isAuth = userData.authToken;
   const [isSign, setIsSign] = useState(null);
@@ -89,7 +99,6 @@ export const TraderProfile = (props) => {
             response.data?.User?.is_verified === 2) ||
           response.data?.User?.kyc_completed === false ||
           response.data?.User?.kyc_completed == undefined
-         
         ) {
           setModalKYCShow(!modalShow);
         } else {
@@ -107,7 +116,6 @@ export const TraderProfile = (props) => {
     }
   }, [userData?.userid]);
 
-  
   useEffect(() => {
     if (loginuserdata) {
       getActiveEscrows();
@@ -229,10 +237,10 @@ export const TraderProfile = (props) => {
             {loader ? (
               <ProfileLoader />
             ) : (
-              <Row className="g-0">              
+              <Row className="g-0">
                 <Col>
-                  <Box sx={{display:"flex"}}>
-                    <Box sx={{mr:{xs:"19px", md:"25px"}}}>
+                  <Box sx={{ display: "flex" }}>
+                    <Box sx={{ mr: { xs: "19px", md: "25px" } }}>
                       {isAuthAddress ? (
                         <Button
                           variant="link"
@@ -252,13 +260,13 @@ export const TraderProfile = (props) => {
                             }
                           />
                           {otherStatus === 1 && (
-                            <div className="profile-status"></div>
+                            <div className="profile-dots profile-status"></div>
                           )}
                           {otherStatus === 2 && (
-                            <div className="profile-status-absent"></div>
+                            <div className="profile-dots profile-status-absent"></div>
                           )}
                           {otherStatus === 3 && (
-                            <div className="profile-status-offline"></div>
+                            <div className="profile-dots profile-status-offline"></div>
                           )}
                         </Button>
                       ) : (
@@ -272,33 +280,35 @@ export const TraderProfile = (props) => {
                             alt={"No Profile"}
                           />
                           {otherStatus === 1 && (
-                            <div className="profile-status"></div>
+                            <div className="profile-dots profile-status"></div>
                           )}
                           {otherStatus === 2 && (
-                            <div className="profile-status-absent"></div>
+                            <div className="profile-dots profile-status-absent"></div>
                           )}
                           {otherStatus === 3 && (
-                            <div className="profile-status-offline"></div>
+                            <div className="profile-dots profile-status-offline"></div>
                           )}
                         </Button>
                       )}
                     </Box>
                     <Box>
-                      <h1>
-                        {isAuthAddress
-                          ? loginuserdata &&
-                          loginuserdata.fname_alias +
-                          " " +
-                          loginuserdata.lname_alias
-                          : otherUserData
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <h1>
+                          {isAuthAddress
+                            ? loginuserdata &&
+                              loginuserdata.fname_alias +
+                                " " +
+                                loginuserdata.lname_alias
+                            : otherUserData
                             ? otherUserData.fname_alias +
-                            " " +
-                            otherUserData.lname_alias
+                              " " +
+                              otherUserData.lname_alias
                             : ""}
+                        </h1>
                         <span className="verify-status">
                           <SimpleCheckIcon width="16" height="12" />
                         </span>
-                      </h1>
+                      </div>
                       <div className="about-profile">
                         <h6>
                           <strong>0</strong> transactions
@@ -314,8 +324,8 @@ export const TraderProfile = (props) => {
                       {isAuthAddress
                         ? loginuserdata && loginuserdata.bio
                         : otherUserData
-                          ? otherUserData.bio
-                          : ""}
+                        ? otherUserData.bio
+                        : ""}
                     </p>
                     <div className="profile-btn">
                       {userData && userData.account === "Connect Wallet" ? (
@@ -345,22 +355,39 @@ export const TraderProfile = (props) => {
                             Edit Profile{" "}
                           </Button>
 
-                          {(loginuserdata?.kyc_completed === true || kycSubmitted === true) &&
-                            ((loginuserdata?.is_verified === 1 && kycSubmitted === false) ? (
-                              <Button variant="success" className="buttonspace auth-btn" disabled>
+                          {(loginuserdata?.kyc_completed === true ||
+                            kycSubmitted === true) &&
+                            (loginuserdata?.is_verified === 1 &&
+                            kycSubmitted === false ? (
+                              <Button
+                                variant="success"
+                                className="buttonspace auth-btn"
+                                disabled
+                              >
                                 KYC approved
                               </Button>
-                            ) : (loginuserdata?.is_verified === 2 && kycSubmitted === false) ? (
-                              <Button variant="primary" className="buttonspace auth-btn" onClick={modalKycToggle}>
+                            ) : loginuserdata?.is_verified === 2 &&
+                              kycSubmitted === false ? (
+                              <Button
+                                variant="primary"
+                                className="buttonspace auth-btn"
+                                onClick={modalKycToggle}
+                              >
                                 Verification
                               </Button>
-                            ) : (loginuserdata?.is_verified === 0 || kycSubmitted === true) ? (
-                              <Button variant="warning" className="buttonspace auth-btn" disabled>
+                            ) : loginuserdata?.is_verified === 0 ||
+                              kycSubmitted === true ? (
+                              <Button
+                                variant="warning"
+                                className="buttonspace auth-btn kyc-width"
+                                disabled
+                              >
                                 KYC Under Review
                               </Button>
                             ) : null)}
 
-                          {(loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed === undefined) &&
+                          {(loginuserdata?.kyc_completed === false ||
+                            loginuserdata?.kyc_completed === undefined) &&
                             kycSubmitted === false && (
                               <Button
                                 variant="primary"
@@ -432,31 +459,41 @@ export const TraderProfile = (props) => {
                     <Col xs="7">
                       <label>Trades</label>
                     </Col>
-                    <Col>0</Col>
+                    <Col>
+                      <span>0</span>
+                    </Col>
                   </Row>
                   <Row className="align-items-center g-0">
                     <Col xs="7">
                       <label>Trading partners</label>
                     </Col>
-                    <Col>0</Col>
+                    <Col>
+                      <span>0</span>
+                    </Col>
                   </Row>
                   <Row className="align-items-center g-0">
                     <Col xs="7">
                       <label>Feedback score</label>
                     </Col>
-                    <Col>0%</Col>
+                    <Col>
+                      <span>0%</span>
+                    </Col>
                   </Row>
                   <Row className="align-items-center g-0">
                     <Col xs="7">
                       <label>Account created</label>
                     </Col>
-                    <Col>Yesterday</Col>
+                    <Col>
+                      <span>Yesterday</span>
+                    </Col>
                   </Row>
                   <Row className="align-items-center g-0">
                     <Col xs="7">
                       <label>Typical finalization time</label>
                     </Col>
-                    <Col>-</Col>
+                    <Col>
+                      <span>-</span>
+                    </Col>
                   </Row>
                 </div>
               </Card.Body>
@@ -537,12 +574,12 @@ export const TraderProfile = (props) => {
                             {/* <span className="circle"></span> */}
                             {(userStatuses[i] === 0 ||
                               userStatuses[i] === false) && (
-                                <div className="chat-status-offline"></div>
-                              )}
+                              <div className="chat-status-offline"></div>
+                            )}
                             {(userStatuses[i] === 1 ||
                               userStatuses[i] === true) && (
-                                <div className="chat-status"></div>
-                              )}
+                              <div className="chat-status"></div>
+                            )}
                             {userStatuses[i] === 2 && (
                               <div className="chat-status-absent"></div>
                             )}
@@ -556,16 +593,30 @@ export const TraderProfile = (props) => {
                         </div>
                       </div>
                       <div className="actions profile-action text-center">
-                
-                      {userData &&
-                        userData.account === escrow.user_address && (
-                          <Link
-                            className="action"
-                            to={`/escrow/details/${escrow?._id}`}
-                          >
-                            <Button variant="primary">Details</Button>
-                          </Link>
-                        )}
+                        
+                           {userData &&
+                          userData?.account === escrow?.user_address ? (
+                            <Link
+                              className="action"
+                              to={`/escrow/details/${escrow?._id}`}
+                            >
+                              <Button variant="primary">Details</Button>
+                            </Link>
+                          ) : userData &&
+                          userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "buyer" ? (
+                            <Button
+                              variant="primary"
+              
+                            >
+                              Sell
+                            </Button>
+                          ) : userData && userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "seller"  ? (
+                            <Button
+                              variant="primary"
+                            >
+                              Buy
+                            </Button>
+                          ) : null}
                       </div>
                     </div>
                   ))}
@@ -613,143 +664,143 @@ export const TraderProfile = (props) => {
 
         <Tab eventKey="reviews" title="Reviews">
           <div className="d-flex justify-content-between align-items-center">
-            {/* <h2>Reviews</h2> */}
-            {/* <Form.Select aria-label="Newest">
-                            <option>Newest</option>
-                            <option value="1">Standard</option>
-                            <option value="2">Latter</option>
-                        </Form.Select> */}
+            <h2>Reviews</h2>
+           <Form.Select aria-label="Newest">
+              <option>Newest</option>
+              <option value="1">Standard</option>
+              <option value="2">Latter</option>
+          </Form.Select>
           </div>
-          {/* <div className="reviews-list">
-                        <Card className="cards-dark">
-                            <Card.Body>
-                                <div className="reviewer-image">
-                                    <img
-                                        src={require("../../content/images/escrows-5.png")}
-                                        alt="Gabriel  Erickson"
-                                        width="51"
-                                        height="51"
-                                    />
-                                </div>
-                                <div className="reviewer-details">
-                                    <StarRating
-                                        ratings={5}
-                                        customIcon={<StarFillIcon width="12" height="12" />}
-                                        customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
-                                    />
-                                    <div className="reviewer-name">
-                                        Gabriel <span>12 hours ago</span>
-                                    </div>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                                        do eiusmod tempor incididunt ut labore et dolore magna
-                                        aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
-                                        elit, sed do eiusmod tempor incididunt ut labore et dolore
-                                        magna aliqua.
-                                    </p>
-                                    <div className="reviewer-transaction">
-                                        Transaction : <strong>Buy 5 BTC</strong>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                        <Card className="cards-dark">
-                            <Card.Body>
-                                <div className="reviewer-image">
-                                    <img
-                                        src={require("../../content/images/escrows-5.png")}
-                                        alt="Gabriel  Erickson"
-                                        width="51"
-                                        height="51"
-                                    />
-                                </div>
-                                <div className="reviewer-details">
-                                    <StarRating
-                                        ratings={5}
-                                        customIcon={<StarFillIcon width="12" height="12" />}
-                                        customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
-                                    />
-                                    <div className="reviewer-name">
-                                        Gabriel <span>12 hours ago</span>
-                                    </div>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                                        do eiusmod tempor incididunt ut labore et dolore magna
-                                        aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
-                                        elit, sed do eiusmod tempor incididunt ut labore et dolore
-                                        magna aliqua.
-                                    </p>
-                                    <div className="reviewer-transaction">
-                                        Transaction : <strong>Buy 5 BTC</strong>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                        <Card className="cards-dark">
-                            <Card.Body>
-                                <div className="reviewer-image">
-                                    <img
-                                        src={require("../../content/images/escrows-5.png")}
-                                        alt="Gabriel  Erickson"
-                                        width="51"
-                                        height="51"
-                                    />
-                                </div>
-                                <div className="reviewer-details">
-                                    <StarRating
-                                        ratings={5}
-                                        customIcon={<StarFillIcon width="12" height="12" />}
-                                        customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
-                                    />
-                                    <div className="reviewer-name">
-                                        Gabriel <span>12 hours ago</span>
-                                    </div>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                                        do eiusmod tempor incididunt ut labore et dolore magna
-                                        aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
-                                        elit, sed do eiusmod tempor incididunt ut labore et dolore
-                                        magna aliqua.
-                                    </p>
-                                    <div className="reviewer-transaction">
-                                        Transaction : <strong>Buy 5 BTC</strong>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                        <Card className="cards-dark">
-                            <Card.Body>
-                                <div className="reviewer-image">
-                                    <img
-                                        src={require("../../content/images/escrows-5.png")}
-                                        alt="Gabriel  Erickson"
-                                        width="51"
-                                        height="51"
-                                    />
-                                </div>
-                                <div className="reviewer-details">
-                                    <StarRating
-                                        ratings={5}
-                                        customIcon={<StarFillIcon width="12" height="12" />}
-                                        customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
-                                    />
-                                    <div className="reviewer-name">
-                                        Gabriel <span>12 hours ago</span>
-                                    </div>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                                        do eiusmod tempor incididunt ut labore et dolore magna
-                                        aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
-                                        elit, sed do eiusmod tempor incididunt ut labore et dolore
-                                        magna aliqua.
-                                    </p>
-                                    <div className="reviewer-transaction">
-                                        Transaction : <strong>Buy 5 BTC</strong>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </div> */}
+          <div className="reviews-list">
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="reviewer-image">
+                  <img
+                    src={require("../../content/images/escrows-5.png")}
+                    alt="Gabriel  Erickson"
+                    width="51"
+                    height="51"
+                  />
+                </div>
+                <div className="reviewer-details">
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <div className="reviewer-name">
+                    Gabriel <span>12 hours ago</span>
+                  </div>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore et dolore
+                    magna aliqua.
+                  </p>
+                  <div className="reviewer-transaction">
+                    Transaction : <strong>Buy 5 BTC</strong>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="reviewer-image">
+                  <img
+                    src={require("../../content/images/escrows-5.png")}
+                    alt="Gabriel  Erickson"
+                    width="51"
+                    height="51"
+                  />
+                </div>
+                <div className="reviewer-details">
+                  <StarRating
+                      ratings={5}
+                      customIcon={<StarFillIcon width="12" height="12" />}
+                      customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <div className="reviewer-name">
+                    Gabriel <span>12 hours ago</span>
+                  </div>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore et dolore
+                    magna aliqua.
+                  </p>
+                  <div className="reviewer-transaction">
+                    Transaction : <strong>Buy 5 BTC</strong>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="reviewer-image">
+                  <img
+                    src={require("../../content/images/escrows-5.png")}
+                    alt="Gabriel  Erickson"
+                    width="51"
+                    height="51"
+                  />
+                </div>
+                <div className="reviewer-details">
+                  <StarRating
+                      ratings={5}
+                      customIcon={<StarFillIcon width="12" height="12" />}
+                      customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <div className="reviewer-name">
+                    Gabriel <span>12 hours ago</span>
+                  </div>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore et dolore
+                    magna aliqua.
+                  </p>
+                  <div className="reviewer-transaction">
+                    Transaction : <strong>Buy 5 BTC</strong>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="reviewer-image">
+                  <img
+                    src={require("../../content/images/escrows-5.png")}
+                    alt="Gabriel  Erickson"
+                    width="51"
+                    height="51"
+                  />
+                </div>
+                <div className="reviewer-details">
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <div className="reviewer-name">
+                    Gabriel <span>12 hours ago</span>
+                  </div>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore et dolore
+                    magna aliqua.
+                  </p>
+                  <div className="reviewer-transaction">
+                    Transaction : <strong>Buy 5 BTC</strong>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
         </Tab>
       </Tabs>
       <MessageView
@@ -757,10 +808,17 @@ export const TraderProfile = (props) => {
         onHide={() => setModalShow(false)}
         otheruser={otherUserData ? otherUserData : ""}
       />
-      <ReviewTransactionView
+      {/* <ReviewTransactionView
         show={reportModalShow}
         onHide={() => setReportModalShow(false)}
-      />
+      /> */}
+      <ReportUserView
+        show={reportModelOpen}
+        onHide={() => setReportModelOpen(false)}
+        id={address}
+        status="Unblock"
+        setUser={setUser}
+      /> 
       <EditProfileView
         show={editProfileModalShow}
         onHide={() => setEditProfileModalShow(false)}
@@ -782,7 +840,8 @@ export const TraderProfile = (props) => {
         show={
           ((loginuserdata?.kyc_completed === true &&
             loginuserdata?.is_verified === 2) ||
-            loginuserdata?.kyc_completed === false || loginuserdata?.kyc_completed == undefined) &&
+            loginuserdata?.kyc_completed === false ||
+            loginuserdata?.kyc_completed == undefined) &&
           modalKycShow
         }
         onHide={() => setModalKYCShow(false)}

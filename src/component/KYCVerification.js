@@ -659,7 +659,7 @@ export const KYCVerification = (props) => {
                     verified_with === "government-passport" ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   <>
                     Passport
                     <div className="checkmark">
@@ -670,7 +670,7 @@ export const KYCVerification = (props) => {
               </div>
 
               <div
-                className="document-issued form-check"
+                className="document-issued form-check DrivingLicenseMargin"
                 onClick={() => verifiedWith("government-license")}
               >
                 <div
@@ -678,7 +678,7 @@ export const KYCVerification = (props) => {
                     verified_with === "government-license" ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   <>
                     Driver's License
                     <div className="checkmark">
@@ -740,10 +740,12 @@ export const KYCVerification = (props) => {
                   </div>
                 )}
               </Dropzone>
-              <p className="mb-0">
-                File size must be between 10KB and 5120KB in ..jpg/.jpeg/.png
-                format.
-              </p>
+              <div style={{paddingBottom:"16px"}}>
+                <p className="mb-0">
+                  File size must be between 10KB and 5120KB in ..jpg/.jpeg/.png
+                  format.
+                </p>
+              </div>
             </>
           )}
           {step === 6 && (
@@ -830,6 +832,7 @@ export const KYCVerification = (props) => {
                 Please ensure that your face is centered well lit, and visible
                 when capturing the photo to avoid facial recognition errors
               </p>
+              <div style={{marginBottom:"62px"}}>
               <div
                 className="terms-checkbox form-check"
                 onClick={() => handleCheckboxChange("terms")}
@@ -839,7 +842,7 @@ export const KYCVerification = (props) => {
                     checkboxState.includes("terms") ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   I have read the Terms and Condition and Privacy and Policy.
                 </label>
               </div>
@@ -852,7 +855,7 @@ export const KYCVerification = (props) => {
                     checkboxState.includes("personal") ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   All the personal information I have entered is correct.
                 </label>
               </div>
@@ -865,7 +868,7 @@ export const KYCVerification = (props) => {
                     checkboxState.includes("registering") ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   I certify that, I am registering to participate in the token
                   distribution event(s) in the capacity of an individual (and
                   beneficial owner) and not as an agent or representative of a
@@ -882,21 +885,24 @@ export const KYCVerification = (props) => {
                     checkboxState.includes("participate") ? "checked" : ""
                   }`}
                 />
-                <label class="form-check-label">
+                <label className="form-check-label">
                   I understand that, I can participate in the token distribution
                   event(s) only with the wallet address that was entered in the
                   application form.
                 </label>
+              </div>
               </div>
             </>
           )}
           {step === 8 && (
             <>
               <h5 className="mb-4">Verification Under Review</h5>
-              <p className="mb-0">
-                Verification Under Review{" "}
-                <strong>{currentDate(new Date())}</strong>
-              </p>
+              <div className="verification-under-row">
+                <p className="mb-0">
+                  Verification Under Review{" "}
+                  <strong>{currentDate(new Date())}</strong>
+                </p>
+              </div>
             </>
           )}
           <div className="form-action-group">

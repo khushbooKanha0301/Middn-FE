@@ -361,46 +361,46 @@ export const EscrowSeller = (props) => {
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">Price</span>
-                      <strong class="card-txt">105,02 BNB</strong>
+                      <span className="card-txt-left">Price</span>
+                      <strong className="card-txt">105,02 BNB</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">You are buying</span>
-                      <strong class="card-txt">1 BTC</strong>
+                      <span className="card-txt-left">You are buying</span>
+                      <strong className="card-txt">1 BTC</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">You must send</span>
-                      <strong class="card-txt">105,02 BNB</strong>
+                      <span className="card-txt-left">You must send</span>
+                      <strong className="card-txt">105,02 BNB</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">Location</span>
-                      <strong class="card-txt">Anywhere</strong>
+                      <span className="card-txt-left">Location</span>
+                      <strong className="card-txt">Anywhere</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">Depositing window</span>
-                      <strong class="card-txt">29:42</strong>
+                      <span className="card-txt-left">Depositing window</span>
+                      <strong className="card-txt">29:42</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
-                      <span class="card-txt-left">Payment window</span>
-                      <strong class="card-txt">60 minutes</strong>
+                      <span className="card-txt-left">Payment window</span>
+                      <strong className="card-txt">60 minutes</strong>
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottomLast">
-                      <span class="card-txt-left">Buyer release address</span>
-                      <strong class="card-txt">0x...asd22A</strong>
+                      <span className="card-txt-left">Buyer release address</span>
+                      <strong className="card-txt">0x...asd22A</strong>
                     </div>
                   </div>
                   {/* <div className="chat-box-btn">
-                      <button type="button" class="btn btn-primary escrowBtn">
+                      <button type="button" className="btn btn-primary escrowBtn">
                         Pay
                       </button>
 
-                      <span class="card-txt-left">
+                      <span className="card-txt-left">
                         You can cancel the contract once the depositing window
                         is expired
                       </span>
@@ -469,7 +469,7 @@ export const EscrowSeller = (props) => {
             <Card className="cards-dark chat-box">
               <Card.Body>
                 <div className="d-flex items-center justify-content-between pe-4">
-                  <Card.Title as="h2">Chatbox</Card.Title>
+                  <Card.Title as="h2">Messages</Card.Title>
                   {/* <p className="text-white">
                     {receiverData &&
                       `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
@@ -603,7 +603,11 @@ export const EscrowSeller = (props) => {
                         />
 
                         <Button variant="primary" type="submit" size="sm">
-                          Send
+                        <span className="chat-send-btn">Send</span>
+                          <img
+                            className="chat-send-btn-icon"
+                            src={require("../../content/images/Frame.png")}
+                          />
                         </Button>
                       </Form>
                     </div>

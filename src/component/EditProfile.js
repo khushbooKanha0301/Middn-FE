@@ -230,7 +230,7 @@ export const EditProfileView = (props) => {
   return (
     <Modal
       {...props}
-      dialogClassName="login-modal"
+      dialogClassName="login-modal edit-profile-modal"
       backdropClassName="login-modal-backdrop"
       aria-labelledby="contained-modal"
       backdrop="static"

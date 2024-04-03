@@ -20,7 +20,7 @@ export const AccountSetting = () => {
   const navigate = useNavigate();
 
   const getChatUser = (user) => {
-    navigate(`/escrow/${user.escrowId}`, { state: { userAddress: user.senderId , key : "sidebar"} });
+    navigate(`/escrow/${user.escrowId}`, { state: { userAddress: user.senderId , key : "notification"} });
   };
 
   useEffect(() => {

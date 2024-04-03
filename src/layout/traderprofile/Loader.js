@@ -1,49 +1,46 @@
+import { Box } from "@mui/material";
 import React from "react";
 import { Col, Row, Placeholder, Card } from "react-bootstrap";
 
 export const ProfileLoader = () => {
   return (
-    <Row className="g-0">
-      <Col xs="2">
-        <Placeholder as="p" animation="wave">
-          <Placeholder xs="6" className="profile-img-placeholder skeleton" />
-        </Placeholder>
-      </Col>
-      <Col>
-        <Placeholder
-          as="p"
-          animation="wave"
-          className="profile-skeleton-container"
-        >
-          <div>
-            <Placeholder className="profile-title skeleton" />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              marginTop: "14px",
-            }}
-          >
-            <Placeholder className="profile-subtitle skeleton" />
-            <Placeholder className="profile-subtitle skeleton" />
-          </div>
-
-          <Placeholder className="profile-text skeleton" />
-
-          <div>
-            <Placeholder className="skelton-button skeleton" />
-            <Placeholder className="skelton-button skeleton" />
-          </div>
-          <div className="social-media-skeleton">
-            <Placeholder className="socials-skeleton skeleton" />
-            <Placeholder className="socials-skeleton skeleton" />
-            <Placeholder className="socials-skeleton skeleton" />
-          </div>
-        </Placeholder>
-      </Col>
-    </Row>
+   <Row className="g-0">
+        <Col style={{ maxWidth: "345px", width: "100%" }}>
+          <Placeholder as="div" animation="wave" className="profile-loader">
+            <Placeholder xs="6" className="profile-img-placeholder skeleton" />
+            <Box sx={{ width: "100%" ,marginLeft:"20px"}}>
+              <Placeholder className="profile-title skeleton" />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  marginTop: "14px",
+                }}
+              >
+                <Placeholder className="profile-subtitle skeleton" />
+                <Placeholder className="profile-subtitle skeleton" />
+              </div>
+            </Box>
+          </Placeholder>
+          <Placeholder animation="wave" style={{ display: "block" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Placeholder className="skelton-button skeleton" />
+              <Placeholder className="skelton-button skeleton" />
+            </div>
+            <div
+              className="social-media-skeleton"
+              style={{
+                marginTop: "100px",
+              }}
+            >
+              <Placeholder className="socials-skeleton skeleton" />
+              <Placeholder className="socials-skeleton skeleton" />
+              <Placeholder className="socials-skeleton skeleton" />
+            </div>
+          </Placeholder>
+        </Col>
+      </Row>
   );
 };
 
@@ -122,4 +119,3 @@ export const InfoLoader = () => {
     </Col>
   );
 };
-

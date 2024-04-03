@@ -264,8 +264,8 @@ export const AccountSetting = () => {
     <div className="account-setting">
       <h1>Account Setting</h1>
       {!loaderUpdate && userDetailsAll ? (
-        <Row>
-          <Col lg="8">
+        <Row >
+          <Col lg="8" className="account-setting-left">
             <Card className="cards-dark mb-32">
               <Card.Body>
                 <Card.Title as="h2">Account Information</Card.Title>
@@ -582,7 +582,7 @@ export const AccountSetting = () => {
                   </div>
                 </Form>
 
-                <Card.Title as="h2" className="mb-3 mt-2">
+                <Card.Title as="h2" className="security-title">
                   Security
                 </Card.Title>
                 <div className="security-details">
@@ -601,7 +601,7 @@ export const AccountSetting = () => {
             </Card>
             <GoogleAuth />
           </Col>
-          <Col lg="4">
+          <Col lg="4" className="account-setting-right">
             <VerifiedInfo />
           </Col>
           

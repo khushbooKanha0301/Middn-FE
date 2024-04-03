@@ -48,7 +48,7 @@ function EscrowDetailLoader() {
                     <p className="text-white mb-0">MID</p>
                   </div>
                   <div className="country-select">
-                    <div class="form-select form-select-sm" />
+                    <div className="form-select form-select-sm" />
                   </div>
                 </div>
               </Form.Group>
@@ -72,7 +72,7 @@ function EscrowDetailLoader() {
                   </div> */}
 
                   <div className="country-select">
-                    <div class="form-select form-select-sm" />
+                    <div className="form-select form-select-sm" />
                   </div>
                 </div>
               </Form.Group>
@@ -81,8 +81,8 @@ function EscrowDetailLoader() {
           <Row>
             <Col lg="12">
               <div className="d-flex main-limit mb-3">
-                <div class="limit-txt">Limit: </div>
-                <div class="limit-txt-right">3MID</div>
+                <div className="limit-txt">Limit: </div>
+                <div className="limit-txt-right">3MID</div>
               </div>
 
               <div className="d-flex main-limit mb-2">
@@ -94,29 +94,29 @@ function EscrowDetailLoader() {
               </div>
 
               <div className="d-flex main-limit">
-                <div class="limit-txt-right">Amount to transfer to Middn </div>
-                <div class="limit-txt-left-amount">105,02 BNB</div>
+                <div className="limit-txt-right">Amount to transfer to Middn </div>
+                <div className="limit-txt-left-amount">105,02 BNB</div>
               </div>
 
               <div className="d-flex main-limit">
-                <div class="limit-txt-right">Invoice Amount</div>
-                <div class="limit-txt-left">105,00 BNB</div>
+                <div className="limit-txt-right">Invoice Amount</div>
+                <div className="limit-txt-left">105,00 BNB</div>
               </div>
 
               <div className="d-flex main-limit">
-                <div class="limit-txt-right">Escrow fees </div>
-                <div class="limit-txt-left">0,02 BNB</div>
+                <div className="limit-txt-right">Escrow fees </div>
+                <div className="limit-txt-left">0,02 BNB</div>
               </div>
 
               <div className="d-flex main-limit">
-                <div class="limit-txt-right">Total</div>
-                <div class="limit-txt-left">105,02 BNB</div>
+                <div className="limit-txt-right">Total</div>
+                <div className="limit-txt-left">105,02 BNB</div>
               </div>
               <div className="d-flex main-limit">
                 <Form.Group className="custom-input-seller">
                   <div className="form-check">
                     <div className={`form-check-input`} />
-                    <label class="form-check-label" for="vehicle1">
+                    <label className="form-check-label" for="vehicle1">
                       I agree to Middin's escrow terms and conditions.
                     </label>
                   </div>
@@ -198,28 +198,28 @@ function EscrowDetailLoader() {
             <Card.Body>
               <Card.Title as="h2">Summary</Card.Title>
               <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Price</span>
-                <strong class="summery-txt">15.4905468 ETH</strong>
+                <span className="summery-txt-left">Price</span>
+                <strong className="summery-txt">15.4905468 ETH</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Limit</span>
-                <strong class="summery-txt">0.1-0.6 MID</strong>
+                <span className="summery-txt-left">Limit</span>
+                <strong className="summery-txt">0.1-0.6 MID</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Payment methods</span>
-                <strong class="summery-txt">Ethereum</strong>
+                <span className="summery-txt-left">Payment methods</span>
+                <strong className="summery-txt">Ethereum</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Network</span>
-                <strong class="summery-txt"> Binance Smart Chain</strong>
+                <span className="summery-txt-left">Network</span>
+                <strong className="summery-txt"> Binance Smart Chain</strong>
               </div>
 
               <div className="d-flex justify-content-between align-items-center buyerDetails">
-                <span class="summery-txt-left">Time constraints</span>
-                <strong class="summery-txt">09:00 AM - 00:00 AM</strong>
+                <span className="summery-txt-left">Time constraints</span>
+                <strong className="summery-txt">09:00 AM - 00:00 AM</strong>
               </div>
             </Card.Body>
           </Card>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { userDetails, userGetFullDetails } from "../store/slices/AuthSlice";
 
+
 import { onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -12,13 +13,16 @@ import { firebaseMessagesEscrow } from "./../helper/configEscrow";
 import { hideAddress } from "../utils";
 import LoginView from "../component/Login";
 import {
-  BellIcon,
+  // BellIcon,
   LogoutIcon,
   NotificationIcon,
   SettingIcon,
   UserIcon,
 } from "./SVGIcon";
 import { HeaderLoader } from "./HeaderLoader";
+import Logo from "../../src/content/images/logo.png";
+import MassageIcon from "../../src/content/images/massage.png";
+import BellIcon from "../../src/content/images/bell.png";
 
 export const Header = (props) => {
   const dispatch = useDispatch();
@@ -86,12 +90,15 @@ export const Header = (props) => {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const unreadCount = Object.values(snapshot.val())
-          .filter((e) => {
+          const unreadCount = Object.values(snapshot.val()).filter((e) => {
             return Object.keys(e).some((element) => {
               const ReciverId = element.split("_")[0];
               const name = acAddress?.account;
-              return ReciverId === name && e[element]?.unreadcount && e[element]?.unreadcount[name] > 0;
+              return (
+                ReciverId === name &&
+                e[element]?.unreadcount &&
+                e[element]?.unreadcount[name] > 0
+              );
             });
           });
           setNotificationCount(unreadCount.length);
@@ -136,34 +143,44 @@ export const Header = (props) => {
     <div className={`header d-flex ${cls}`}>
       <Navbar.Toggle
         onClick={props.clickHandler}
+        style={{paddingLeft: "14px"}}
         className="d-block d-md-none"
         aria-controls="basic-navbar-nav"
       />
+      <a class="menu-hide navbar-brand" href="/">
+        <img src={Logo} alt="Logo" />
+      </a>
       <Nav className="ms-auto" as="ul">
         {acAddress?.authToken ? (
           <>
             {messageCount > 0 ? (
               <Nav.Item as="li" className="items">
                 <Nav.Link as={Link} to="/chat">
-                  <NotificationIcon width="26" height="24" />
-                    <span className="notification-badge">{messageCount}</span>
+                  {/* <NotificationIcon width="26" height="24" /> */}
+                  <img src={MassageIcon} alt="MassageIcon" />
+                  <span className="notification-badge">{messageCount}</span>
                 </Nav.Link>
               </Nav.Item>
-            ) :  
+            ) : (
               <Nav.Item as="li">
                 <Nav.Link as={Link} to="/chat">
-                  <NotificationIcon width="26" height="24" />
+                  <img src={MassageIcon} alt="MassageIcon" />
+
+                  {/* <NotificationIcon width="26" height="24" /> */}
                   {messageCount > 0 && (
                     <span className="notification-badge">{messageCount}</span>
                   )}
                 </Nav.Link>
               </Nav.Item>
-            }
+            )}
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/notification">
-                <BellIcon width="20" height="22" />
+                {/* <BellIcon width="20" height="22" /> */}
+                <img src={BellIcon} alt="BellIcon" />
                 {notificationCount > 0 && (
-                  <span className="notification-badge">{notificationCount}</span>
+                  <span className="notification-badge">
+                    {notificationCount}
+                  </span>
                 )}
               </Nav.Link>
             </Nav.Item>
@@ -172,7 +189,9 @@ export const Header = (props) => {
           <>
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/chat" onClick={handleLinkClick}>
-                <NotificationIcon width="26" height="24" />
+                {/* <NotificationIcon width="26" height="24" /> */}
+                
+                <img src={MassageIcon} alt="MassageIcon" />
               </Nav.Link>
               {modalShow && (
                 <LoginView
@@ -184,10 +203,12 @@ export const Header = (props) => {
               )}
             </Nav.Item>
             <Nav.Item as="li">
-              <Nav.Link as={Link} 
-              to={acAddress.authToken && "/notification"}
-              onClick={handleNotificationClick}>
-                <BellIcon width="20" height="22" />
+              <Nav.Link
+                as={Link}
+                to={acAddress.authToken && "/notification"}
+                onClick={handleNotificationClick}
+              >
+               <img src={BellIcon} alt="BellIcon" />
               </Nav.Link>
               {modalNotifyShow && (
                 <LoginView
@@ -220,15 +241,15 @@ export const Header = (props) => {
         userDetailsAll?.is_2FA_login_verified === true &&
         acAddress.account == userDetailsAll.wallet_address ? (
           <NavDropdown
+            className="dropdownProfile"
             as="li"
             title={
               <img
                 className="rounded-circle"
-                style={{ width: "48px", height: "48px" }}
                 src={
                   usergetdata?.imageUrl
                     ? usergetdata?.imageUrl
-                    : require("../content/images/avatar.png")
+                    : require("../content/images/avatar1.png")
                 }
                 alt="No Profile"
               />
