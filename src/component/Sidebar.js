@@ -71,7 +71,7 @@ export const Sidebar = (props) => {
     setTimeout(() => {
       if (divSize === height) {
         setUserDisplayCount(userDisplayCal);
-        setUserList(escrows.filter((item, index) => index < userDisplayCount));
+        setUserList(escrows.slice(0, userDisplayCal));
       }
     }, 500);
   };
@@ -85,6 +85,7 @@ export const Sidebar = (props) => {
         );
         setEscrow(res.data?.data);
         handleMouseMove();
+        setUserList(res.data?.data.slice(0, 2));
       }
     } catch (err) {
       console.error(err);
@@ -112,13 +113,10 @@ export const Sidebar = (props) => {
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
-    //const intervalId = setInterval(handleMouseMove,  10000);
-
     return () => {
       window.removeEventListener("resize", handleResize);
-      //clearInterval(intervalId);
     };
-  }, [acAddress]);
+  }, [acAddress, userList]);
 
   const loadMoreData = () => {
     setUserList(escrows);
@@ -292,6 +290,7 @@ export const Sidebar = (props) => {
               <span className="menu-hide">Create Escrow</span>
             </Button>
           )}
+           <div className="divider"></div>
         </PerfectScrollbar>
       </div>
       <Card className="cards-dark menu-hide">

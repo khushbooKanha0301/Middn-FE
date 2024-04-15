@@ -590,13 +590,11 @@ export const LoginView = (props) => {
                         />
                         <label className="form-check-label">
                           <>
-                            <span>
-                              <img
-                                src={require("../content/images/metamask.png")}
-                                alt="Metamask"
-                              />{" "}
-                              Metamask
-                            </span>
+                            <img
+                              src={require("../content/images/metamask.png")}
+                              alt="Metamask"
+                            />{" "}
+                            Metamask
                           </>
                         </label>
                       </div>
@@ -631,13 +629,11 @@ export const LoginView = (props) => {
                         />
                         <label className="form-check-label">
                           <>
-                            <span>
-                              <img
-                                src={require("../content/images/coinbase-wallet.png")}
-                                alt="Coinbase Wallet"
-                              />{" "}
-                              Coinbase Wallet
-                            </span>
+                            <img
+                              src={require("../content/images/coinbase-wallet.png")}
+                              alt="Coinbase Wallet"
+                            />{" "}
+                            Coinbase Wallet
                           </>
                         </label>
                       </div>
@@ -671,13 +667,11 @@ export const LoginView = (props) => {
                         />
                         <label className="form-check-label">
                           <>
-                            <span>
-                              <img
-                                src={require("../content/images/fortmatic.png")}
-                                alt="Fortmatic"
-                              />{" "}
-                              Fortmatic
-                            </span>
+                            <img
+                              src={require("../content/images/fortmatic.png")}
+                              alt="Fortmatic"
+                            />{" "}
+                            Fortmatic
                           </>
                         </label>
                       </div>

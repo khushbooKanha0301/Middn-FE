@@ -147,7 +147,7 @@ export const Header = (props) => {
         className="d-block d-md-none"
         aria-controls="basic-navbar-nav"
       />
-      <a class="menu-hide navbar-brand" href="/">
+      <a className="menu-hide navbar-brand" href="/">
         <img src={Logo} alt="Logo" />
       </a>
       <Nav className="ms-auto" as="ul">

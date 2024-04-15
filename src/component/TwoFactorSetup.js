@@ -110,12 +110,11 @@ const TwoFactorSetup = (props) => {
             }
           })
           .catch((error) => {
-            if(typeof error == "string")
-            {
+            if (typeof error == "string") {
               dispatch(notificationFail(error));
-            }else if(error?.response?.data?.message){
+            } else if (error?.response?.data?.message) {
               dispatch(notificationFail(error?.response?.data?.message));
-            }else{
+            } else {
               dispatch(notificationFail("Something Went Wrong"));
             }
           });

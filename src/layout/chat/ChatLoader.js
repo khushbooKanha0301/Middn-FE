@@ -45,7 +45,7 @@ const ChatLoader = () => {
               <p className="text-white">{}</p>
             </div>
             <div className="chat-box-list chat-box-placeholder red">
-              <div className="my-2">
+              {/* <div className="my-2">
                 <div className="right">
                   <Placeholder
                     as="p"
@@ -65,8 +65,8 @@ const ChatLoader = () => {
                     <Placeholder className="left-chat" />
                   </Placeholder>
                 </div>
-              </div>
-              <div className="my-2">
+              </div> */}
+              {/* <div className="my-2">
                 <div className="right">
                   <Placeholder
                     as="p"
@@ -86,8 +86,8 @@ const ChatLoader = () => {
                     <Placeholder className="left-chat" />
                   </Placeholder>
                 </div>
-              </div>
-              <div className="my-2">
+              </div> */}
+              {/* <div className="my-2">
                 <div className="right">
                   <Placeholder
                     as="p"
@@ -107,7 +107,7 @@ const ChatLoader = () => {
                     <Placeholder className="left-chat" />
                   </Placeholder>
                 </div>
-              </div>
+              </div> */}
             </div>
           </Card.Body>
         </Card>

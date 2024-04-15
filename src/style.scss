@@ -5,6 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@500&display=swap');
 @import '@sweetalert2/theme-dark/dark.scss';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 $new-breakpoints: (
     xxl:1366px
 );
@@ -739,6 +743,10 @@ body {
     }
 }
 
+.react-datepicker__year-dropdown {
+    border: none !important;
+}
+
 .sales {
     background-color: $cards-bg;
 
@@ -763,7 +771,7 @@ body {
             flex-wrap: wrap;
 
             @include media-breakpoint-down(md) {
-                margin-bottom: 15px;
+                margin-bottom: 28.2px;
             }
 
             .item {
@@ -1078,7 +1086,9 @@ body {
             margin-right: 16px;
             border-radius: 50%;
             @include gradient(263.76deg, $green-lite, $green-medium);
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .load-arrow {
@@ -1263,6 +1273,7 @@ body {
 
             .nav-link {
                 padding: 0;
+                position: relative;
             }
 
             svg {
@@ -1307,7 +1318,8 @@ body {
                 line-height: 16px;
                 font-weight: 500;
                 margin-left: 6px;
-                top: -15px;
+                top: -8px;
+                position: absolute;
                 font-size: 12px;
 
                 @include media-breakpoint-down(md) {
@@ -1382,7 +1394,12 @@ body {
         }
     }
 }
-
+.close-sidebar .sidebar .nav-title {
+    text-align: center;
+}
+.close-sidebar .sidebar .navbar-toggler .navbar-toggler-icon {
+    margin-right: 0px;
+}
 .mb-32 {
     margin-bottom: 16px;
 
@@ -1411,7 +1428,7 @@ body {
         border: none;
         box-shadow: none;
         padding: 0;
-        font-size: 18px;
+        font-size: 15px;
         line-height: 37px;
         color: #808191;
         border-radius: 0;
@@ -1504,6 +1521,9 @@ body {
         padding-top: 0;
 
         .react-datepicker {
+
+            margin-left: -30px !important;
+
             &__triangle {
                 display: none;
             }
@@ -1644,6 +1664,7 @@ body {
             line-height: 40px;
             letter-spacing: -1px;
         }
+
         @include media-breakpoint-down(lg) {
             margin-bottom: 10px;
         }
@@ -1735,6 +1756,7 @@ body {
     .security-details {
         display: flex;
         justify-content: space-between;
+        padding: 0 5px;
 
         .security-text {
             position: relative;
@@ -1805,6 +1827,7 @@ body {
                     @media screen and (max-width: 767px) {
                         max-width: 280px;
                     }
+
                     @media screen and (max-width: 1199px) {
                         max-width: 280px;
                     }
@@ -2953,6 +2976,7 @@ body {
                 font-size: 11px;
                 line-height: 10px;
                 width: 174px;
+                margin-top: 0;
 
                 @include media-breakpoint-up(md) {
                     // width: 185px;
@@ -2961,6 +2985,7 @@ body {
                     line-height: 20px;
             
                 }
+
                 @include media-breakpoint-down(sm) {
                     margin: 0;
                     // max-width: 210px;
@@ -3114,6 +3139,20 @@ body {
 
         @include media-breakpoint-down(md) {
             margin: 32px 0;
+
+            .Toastify__toast-container {
+                top: 15%;
+                width: 100%;
+                max-width: 300px;
+
+                .Toastify__toast {
+                    min-height: 50px;
+                    padding: 0 10px;
+                    border-radius: 18px;
+                }
+            }
+
+
 
             .nav-item {
                 width: 50%;
@@ -3395,6 +3434,7 @@ body {
                         transform: unset !important;
                         right: 0 !important;
                         left: auto !important;
+                        margin-right: 0;
 
                         &::before {
                             content: '';
@@ -3620,7 +3660,7 @@ body {
                     
                     p {
                         @include media-breakpoint-down(lg) {
-                        margin-top: 5px;
+                            margin-top: 5px;
                         }
                     }
                 }
@@ -3630,6 +3670,7 @@ body {
                     background-color: $cards-footer;
                     padding: 32px;
                     position: relative;
+                    padding-right: 0px !important;
 
                     &.chat-box-placeholder {
                         @include media-breakpoint-up(lg) {
@@ -3756,10 +3797,11 @@ body {
                         }
 
                         .scrollbar-container {
-                            padding-right: 20px;
+                            padding-right: 28px;
 
                             @include media-breakpoint-up(lg) {
-                                padding-right: 40px;
+                                padding-right: 20px;
+                                margin-right: 5px;
                             }
                         }
 
@@ -5433,9 +5475,9 @@ body {
                 padding-right: 10px;
             }
 
-            @include media-breakpoint-down(md) {
-                margin-bottom: 80px;
-            }
+            // @include media-breakpoint-down(md) {
+            //     margin-bottom: 80px;
+            // }
         }
 
         &>div {
@@ -6774,7 +6816,7 @@ body {
 
             &.Createescrow {
                 @include media-breakpoint-down(md) {
-                    margin: 0px;
+                    margin: 0px auto;
                     padding: 24px;
                 }
 
@@ -7273,69 +7315,6 @@ aside.EmojiPickerReact.epr-main {
 }
 
 
-//skelton loader styles
-
-.profile-skeleton-container {
-    width: 100% !important;
-}
-
-.profile-img-placeholder {
-    height: 90px;
-    width: 90px;
-    border-radius: 50%;
-
-}
-
-.profile-title {
-    height: 60px;
-    width: 100% !important;
-}
-
-.profile-subtitle {
-    height: 24px;
-    width: 47%;
-}
-
-.profile-text {
-    width: 100%;
-    height: 48px;
-    margin-top: 18px;
-}
-
-.skeleton {
-    background-color: #36373a !important;
-}
-
-.skelton-button {
-    width: 48%;
-    margin-top: 25px;
-    height: 60px;
-    background-color: #858788;
-    border-radius: 10px;
-}
-
-.social-media-skeleton {
-    margin-top: 86px;
-
-    .socials-skeleton {
-        height: 34px;
-        width: 34px;
-        border-radius: 10px;
-        margin-right: 10px;
-    }
-}
-
-.profile-info-skeleton-container {
-    .profile-info-skeleton {
-        height: 16px;
-        width: 100%;
-
-        &+.profile-info-skeleton {
-            margin-top: 24px;
-        }
-    }
-}
-
 .account-setting-skeleton {
     .inp-row {
         .col {
@@ -7440,18 +7419,6 @@ aside.EmojiPickerReact.epr-main {
     border-radius: 4px 20px 20px 20px;
 }
 
-.skelton-button {
-    width: 159.82px;
-    margin-top: 20px;
-    height: 56px;
-    background-color: #858788;
-    border-radius: 16px;
-
-    &+.skelton-button {
-        width: 164.32px;
-        margin-left: 15px;
-    }
-}
 
 .no-notification {
     color: gray !important;
@@ -7502,7 +7469,8 @@ aside.EmojiPickerReact.epr-main {
 
 .qrcode {
     height: 200px !important;
-    width: 200px !important
+    width: 200px !important;
+    margin: 0 auto 20px;
 }
 
 .digit-input {
@@ -7537,6 +7505,7 @@ aside.EmojiPickerReact.epr-main {
     color: #1e1f24 !important;
     border-radius: 16px;
     font-weight: 700;
+
     @include media-breakpoint-down(sm) {
         width: 100% !important;
     }
@@ -7798,6 +7767,15 @@ aside.EmojiPickerReact.epr-main {
     }
 }
 
+.deactiveBtn.btn:first-child:active,
+.deactiveBtn.btn:hover {
+    background: transparent linear-gradient(263.76deg, #7FFC8D -28.53%, #C6FA56 140.05%);
+}
+
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
 @include media-breakpoint-down(md) {
     .designCheapDetails {
         border-bottom: none;
@@ -7867,8 +7845,12 @@ aside.EmojiPickerReact.epr-main {
     }
 
     .default-active-keys .select-dropdown {
-        margin-left: 0px;
-        margin-right: 16px;
+        display: block;
+        margin: 0px 0 15px 0 !important;
+    }
+
+    .default-active-keys .select-dropdown:last-child {
+        margin-bottom: 0px !important;
     }
 }
 
@@ -7876,25 +7858,36 @@ aside.EmojiPickerReact.epr-main {
     .account-setting-right {
         order: 0;
     }
+
     .account-setting-left {
-        order:1;
+        order: 1;
     }
+
     .account-setting .cards-dark {
         margin-top: 20px;
     }
 }
 
 @media screen and (max-width: 767px) {
-   
+    .kyc-verification.card {
+        button {
+            font-size: 13px;
+            padding: 12px 10px;
+        }
+    }
+
     .account-setting .cards-dark {
         margin-top: 20px;
     }
+
     .account-setting-right {
         order: 0;
     }
+
     .account-setting-left {
-        order:1;
+        order: 1;
     }
+
     .table-pagination {
         flex-wrap: wrap;
         flex-direction: column-reverse;
@@ -7962,7 +7955,9 @@ aside.EmojiPickerReact.epr-main {
 // }
 
 .table-pagination {
-    margin-top: 40px;
+    margin-top: 20px;
+    overflow: auto;
+    padding-bottom: 20px;
 
     .pagination {
         margin-bottom: 0;
@@ -8351,6 +8346,10 @@ aside.EmojiPickerReact.epr-main {
     @include media-breakpoint-up(md) {
         width: 185px;
     }
+}
+
+.mobile-setting-dropdown {
+    width: 250px;
 }
 
 .statisticBox ul.options {
@@ -8787,6 +8786,7 @@ aside.EmojiPickerReact.epr-main {
     @include media-breakpoint-down(md) {
         padding: 16px 0 0 0px;
     }
+
     @include media-breakpoint-down(lg) {
         padding: 0px 0 0 0px;
     }
@@ -8859,6 +8859,7 @@ aside.EmojiPickerReact.epr-main {
 
 .open-sidebar .navbar-toggler .navbar-toggler-icon {
     background-image: url("../src/content/images/right-arrow.png");
+    margin-right: 0px;
 }
 
 .navbar-toggler-icon {
@@ -8867,7 +8868,7 @@ aside.EmojiPickerReact.epr-main {
     height: 40px;
     display: inline-block;
     vertical-align: top;
-    margin-right: 10px;
+    margin-right: 20px;
 }
 
 .rounded-circle {
@@ -8881,9 +8882,10 @@ aside.EmojiPickerReact.epr-main {
 }
 
 .dropdownProfile {
-    padding-right: 14px !important;
-    @include media-breakpoint-down(xl) {
-        padding-right: 0px;
+    padding-right: 0px !important;
+
+    @include media-breakpoint-down(md) {
+        padding-right: 10px !important;
     }
 
 }
@@ -8916,6 +8918,7 @@ aside.EmojiPickerReact.epr-main {
     margin-bottom: 0px;
     font-size: 20px;
     display: flex;
+    align-items: center;
 
     @include media-breakpoint-down(lg) {
         padding-left: 10px;
@@ -8928,13 +8931,18 @@ aside.EmojiPickerReact.epr-main {
     margin-bottom: 10px;
 }
 
+.chat-view .cards-dark.chat-box .card-body .chat-box-drop{
+    padding-right: 1.7rem !important;
+}
+
 .chat-view .cards-dark.chat-box .card-body p,
 .chat-view .cards-dark.chat-box .card-body ul {
     margin: 0px;
 }
 
-.chat-send-btn-icon{
+.chat-send-btn-icon {
     display: none;
+
     @media screen and (max-width:767px) {
         display: block;
     }
@@ -8942,5 +8950,602 @@ aside.EmojiPickerReact.epr-main {
 .chat-send-btn{
     @media screen and (max-width:767px) {
         display: none;
-    } 
+    }
+}
+
+img.rectangle-data {
+    width: 20px;
+    height: 17px;
+    margin-right: 10px;
+    float: left;
+
+    &+p.text-white {
+        font-size: 16px;
+        line-height: 24px;
+    }
+}
+
+
+.phone-number-dropdown {
+    .dropdown-menu-inner {
+        display: flex;
+        background: #202127;
+        margin-bottom: 10px;
+        padding: 0 10px;
+        align-items: center;
+        border-radius: 20px;
+    }
+
+    .filter-option {
+        height: 322px;
+        overflow: auto;
+
+        .yourself-option {
+            position: relative;
+
+            .check-input {
+                position: absolute;
+                margin: 0;
+                background: #34363E;
+                background-repeat: no-repeat;
+                background-position: center;
+                width: 18px;
+                height: 18px;
+                border: none;
+                box-shadow: none;
+                top: 13px;
+                right: 20px;
+                border-radius: 50%;
+
+            }
+        }
+
+
+        .form-check {
+            height: 42px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            margin-right: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+
+            .form-check-label {
+                color: #fff;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 170px;
+                overflow: hidden;
+                // display: flex;
+                font-weight: unset;
+                font-family: 'eudoxus sans';
+                font-size: 16px;
+            }
+
+            input {
+                position: absolute;
+                right: 21px;
+                background: transparent;
+                border: none;
+                z-index: 9999;
+                border-radius: 50%;
+                top: 10px;
+
+                &:focus {
+                    box-shadow: none;
+                }
+            }
+        }
+
+
+        &::-webkit-scrollbar {
+            width: 12px;
+            border-radius: 18px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #2F313E;
+            border-radius: 18px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(263.76deg, #7FFC8D -28.53%, #C6FA56 140.05%);
+            border-radius: 18px;
+        }
+    }
+
+    svg {
+        fill: white;
+        width: 12px;
+        position: absolute;
+        right: 14px;
+        top: 42px;
+    }
+
+    .dropdown-menu {
+        border-radius: 8px;
+        background-color: #1E1F24;
+        padding: 10px;
+        width: 100%;
+        transform: translate(0%, 25%) !important;
+        // top: 198% !important;
+    }
+}
+
+.account-setting-dropdown {
+    .dropdown-toggle {
+        color: #fff;
+        font-weight: unset;
+        background: none;
+        height: 100%;
+
+        &:first-child:active {
+            background-color: transparent;
+        }
+
+        &::after {
+            border: none;
+        }
+    }
+}
+
+.phone-number-dropdown .edit-btn {
+    margin-bottom: 5px !important;
+}
+
+#drawer-swipe {
+    border-radius: 8px;
+    background-color: #1E1F24 !important;
+    padding: 10px;
+}
+
+.mobile-setting-dropdown-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    position: fixed;
+}
+
+.phone-number-dropdown .filter-option .yourself-option .check-input.selected {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB2aWV3Qm94PSIwIDAgOCA4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8Y2lyY2xlIGN4PSI0IiBjeT0iNCIgcj0iNCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzFfNTY4MSkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8xXzU2ODEiIHgxPSIxMC41MzI0IiB5MT0iLTguOTgzNDZlLTA3IiB4Mj0iLTQuMjUyNTUiIHkyPSIxLjYxNjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM3RkZDOEQiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzZGQTU2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==);
+}
+
+.bg-gray {
+    background-color: #373A43 !important;
+}
+
+.react-datepicker__header__dropdown {
+
+    .react-datepicker__month-select,
+    .react-datepicker__year-select {
+        background: #48484859;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+
+        option {
+            background: #24262c;
+        }
+
+        &:focus {
+            border: none;
+            box-shadow: none;
+            border-radius: 5px;
+        }
+    }
+}
+
+.react-datepicker__month-select {
+    position: relative;
+}
+
+.react-datepicker__month-dropdown-container--select:before,
+.react-datepicker__year-dropdown-container--select:before {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 2px 2px 0 0;
+    content: "";
+    display: block;
+    height: 7px;
+    position: absolute;
+    top: 11px;
+    width: 7px;
+    transform: rotate(136deg);
+    right: 6px;
+}
+
+.react-datepicker__month-dropdown-container--select,
+.react-datepicker__year-dropdown-container--select {
+    position: relative;
+}
+
+.card-body .form-group {
+    position: relative;
+}
+
+.account-setting-dropdown {
+    position: unset;
+}
+
+.phone-number-dropdown {
+    position: unset;
+}
+
+
+#drawer-swipe {
+    border-radius: 8px;
+    background-color: #1E1F24 !important;
+
+    .drawer-swipe-wrapper {
+        position: relative;
+        padding: 40px 10px 10px;
+
+        .drawer-swiper {
+            position: absolute;
+            content: "";
+            width: 59px;
+            height: 8px;
+            top: 16px;
+            left: 50%;
+            border-radius: 10px;
+            background: #40434F;
+            transform: translateX(-50%);
+        }
+    }
+
+}
+
+.mobile-setting-dropdown-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    position: fixed;
+}
+
+.phone-number-dropdown .filter-option .yourself-option .check-input.selected {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB2aWV3Qm94PSIwIDAgOCA4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8Y2lyY2xlIGN4PSI0IiBjeT0iNCIgcj0iNCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzFfNTY4MSkiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl8xXzU2ODEiIHgxPSIxMC41MzI0IiB5MT0iLTguOTgzNDZlLTA3IiB4Mj0iLTQuMjUyNTUiIHkyPSIxLjYxNjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM3RkZDOEQiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjQzZGQTU2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==);
+}
+
+.bg-gray {
+    background-color: #373A43 !important;
+}
+
+.react-datepicker__header__dropdown {
+
+    .react-datepicker__month-select,
+    .react-datepicker__year-select {
+        background: #48484859;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+
+        option {
+            background: #24262c;
+        }
+
+        &:focus {
+            border: none;
+            box-shadow: none;
+            border-radius: 5px;
+        }
+    }
+}
+
+.react-datepicker__month-select {
+    position: relative;
+}
+
+.react-datepicker__month-dropdown-container--select:before,
+.react-datepicker__year-dropdown-container--select:before {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 2px 2px 0 0;
+    content: "";
+    display: block;
+    height: 7px;
+    position: absolute;
+    top: 11px;
+    width: 7px;
+    transform: rotate(136deg);
+    right: 6px;
+}
+
+.react-datepicker__month-dropdown-container--select,
+.react-datepicker__year-dropdown-container--select {
+    position: relative;
+}
+
+.card-body .form-group {
+    position: relative;
+}
+
+.account-setting-dropdown {
+    position: unset;
+}
+
+.phone-number-dropdown {
+    position: unset;
+}
+
+.chat-view {
+    .cards-dark {
+        .card-body {
+            padding: 20px;
+
+            .chat-list {
+                .scrollbar-container {
+                    padding: 0px;
+                }
+
+                .card-title {
+                    padding-left: 0px;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    .phone-number-dropdown .filter-option .form-check .form-check-label {
+        width: 120px;
+        font-size: 13px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .filter-btn .nav-item .nav-link {
+        width: 100%;
+        min-width: 100px;
+    }
+
+    .default-active-keys .filter-btn.nav {
+        flex-wrap: nowrap;
+    }
+
+    .default-active-keys .filter-btn.nav .nav-item {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .chat-view .cards-dark.chat-box .card-body>div {
+        padding-right: 16px !important;
+    }
+
+    .default-active-keys .filter-btn.nav li a {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .phone-number-dropdown svg {
+        top: 10px;
+        right: -5px;
+    }
+
+    .chat-view .cards-dark .back-button {
+        width: 30px;
+        height: 30px;
+        padding: 0px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .notification-view {
+        .notification-list {
+            .btn-action-group {
+                display: flex;
+
+                .btn {
+                    width: 40px;
+                    height: 40px;
+
+                    svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+.chat-view {
+    .cards-dark {
+        .card-body {
+            padding: 20px;
+
+            .chat-list {
+                .scrollbar-container {
+                    padding: 0px;
+                }
+
+                .card-title {
+                    padding-left: 0px;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    .phone-number-dropdown .filter-option .form-check .form-check-label {
+        width: 120px;
+        font-size: 13px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .filter-btn .nav-item .nav-link {
+        width: 100%;
+        min-width: 100px;
+    }
+
+    .default-active-keys .filter-btn.nav {
+        flex-wrap: nowrap;
+    }
+
+
+
+    .default-active-keys .filter-btn.nav .nav-item {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .chat-view .cards-dark.chat-box .card-body>div {
+        padding-right: 16px !important;
+    }
+
+    .open-sidebar .dropdownMenu {
+        width: 208px;
+        left: -48% !important;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .default-active-keys .filter-btn.nav li a {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+
+
+//skelton loader styles
+@media screen and (max-width: 767px) {
+    .profile-img-placeholder{
+        height: 75px !important;
+        width: 75px !important;
+    }
+    .profiles{
+        margin-left:0;
+    }
+    .profile-name {
+        margin-top: 17px !important;
+    }
+    .profile-title {
+        height: 25px !important;
+        width: 70% !important;
+    }
+    .profile-subtitle1 {
+        width: 90% !important;
+    }
+}
+
+.profile-skeleton-container {
+    width: 100% !important;
+}
+
+.profile-img-placeholder {
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+
+}
+.profiles{
+    width: 100%;
+    margin-left:20px;
+}
+.profile-name {
+    display: flex;
+    width: 100%;
+    margin-top: 30px;
+    justify-content: space-between;
+    
+}
+
+.skeleton-profile-btn{
+    margin-left: 120px;
+    @media screen and (max-width: 1200px) {
+        margin-left: 0;
+    }
+   
+}
+.loader-profile{
+    margin-bottom: 25px;
+}
+.profile-title {
+    height: 60px;
+    width: 30%;
+}
+
+.profile-subtitle1 {
+    height: 24px;
+    width: 43%;
+}
+
+.profile-text {
+    width: 100%;
+    height: 48px;
+    margin-top: 18px;
+}
+
+.skeleton {
+    background-color: #36373a !important;
+}
+
+.skeleton-button-left {
+    margin-left: 15px;
+}
+
+.social-media-skeleton {
+    margin-top: 60px;
+    margin-left: 120px;
+
+    @media screen and (max-width: 1200px) {
+        margin-top: 46px;
+        margin-left: 0;
+    }
+    
+    .socials-skeleton {
+        height: 34px;
+        width: 34px;
+        border-radius: 10px;
+        margin-right: 10px;
+    }
+}
+
+.skelton-btn {
+    margin-top: 42px;
+    background-color: #858788;
+    border-radius: 16px;
+    height: 58px;
+    padding: 18px 24px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 10px;
+    width: 174px;
+
+    @include media-breakpoint-down(sm) {
+        margin-top: 32px;
+        width: 154px;
+        height: 45px;
+    }
+}
+
+.profile-info-skeleton-container {
+    .profile-info-skeleton {
+        height: 16px;
+        width: 100%;
+
+        &+.profile-info-skeleton {
+            margin-top: 24px;
+        }
+    }
 }

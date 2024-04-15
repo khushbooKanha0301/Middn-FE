@@ -1,10 +1,15 @@
 import Picker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
-import { Nav , NavDropdown } from "react-bootstrap";
+import { Nav, NavDropdown } from "react-bootstrap";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import { IoIosCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { BackArrow, LinkSimpleIcon, SmileyIcon, SimpleDotedIcon } from "../../component/SVGIcon";
+import {
+  BackArrow,
+  LinkSimpleIcon,
+  SmileyIcon,
+  SimpleDotedIcon,
+} from "../../component/SVGIcon";
 import { userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import ChatLoader from "./ChatLoader";
@@ -13,12 +18,13 @@ import { converImageToBase64, sendMessage } from "../../helper/firebaseConfig";
 import MessageList from "./MessageList";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import UserList from "./UserList";
-import { notificationFail } from "../../store/slices/notificationSlice";
+import { notificationFail, notificationSuccess } from "../../store/slices/notificationSlice";
 import ReportUserView from "../../component/ReportUser";
 import jwtAxios from "../../service/jwtAxios";
 
 export const Chat = () => {
   const [user, setUser] = useState("");
+ console.log("user ", user);
   const userDetailsAll = useSelector(userGetFullDetails);
   const [messages, setMessages] = useState([]);
   const [showSmily, setShowSmily] = useState(false);
@@ -30,11 +36,10 @@ export const Chat = () => {
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
  console.log("receiverData ", receiverData);
-  (receiverData?.id !== null) ? console.log("ok") : console.log("hello")
   const [ReciverId, setReciverId] = useState(null);
   const [reportModelOpen, setReportModelOpen] = useState(false);
-  const [reportModelData, setReportModelData] = useState({ id: null, status: null });
-  
+  const [reportModelData, setReportModelData] = useState(null);
+
   let scrollBottom = document.getElementById("scrollBottom");
 
   useEffect(() => {
@@ -45,12 +50,12 @@ export const Chat = () => {
   useEffect(() => {
     if (ReciverId) {
       setMessageText("");
-      setUser(receiverData)
+      setUser(receiverData);
     }
   }, [ReciverId]);
 
   useEffect(() => {
-    dispatch(setIsChatPage({ user : user , isChatOpen: true}));
+    dispatch(setIsChatPage({ user: user, isChatOpen: true }));
   }, [user]);
   
   const smilyOpen = () => {
@@ -210,57 +215,87 @@ export const Chat = () => {
       ) {
         try {
           const reqData = {
-            report_from_user_address: userDetailsAll?.wallet_address,
-            report_to_user_address: receiverData?.id
-          }
-          const result = await jwtAxios.post(`/users/getUserStatusToMessage`, reqData);
- 
-          if (result?.data?.reportUser) {
-             
-              sendMessage(
-                result?.data?.reportUser?.userStatus,
-                messageText,
-                userDetailsAll?.wallet_address,
-                receiverData?.id,
-                messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
-                file
-              );
-              // e.target.elements.content.value = "";
-              setMessageFile("");
-              setMessageText("");
+            block_from_user_address: userDetailsAll?.wallet_address,
+            block_to_user_address: receiverData?.id,
+          };
+          const result = await jwtAxios.post(
+            `/users/getUserStatusToMessage`,
+            reqData
+          );
 
+          if (result?.data?.reportUser) {
+            sendMessage(
+              result?.data?.reportUser?.userStatus,
+              messageText,
+              userDetailsAll?.wallet_address,
+              receiverData?.id,
+              messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
+              file
+            );
+            // e.target.elements.content.value = "";
+            setMessageFile("");
+            setMessageText("");
           } else {
-              dispatch(notificationFail("Something went wrong"));
-              return null; // Return null or some other default value
+            dispatch(notificationFail("Something went wrong"));
+            return null; // Return null or some other default value
           }
-      } catch (error) {
+        } catch (error) {
           console.error("Error fetching user status:", error);
           dispatch(notificationFail("Error fetching user status"));
           return null; // Return null or some other default value
+        }
       }
-      } 
     }
-  }
-
-  const modalToggle =(id, status) => {
-    setReportModelOpen(!reportModelOpen);
-    setReportModelData({ id, status });
   };
+
+  const modalToggle = (id) => {
+    setReportModelOpen(!reportModelOpen);
+    setReportModelData(id);
+  };
+
+  const userBlockedCheck = async (id, status) => {
+    const reqData = {
+      to_block_user: id,
+      userStatus: status === "Block" ? true : false
+    };
+    await jwtAxios
+      .post(`/users/userBlockStatus`, reqData)
+      .then((result) => {
+        if (result) {
+          setUser(prevData => ({
+            ...prevData,
+            userStatus: result?.data?.blockUser?.userStatus
+          }));
+          dispatch(notificationSuccess(result?.data?.message));
+        }
+      })
+      .catch((error) => {
+        if (typeof error == "string") {
+          dispatch(notificationFail(error));
+        }
+        if (error?.response?.data?.message === "") {
+          dispatch(notificationFail("Invalid "));
+        }
+        if (error?.response?.data?.message) {
+          dispatch(notificationFail(error?.response?.data?.message));
+        }
+      });
+  } 
 
   return (
     <div className="chat-view">
       {loader ? (
-        <ChatLoader/>
+        <ChatLoader />
       ) : (
         <Row>
           <UserList setLoader={setLoader} setReciverId={setReciverId} />
           <Col
             lg="8"
-            className={`${receiverData?.id  ? "show-mobile" : "hide-mobile"}`}
+            className={`${receiverData?.id ? "show-mobile" : "hide-mobile"}`}
           >
             <Card className="cards-dark chat-box">
               <Card.Body>
-                <div className="d-flex items-center justify-content-between pe-4">
+                <div className="d-flex items-center justify-content-between chat-box-drop">
                   <Card.Title as="h2">
                     <Button
                       variant="primary"
@@ -272,41 +307,44 @@ export const Chat = () => {
                     </Button>
                     <p>Messages</p>
                   </Card.Title>
-                  {receiverData ? 
-                  <>
-                    {(user?.userStatus || receiverData?.userStatus) ? 
+                  {receiverData ? (
                     <>
                       <Nav as="ul">
                         <NavDropdown
                           as="li"
-                          title={
-                            <SimpleDotedIcon width="20" height="20" />
-                          }
+                          title={<SimpleDotedIcon width="20" height="20" />}
                           id="nav-dropdown"
                         >
-                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Unblock")}>
-                          UnBlock user
+                          {user?.userStatus || receiverData?.userStatus ? (
+                            <NavDropdown.Item
+                              onClick={() =>
+                                userBlockedCheck(receiverData?.id, "Unblock")
+                              }
+                            >
+                              Unblock User
+                            </NavDropdown.Item>
+                          ) : (
+                            <NavDropdown.Item
+                              onClick={() =>
+                                userBlockedCheck(receiverData?.id, "Block")
+                              }
+                            >
+                              Block User
+                            </NavDropdown.Item>
+                          )}
+
+                          <NavDropdown.Item
+                            onClick={() =>
+                              modalToggle(receiverData?.id)
+                            }
+                          >
+                            Report User
                           </NavDropdown.Item>
                         </NavDropdown>
                       </Nav>
-                    </> : 
-                    <>
-                      <Nav as="ul">
-                        <NavDropdown
-                          as="li"
-                          title={
-                            <SimpleDotedIcon width="20" height="20" />
-                          }
-                          id="nav-dropdown"
-                        >
-                          <NavDropdown.Item onClick={() => modalToggle(receiverData?.id, "Block")}>
-                          Block user
-                          </NavDropdown.Item>
-                        </NavDropdown>
-                      </Nav>
-                    </>}
-                  </>
-                  : null}
+                    </>
+                  ) : null}
+
                 </div>
                 <div className="chat-box-list">
                   <ul>
@@ -413,10 +451,8 @@ export const Chat = () => {
       <ReportUserView
         show={reportModelOpen}
         onHide={() => setReportModelOpen(false)}
-        id={reportModelData.id}
-        status={reportModelData.status}
-        setUser={setUser}
-      /> 
+        id={reportModelData}
+      />
     </div>
   );
 };

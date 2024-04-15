@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, Form, Button, Placeholder } from "react-bootstrap";
 import {
-  SecurityIcon
-} from "../../component/SVGIcon";
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Placeholder,
+  Dropdown,
+  FormControl,
+} from "react-bootstrap";
+import { SecurityIcon } from "../../component/SVGIcon";
 import ChangePasswordView from "../../component/ChangePassword";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +28,7 @@ import {
 } from "../../store/slices/countrySettingSlice";
 import GoogleAuth from "./googleAuth";
 import VerifiedInfo from "./verifiedInfo";
+import Search from "../../content/images/search.svg";
 
 export const AccountSetting = () => {
   const dispatch = useDispatch();
@@ -47,32 +55,47 @@ export const AccountSetting = () => {
   const countryDropdownRef = useRef(null);
   const optionsDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [openDr, setOpenDr] = useState(true);
 
-  const handleGlobalClick = (event) => {
-    // Close dropdowns if the click is outside of them
-    if (
-      countryDropdownRef.current &&
-      !countryDropdownRef.current.contains(event.target) &&
-      optionsDropdownRef.current &&
-      !optionsDropdownRef.current.contains(event.target) &&
-      locationDropdownRef.current &&
-      !locationDropdownRef.current.contains(event.target)
-    ) {
-      setShowCurrencyOptions(false);
-      setShowCountryOptions(false);
-      setShowOptions(false);
-    }
-  };
-
+  // const handleGlobalClick = (event) => {
+  //   if (
+  //     countryDropdownRef.current &&
+  //     !countryDropdownRef.current.contains(event.target) &&
+  //     optionsDropdownRef.current &&
+  //     !optionsDropdownRef.current.contains(event.target) &&
+  //     locationDropdownRef.current &&
+  //     !locationDropdownRef.current.contains(event.target)
+  //   ) {
+  //     setShowCurrencyOptions(false);
+  //     setShowCountryOptions(false);
+  //     setShowOptions(false);
+  //   }
+  // };
   useEffect(() => {
-    // Add global click event listener
-    document.addEventListener("click", handleGlobalClick);
-
-    // Remove the event listener when the component unmounts
-    return () => {
-      document.removeEventListener("click", handleGlobalClick);
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mobileMatch.matches);
     };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const handlePhoneNumberMobile = (option) => {
+    setSelectedOption(option);
+    const imageUrl = phoneCountryData(option.code);
+    setImageUrl(imageUrl);
+    setOpenDr(true);
+  };
+  // useEffect(() => {
+  //   document.addEventListener("click", handleGlobalClick);
+
+  //   // Remove the event listener when the component unmounts
+  //   return () => {
+  //     document.removeEventListener("click", handleGlobalClick);
+  //   };
+  // }, []);
 
   countryInfo.sort(function (a, b) {
     var textA = a.currency.code.toUpperCase();
@@ -89,7 +112,6 @@ export const AccountSetting = () => {
       setEmail(user?.email ? user?.email : "");
       setCity(user?.city ? user?.city : "");
     }
-
     if (user?.currentpre) {
       setCurrentPre(user?.currentpre);
     } else {
@@ -194,6 +216,7 @@ export const AccountSetting = () => {
       }
     }
   };
+
   const onChange = (e) => {
     if (e.target.name === "fname") {
       setFname(e.target.value);
@@ -211,8 +234,13 @@ export const AccountSetting = () => {
     }
   };
 
-  const phoneCountry = () => {
-    const result = listData.find((item) => item?.code === countryCallingCode);
+  // const phoneCountry = () => {
+  //   const result = listData.find((item) => item?.code === countryCallingCode);
+  //   return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
+  // };
+
+  const phoneCountryData = (code) => {
+    const result = listData.find((item) => item?.code === code);
     return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
   };
 
@@ -233,38 +261,91 @@ export const AccountSetting = () => {
     );
     return result?.currency.name;
   };
+
   useEffect(() => {
     setIs2FAEnabled(userData?.is_2FA_enabled);
   }, [userData?.is_2FA_enabled]);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  // const openModal = () => {
+  //   setIsModalOpen(true);
+  // };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-  const toggleOptions = () => {
-    setShowOptions(!showOptions);
-    setShowCountryOptions(false);
-    setShowCurrencyOptions(false);
-  };
+  // const closeModal = () => {
+  //   setIsModalOpen(false);
+  // };
+
+  // const toggleOptions = () => {
+  //   setShowOptions(!showOptions);
+  //   setShowCountryOptions(false);
+  //   setShowCurrencyOptions(false);
+  // };
+
   const toggleCountryOptions = () => {
     setShowCountryOptions(!showCountryOptions);
     setShowOptions(false);
     setShowCurrencyOptions(false);
   };
+
   const toggleCurrencyOptions = () => {
     setShowCurrencyOptions(!showCurrencyOptions);
     setShowOptions(false);
     setShowCountryOptions(false);
   };
 
+  const [selectedOption, setSelectedOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
+  const [searchText, setSearchText] = useState("United States ( +1)");
+  const [filteredOptions, setFilteredOptions] = useState(listData);
+  const [searchTextOrigin, setSearchTextOrigin] = useState(null);
+  const [imageUrlSet, setImageUrl] = useState("https://flagcdn.com/h40/us.png");
+
+  const handleCheckboxChange = (option) => {
+    setSelectedOption(option === selectedOption ? null : option);
+    const imageUrl = phoneCountryData(option.code);
+    setImageUrl(imageUrl);
+    setSearchText(`${option.country} (${option.code})`);
+    console.log("option.code: ", option.code);
+    console.log("option.country: ", option.country);
+    setSearchTextOrigin(option);
+  };
+
+  const handleSearchChange = (event) => {
+    if (searchTextOrigin === null) {
+      setSearchText(event.target.value);
+    } else {
+      setSearchTextOrigin(null);
+    }
+
+    const searchValue = event.target.value.toLowerCase();
+    const filteredData = listData.filter(
+      (data) =>
+        data.country.toLowerCase().includes(searchValue) ||
+        data.code.toLowerCase().includes(searchValue)
+    );
+    setFilteredOptions(filteredData);
+
+    if (searchValue === "") {
+      setSearchText(null); // Set searchText to null if searchValue is empty
+      setImageUrl(null); // Reset imageUrlSet when search text is cleared
+    }
+  };
+
+  const handleDrawer = () => {
+    setOpenDr(!openDr);
+  };
+  const handleDrawerOverlay = () => {
+    setOpenDr(true);
+  };
+
   return (
     <div className="account-setting">
       <h1>Account Setting</h1>
       {!loaderUpdate && userDetailsAll ? (
-        <Row >
+        <Row>
           <Col lg="8" className="account-setting-left">
             <Card className="cards-dark mb-32">
               <Card.Body>
@@ -324,78 +405,269 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Phone number (required)</Form.Label>
-                        <div className="d-flex align-items-center">
-                          <Form.Control
-                            placeholder={countryCallingCode}
-                            name="phone"
-                            type="text"
-                            value={phone}
-                            onChange={(e) => {
-                              onChange(e);
-                            }}
-                            maxLength="10"
-                          />
-
-                          {countryCallingCode ? (
-                            <img
-                              src={phoneCountry()}
-                              alt="Flag"
-                              className="circle-data"
-                            />
-                          ) : (
-                            "No Flag"
-                          )}
-
-                          <div
-                            className="country-select"
-                            ref={locationDropdownRef}
-                          >
-                            {/* <Form.Select
-                              size="sm"
-                              onChange={(e) => {
-                                setCountryCallingCode(e.target.value);
-                                dispatch(definePhoneCode(e.target.value));
-                              }}
-                              value={countryCallingCode}
-                            >
-                              {listData.map((data) => (
-                                <option
-                                  value={`${data?.code}`}
-                                  key={`${data?.code}_${data?.country}}`}
-                                >
-                                  {data?.country} ({data?.code})
-                                </option>
-                              ))}
-                            </Form.Select> */}
-
-                            <div
-                              className="dropdownPersonalData form-select form-select-sm"
-                              onClick={toggleOptions}
-                            >
-                              <p className="text-white mb-0">
-                                {
-                                  listData.find(
-                                    (item) => item?.code === countryCallingCode
-                                  )?.cca3
-                                }
-                              </p>
-                            </div>
-                            {showOptions && (
-                              <ul className="options">
-                                {listData.map((data, key) => (
-                                  <li
-                                    key={`${data?.code}_${data?.country}}`}
-                                    onClick={() => {
-                                      setCountryCallingCode(data?.code);
-                                      dispatch(definePhoneCode(data?.code));
-                                    }}
+                        <div className="d-flex items-center phone-number-dropdown justify-between relative">
+                          {!isMobile && (
+                            <>
+                              <Form.Control
+                                placeholder={countryCallingCode}
+                                name="phone"
+                                type="text"
+                                value={selectedOption?.code}
+                                onChange={(e) => {
+                                  onChange(e);
+                                }}
+                                maxLength="10"
+                              />
+                              {countryCallingCode ? (
+                                <img
+                                  src={imageUrlSet}
+                                  alt="Flag"
+                                  className="circle-data"
+                                />
+                              ) : (
+                                "No Flag"
+                              )}
+                              <Dropdown className="account-setting-dropdown">
+                                <Dropdown.Toggle>
+                                  {selectedOption?.country}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 448 512"
                                   >
-                                    {data?.country} ({data?.code})
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
+                                    <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
+                                  </svg>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu className="dropdownMenu">
+                                  <div className="dropdown-menu-inner">
+                                    {searchText && imageUrlSet ? (
+                                      <img
+                                        src={imageUrlSet}
+                                        alt="Flag"
+                                        className="rectangle-data"
+                                      />
+                                    ) : null}
+
+                                    <FormControl
+                                      type="text"
+                                      placeholder="Search..."
+                                      className="mr-3 mb-2"
+                                      value={searchText}
+                                      onChange={handleSearchChange}
+                                    />
+                                    <img
+                                      src={Search}
+                                      alt=""
+                                      className="search-icon"
+                                    />
+                                  </div>
+                                  <div className="filter-option">
+                                    {filteredOptions.map((data, key) => (
+                                      <div className="yourself-option">
+                                        <Form.Check
+                                          key={`${data.code}_${data.country}`}
+                                          type="checkbox"
+                                          id={`checkbox-${data.code}`}
+                                          label={
+                                            <>
+                                              <img
+                                                src={phoneCountryData(
+                                                  data.code
+                                                )}
+                                                alt="Flag"
+                                                className="rectangle-data"
+                                              />
+                                              {data.country} ({data.code})
+                                            </>
+                                          }
+                                          checked={selectedOption === data}
+                                          onChange={() =>
+                                            handleCheckboxChange(data)
+                                          }
+                                        />
+
+                                        <div
+                                          className={`form-check-input check-input ${
+                                            JSON.stringify(selectedOption) ===
+                                            JSON.stringify(data)
+                                              ? "selected"
+                                              : ""
+                                          }`}
+                                        />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </Dropdown.Menu>
+                              </Dropdown>
+                            </>
+                          )}
+                          {isMobile && (
+                            <>
+                              <Form.Control
+                                placeholder={countryCallingCode}
+                                name="phone"
+                                type="text"
+                                value={selectedOption?.code}
+                                onChange={(e) => {
+                                  onChange(e);
+                                }}
+                                maxLength="10"
+                                className="md:w-auto w-full"
+                              />
+
+                              <div className="text-center relative mobile-setting-dropdown flex items-center">
+                                {countryCallingCode ? (
+                                  <img
+                                    src={imageUrlSet}
+                                    alt="Flag"
+                                    className="circle-data"
+                                  />
+                                ) : (
+                                  "No Flag"
+                                )}
+                                <button
+                                  className="text-white font-medium rounded-lg text-sm"
+                                  type="button"
+                                  data-drawer-target="drawer-swipe"
+                                  data-drawer-show="drawer-swipe"
+                                  data-drawer-placement="bottom"
+                                  data-drawer-edge="true"
+                                  data-drawer-edge-offset="bottom-[60px]"
+                                  aria-controls="drawer-swipe"
+                                  onClick={handleDrawer}
+                                >
+                                  <p className="text-white mb-0 personalDataLocation">
+                                    {selectedOption?.country}
+                                  </p>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 448 512"
+                                  >
+                                    <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
+                                  </svg>
+                                </button>
+                                <div
+                                  className={
+                                    !openDr
+                                      ? "mobile-setting-dropdown-overlay"
+                                      : ""
+                                  }
+                                  onClick={handleDrawerOverlay}
+                                ></div>
+                                <div
+                                  id="drawer-swipe"
+                                  className={`fixed  z-40 w-full overflow-y-auto bg-white  rounded-t-lg dark:bg-gray-800 transition-transform bottom-0 left-0 right-0 ${
+                                    openDr ? "translate-y-full" : ""
+                                  } bottom-[60px]`}
+                                  tabindex="-1"
+                                  aria-labelledby="drawer-swipe-label"
+                                >
+                                  <div className="drawer-swipe-wrapper">
+                                    <div
+                                      className="drawer-swiper"
+                                      onClick={handleDrawerOverlay}
+                                    />
+                                    <div className="dropdown-menu-inner">
+                                      {searchText && imageUrlSet ? (
+                                        <img
+                                          src={imageUrlSet}
+                                          alt="Flag"
+                                          className="rectangle-data"
+                                        />
+                                      ) : null}
+
+                                      <FormControl
+                                        type="text"
+                                        placeholder="Search..."
+                                        className="mr-3 mb-2"
+                                        value={searchText}
+                                        onChange={handleSearchChange}
+                                      />
+                                      <img
+                                        src={Search}
+                                        alt=""
+                                        className="search-icon"
+                                      />
+                                    </div>
+                                    <div className="filter-option">
+                                      {filteredOptions.map((data, key) => (
+                                        <div
+                                          className={`yourself-option ${
+                                            selectedOption === data
+                                              ? "selected"
+                                              : ""
+                                          }`}
+                                        >
+                                          <Form.Check
+                                            key={`${data.code}_${data.country}`}
+                                            type="checkbox"
+                                            id={`checkbox-${data.code}`}
+                                            label={
+                                              <>
+                                                <img
+                                                  src={phoneCountryData(
+                                                    data.code
+                                                  )}
+                                                  alt="Flag"
+                                                  className="rectangle-data"
+                                                />
+                                                {data.country} ({data.code})
+                                              </>
+                                            }
+                                            //checked={selectedOption === data}
+                                            onChange={() =>
+                                              handleCheckboxChange(data)
+                                            }
+                                          />
+
+                                          <div
+                                            className={`form-check-input check-input ${
+                                              JSON.stringify(selectedOption) ===
+                                              JSON.stringify(data)
+                                                ? "selected"
+                                                : ""
+                                            }`}
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className="edit-btn flex justify-center">
+                                      {selectedOption ? (
+                                        <>
+                                          <button
+                                            type="button"
+                                            class="btn btn-primary mx-1"
+                                            onClick={() =>
+                                              handlePhoneNumberMobile(
+                                                selectedOption
+                                              )
+                                            }
+                                          >
+                                            Save
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <button
+                                            type="button"
+                                            class="btn btn-primary mx-1"
+                                          >
+                                            Save
+                                          </button>
+                                        </>
+                                      )}
+                                      <button
+                                        type="button"
+                                        class="btn mx-1 bg-gray text-white"
+                                        onClick={handleDrawerOverlay}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </Form.Group>
                     </Col>
@@ -404,7 +676,7 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Location</Form.Label>
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center justify-between">
                           <Form.Control
                             placeholder={"City"}
                             name="city"
@@ -413,7 +685,6 @@ export const AccountSetting = () => {
                               onChange(e);
                             }}
                           />
-
                           {country ? (
                             <img
                               src={countryName()}
@@ -604,7 +875,6 @@ export const AccountSetting = () => {
           <Col lg="4" className="account-setting-right">
             <VerifiedInfo />
           </Col>
-          
         </Row>
       ) : (
         <Row className="account-setting-skeleton">

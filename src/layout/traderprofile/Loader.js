@@ -4,35 +4,35 @@ import { Col, Row, Placeholder, Card } from "react-bootstrap";
 
 export const ProfileLoader = () => {
   return (
-   <Row className="g-0">
-        <Col style={{ maxWidth: "345px", width: "100%" }}>
+    <>
+    <div class="loader-profile">
+      <Row className="g-0">
+        <Col xs="2" style={{ maxWidth: "100px", width: "100%" }}>
           <Placeholder as="div" animation="wave" className="profile-loader">
             <Placeholder xs="6" className="profile-img-placeholder skeleton" />
-            <Box sx={{ width: "100%" ,marginLeft:"20px"}}>
-              <Placeholder className="profile-title skeleton" />
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  marginTop: "14px",
-                }}
-              >
-                <Placeholder className="profile-subtitle skeleton" />
-                <Placeholder className="profile-subtitle skeleton" />
-              </div>
-            </Box>
           </Placeholder>
-          <Placeholder animation="wave" style={{ display: "block" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Placeholder className="skelton-button skeleton" />
-              <Placeholder className="skelton-button skeleton" />
+        </Col>
+        <Col >
+          <Box className="profiles">
+            <Placeholder className="profile-title skeleton" />
+              <div
+                className="profile-name"
+              >
+                <Placeholder className="profile-subtitle1 skeleton" />
+                {/* <Placeholder className="profile-subtitle2 skeleton" /> */}
+              </div>
+          </Box>
+        </Col>
+      </Row>
+      <Row className="g-0">
+        <Col >
+          <Placeholder animation="wave" style={{display: "block"}}>
+            <div className="skeleton-profile-btn">
+              <Placeholder className="skelton-btn skelton-button skeleton" />
+              <Placeholder className="skelton-btn skeleton-button-left skeleton" />
             </div>
             <div
               className="social-media-skeleton"
-              style={{
-                marginTop: "100px",
-              }}
             >
               <Placeholder className="socials-skeleton skeleton" />
               <Placeholder className="socials-skeleton skeleton" />
@@ -41,6 +41,8 @@ export const ProfileLoader = () => {
           </Placeholder>
         </Col>
       </Row>
+    </div>  
+    </>
   );
 };
 

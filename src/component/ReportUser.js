@@ -10,7 +10,7 @@ import { userGetFullDetails } from "../store/slices/AuthSlice";
 import { Box } from "@mui/material";
 
 export const ReportUserView = (props) => {
-  const { id, status , setUser} = props;
+  const { id} = props;
   const [reason, setReason] = useState(null);
   const dispatch = useDispatch();
   const userData = useSelector(userGetFullDetails);
@@ -36,17 +36,12 @@ export const ReportUserView = (props) => {
       const reqData = {
         report_from_user_address: userData?.wallet_address,
         to_report_user: id,
-        userStatus: status === "Block" ? true : false,
         reason,
       };
       await jwtAxios
         .post(`/users/reportUser`, reqData)
         .then((result) => {
           if (result) {
-            setUser(prevData => ({
-              ...prevData,
-              userStatus: result?.data?.reportUser?.userStatus
-            }));
             dispatch(notificationSuccess(result?.data?.message));
             props.onHide();
           }
@@ -65,6 +60,7 @@ export const ReportUserView = (props) => {
         });
     }
   };
+
   return (
     <Modal
       {...props}
@@ -109,11 +105,11 @@ export const ReportUserView = (props) => {
               <Form.Label className="mb-1">Other reason</Form.Label>
               <div
                 className="document-issued form-check"
-                onClick={() => verifiedWith("Other")}
+                onClick={() => verifiedWith("")}
               >
                 <div
                   className={`form-check-input ${
-                    reason === "Other" ? "checked" : ""
+                    reason === "" ? "checked" : ""
                   }`}
                 />
                 <Form.Control
@@ -122,7 +118,7 @@ export const ReportUserView = (props) => {
                   name="reason"
                   placeholder="Other reason"
                   onChange={(e) => setReason(e.target.value)}
-                  value={reason === "Other reason" ? "" : reason}
+                  //value={reason === "" ? "" : reason}
                 />
               </div>
             </Box>

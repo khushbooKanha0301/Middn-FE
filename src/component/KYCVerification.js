@@ -24,7 +24,6 @@ import { CalenderIcon } from "./SVGIcon";
 import { forwardRef } from "react";
 import * as flatted from "flatted";
 
-
 export const KYCVerification = (props) => {
   const { setkycsubmitted, ...rest } = props;
   const dispatch = useDispatch();
@@ -56,14 +55,14 @@ export const KYCVerification = (props) => {
 
   const countryDropdownRef = useRef(null);
   const optionsDropdownRef = useRef(null);
-  
+
   const handleGlobalClick = (event) => {
     // Close dropdowns if the click is outside of them
     if (
       countryDropdownRef.current &&
       !countryDropdownRef.current.contains(event.target) &&
       optionsDropdownRef.current &&
-      !optionsDropdownRef.current.contains(event.target) 
+      !optionsDropdownRef.current.contains(event.target)
     ) {
       setShowCountryOptions(false);
       setShowOptions(false);
@@ -72,11 +71,11 @@ export const KYCVerification = (props) => {
 
   useEffect(() => {
     // Add global click event listener
-    document.addEventListener('click', handleGlobalClick);
+    document.addEventListener("click", handleGlobalClick);
 
     // Remove the event listener when the component unmounts
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
 
@@ -323,7 +322,7 @@ export const KYCVerification = (props) => {
 
   const nationalityData = () => {
     const result = listData.find((item) => item?.country === nationality);
-    return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;   
+    return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
   };
 
   const CountyOfIssueData = () => {
@@ -379,8 +378,8 @@ export const KYCVerification = (props) => {
   };
   const handleSelectedCountryClick = (value) => {
     setCountryOfIssue(value);
-    setShowCountryOptions(false)
-  }
+    setShowCountryOptions(false);
+  };
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -393,7 +392,7 @@ export const KYCVerification = (props) => {
 
   return (
     <Modal
-      {...rest}      
+      {...rest}
       dialogClassName="login-modal kyc-verify-model"
       backdropClassName="login-modal-backdrop"
       aria-labelledby="contained-modal"
@@ -467,12 +466,13 @@ export const KYCVerification = (props) => {
                   ) : (
                     "No Flag"
                   )}
-                  <div className="country-select" ref={optionsDropdownRef}> 
+                  <div className="country-select" ref={optionsDropdownRef}>
                     <div
                       className="country-select-dropdown form-select form-select-sm kyc-margin"
                       onClick={toggleOptions}
                     >
-                      {listData.find((data) => data?.country === nationality)?.cca3 || ""}
+                      {listData.find((data) => data?.country === nationality)
+                        ?.cca3 || ""}
                     </div>
                     {showOptions && (
                       <ul className="options">
@@ -536,17 +536,20 @@ export const KYCVerification = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Date of birth</Form.Label>
+
                     <DatePicker
                       selected={dob}
                       onChange={(date) => setDob(date)}
                       className="form-control"
                       placeholderText="DD/MM/YYYY"
-                      dateFormat="dd/MM/yyyy"
                       name="dob"
                       maxDate={new Date()}
                       customInput={<DatepickerCustomInput />}
                       disabled={userDetailsAll?.dob ? true : false}
-                    />
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                   />
                   </Form.Group>
                 </Col>
               </Row>
@@ -624,7 +627,9 @@ export const KYCVerification = (props) => {
                       className="country-select-dropdown form-select form-select-sm kyc-margin"
                       onClick={toggleCountryOptions}
                     >
-                      {listData.find((data) => data?.country === country_of_issue)?.cca3 || ""}
+                      {listData.find(
+                        (data) => data?.country === country_of_issue
+                      )?.cca3 || ""}
                     </div>
                     {showCountryOptions && (
                       <ul className="options">
@@ -649,7 +654,7 @@ export const KYCVerification = (props) => {
                 Only the following documents listed below will be accepted, all
                 other documents will be rejected.
               </p>
-            
+
               <div
                 className="document-issued form-check"
                 onClick={() => verifiedWith("government-passport")}
@@ -740,7 +745,7 @@ export const KYCVerification = (props) => {
                   </div>
                 )}
               </Dropzone>
-              <div style={{paddingBottom:"16px"}}>
+              <div style={{ paddingBottom: "16px" }}>
                 <p className="mb-0">
                   File size must be between 10KB and 5120KB in ..jpg/.jpeg/.png
                   format.
@@ -832,65 +837,65 @@ export const KYCVerification = (props) => {
                 Please ensure that your face is centered well lit, and visible
                 when capturing the photo to avoid facial recognition errors
               </p>
-              <div style={{marginBottom:"62px"}}>
-              <div
-                className="terms-checkbox form-check"
-                onClick={() => handleCheckboxChange("terms")}
-              >
+              <div style={{ marginBottom: "62px" }}>
                 <div
-                  className={`form-check-input ${
-                    checkboxState.includes("terms") ? "checked" : ""
-                  }`}
-                />
-                <label className="form-check-label">
-                  I have read the Terms and Condition and Privacy and Policy.
-                </label>
-              </div>
-              <div
-                className="terms-checkbox form-check"
-                onClick={() => handleCheckboxChange("personal")}
-              >
+                  className="terms-checkbox form-check"
+                  onClick={() => handleCheckboxChange("terms")}
+                >
+                  <div
+                    className={`form-check-input ${
+                      checkboxState.includes("terms") ? "checked" : ""
+                    }`}
+                  />
+                  <label className="form-check-label">
+                    I have read the Terms and Condition and Privacy and Policy.
+                  </label>
+                </div>
                 <div
-                  className={`form-check-input ${
-                    checkboxState.includes("personal") ? "checked" : ""
-                  }`}
-                />
-                <label className="form-check-label">
-                  All the personal information I have entered is correct.
-                </label>
-              </div>
-              <div
-                className="terms-checkbox form-check"
-                onClick={() => handleCheckboxChange("registering")}
-              >
+                  className="terms-checkbox form-check"
+                  onClick={() => handleCheckboxChange("personal")}
+                >
+                  <div
+                    className={`form-check-input ${
+                      checkboxState.includes("personal") ? "checked" : ""
+                    }`}
+                  />
+                  <label className="form-check-label">
+                    All the personal information I have entered is correct.
+                  </label>
+                </div>
                 <div
-                  className={`form-check-input ${
-                    checkboxState.includes("registering") ? "checked" : ""
-                  }`}
-                />
-                <label className="form-check-label">
-                  I certify that, I am registering to participate in the token
-                  distribution event(s) in the capacity of an individual (and
-                  beneficial owner) and not as an agent or representative of a
-                  third party corporate entity.
-                </label>
-              </div>
+                  className="terms-checkbox form-check"
+                  onClick={() => handleCheckboxChange("registering")}
+                >
+                  <div
+                    className={`form-check-input ${
+                      checkboxState.includes("registering") ? "checked" : ""
+                    }`}
+                  />
+                  <label className="form-check-label">
+                    I certify that, I am registering to participate in the token
+                    distribution event(s) in the capacity of an individual (and
+                    beneficial owner) and not as an agent or representative of a
+                    third party corporate entity.
+                  </label>
+                </div>
 
-              <div
-                className="terms-checkbox form-check"
-                onClick={() => handleCheckboxChange("participate")}
-              >
                 <div
-                  className={`form-check-input ${
-                    checkboxState.includes("participate") ? "checked" : ""
-                  }`}
-                />
-                <label className="form-check-label">
-                  I understand that, I can participate in the token distribution
-                  event(s) only with the wallet address that was entered in the
-                  application form.
-                </label>
-              </div>
+                  className="terms-checkbox form-check"
+                  onClick={() => handleCheckboxChange("participate")}
+                >
+                  <div
+                    className={`form-check-input ${
+                      checkboxState.includes("participate") ? "checked" : ""
+                    }`}
+                  />
+                  <label className="form-check-label">
+                    I understand that, I can participate in the token
+                    distribution event(s) only with the wallet address that was
+                    entered in the application form.
+                  </label>
+                </div>
               </div>
             </>
           )}
@@ -899,7 +904,7 @@ export const KYCVerification = (props) => {
               <h5 className="mb-4">Verification Under Review</h5>
               <div className="verification-under-row">
                 <p className="mb-0">
-                  Verification Under Review{" "}
+                  Review expected to be completed:{" "}
                   <strong>{currentDate(new Date())}</strong>
                 </p>
               </div>

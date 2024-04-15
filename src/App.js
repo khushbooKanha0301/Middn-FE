@@ -50,7 +50,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["37.168.149.133", "106.200.212.38"]; 
+  const allowedIPs = ["124.122.187.159", "103.239.146.251", "182.77.117.231"];
 
   const fetchIPAddress = async () => {
     try {
@@ -121,7 +121,6 @@ export const App = () => {
               lastActive: Date.now(),
               isOnline: 1,
             });
-
           }
         });
       };
@@ -171,7 +170,7 @@ export const App = () => {
           if (isMoreThan30Minutes) {
             updateOffline();
           }
-          
+
           // 15 min
           const timeWindowAbsent = 15 * 60 * 1000;
           const isMoreThan5Minutes = timeDifference > timeWindowAbsent;
@@ -227,7 +226,8 @@ export const App = () => {
 
   useEffect(() => {
     if (acAddress?.userid) {
-      var childKey = firebaseMessagesActive.Middn_USERS + "/" + acAddress?.userid;
+      var childKey =
+        firebaseMessagesActive.Middn_USERS + "/" + acAddress?.userid;
       const setReciverReadCountNode = ref(database, childKey);
       onValue(setReciverReadCountNode, (snapshot) => {
         if (snapshot && snapshot.val() && localStorage.getItem("token")) {
@@ -240,11 +240,10 @@ export const App = () => {
     }
   }, [acAddress?.userid]);
 
-
   if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (
       <div>
-        <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : ""}`}>
+        <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : "close-sidebar"}`}>
           <ToastContainer />
           <SnackBar />
           <Sidebar
@@ -253,7 +252,9 @@ export const App = () => {
             setIsOpen={setIsOpen}
             isResponsive={isResponsive}
           />
-          <div className="wrapper">
+          <div
+            className={`wrapper ${isOpen ? "open-sidebar" : "close-sidebar"}`}
+          >
             <Header
               clickHandler={sidebarToggle}
               clickModalHandler={modalToggle}
@@ -353,7 +354,7 @@ export const App = () => {
       </div>
     );
   } else if (error) {
-    return <h1 class="accessMsg">{error.message}</h1>;
+    return <h1 className="accessMsg">{error.message}</h1>;
   }
 };
 

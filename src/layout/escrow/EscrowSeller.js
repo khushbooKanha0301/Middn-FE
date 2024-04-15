@@ -391,7 +391,9 @@ export const EscrowSeller = (props) => {
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center buyerBottomLast">
-                      <span className="card-txt-left">Buyer release address</span>
+                      <span className="card-txt-left">
+                        Buyer release address
+                      </span>
                       <strong className="card-txt">0x...asd22A</strong>
                     </div>
                   </div>
@@ -425,8 +427,8 @@ export const EscrowSeller = (props) => {
                         escrowType === "buyer" ? "checked" : ""
                       }`}
                     />
-                    <span class="card-txt-left">Buyer to make payment</span>
-                    <p className="seller-p"><strong class="card-txt">1 BTC</strong></p>
+                    <span className="card-txt-left">Buyer to make payment</span>
+                    <p className="seller-p"><strong className="card-txt">1 BTC</strong></p>
                   </div>
                   </Form.Group>
                   <Form.Group className="custom-input-seller">
@@ -438,8 +440,8 @@ export const EscrowSeller = (props) => {
                         escrowFund === "fund" ? "checked" : ""
                       }`}
                     />
-                    <span class="card-txt-left">The funds is locked in Middn</span>
-                    <p className="seller-p"><strong class="card-txt">1 BTC</strong></p>
+                    <span className="card-txt-left">The funds is locked in Middn</span>
+                    <p className="seller-p"><strong className="card-txt">1 BTC</strong></p>
                   </div>
                   </Form.Group>
                   <Form.Group className="custom-input-seller">
@@ -451,13 +453,13 @@ export const EscrowSeller = (props) => {
                         escrowCompleted === "completed" ? "checked" : ""
                       }`}
                     />
-                    <span class="card-txt-left">Check for Payment</span>
-                    <p className="seller-p"><strong class="card-txt">Completed</strong></p>
+                    <span className="card-txt-left">Check for Payment</span>
+                    <p className="seller-p"><strong className="card-txt">Completed</strong></p>
                   </div>
                   </Form.Group>
 
                   <div className="chat-box-btn">
-                    <button type="button" class="btn btn-primary escrowBtn">
+                    <button type="button" className="btn btn-primary escrowBtn">
                       Pay
                     </button>
                   </div>

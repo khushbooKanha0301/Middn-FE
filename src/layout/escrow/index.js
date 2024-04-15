@@ -13,14 +13,14 @@ import { database } from "../../helper/config";
 import { firebaseStatus } from "../../helper/statusManage";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import FilterImage from "../../content/images/filter.png";
 
 let PageSize = 5;
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
-
 const data = [
   {
     value: 1,
@@ -84,31 +84,32 @@ export const Escrow = () => {
   const [modalShow, setModalShow] = useState(false);
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [userStatuses, setUserStatuses] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState("All");
   const [isComponentMounted, setIsComponentMounted] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   const getAllEscrow = async () => {
     if (currentPage) {
-     try {
+      try {
         setUserStatuses([]);
         let res;
         if (acAddress.authToken) {
           res = await jwtAxios.get(
-            `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}&userAddress=${userData?.account}&statusFilter=${
-              statusFilter ? statusFilter : 'All'}`
+            `/auth/getAllEscrows?page=${currentPage}&pageSize=${PageSize}&userAddress=${
+              userData?.account
+            }&statusFilter=${statusFilter ? statusFilter : "All"}`
           );
-        
         } else {
           res = await jwtAxios.get(
             `/auth/getAllEscrowsWithoutLogin?page=${currentPage}&pageSize=${PageSize}&statusFilter=${
-              statusFilter ? statusFilter : 'All'}`
+              statusFilter ? statusFilter : "All"
+            }`
           );
         }
-    
         setEscrow(res.data?.data); // Update the state with the new array
         setTotalEscrowCount(res.data?.escrowsCount);
         setEscrowLoading(false);
-
         let statuses = await Promise.all(
           res.data?.data.map(async (e) => {
             const starCountRef = ref(
@@ -127,14 +128,17 @@ export const Escrow = () => {
       }
     }
   };
-
+  const filterHandle = () => {
+    setIsOpen(!isOpen);
+    console.log("!isOpen: ", !isOpen);
+  };
   useEffect(() => {
     if (isComponentMounted) {
       setCurrentPage(1);
       getAllEscrow();
     }
   }, [statusFilter, acAddress]);
-  
+
   useEffect(() => {
     getAllEscrow();
     setIsComponentMounted(true);
@@ -165,7 +169,7 @@ export const Escrow = () => {
   const onBuySellClick = async (escrow_id) => {
     if (acAddress.authToken) {
       //navigate("/escrow", { state: { id :  escrow_id } });
-      navigate(`/escrow/${escrow_id}`); 
+      navigate(`/escrow/${escrow_id}`);
     } else {
       setModalShow(true);
     }
@@ -173,8 +177,17 @@ export const Escrow = () => {
 
   const changeStatus = (status) => {
     setStatusFilter(status);
-  }
-  
+  };
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 991px)");
+      setIsMobile(mobileMatch.matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <div className="escrow-view">
       <h4>Hi Alex, Welcome back!</h4>
@@ -209,100 +222,199 @@ export const Escrow = () => {
         </Col>
       </Row>
       <div className="escrow-active-offers">
-        <h2>Active offers</h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            position: "relative",
+            marginBottom: "10px",
+          }}
+        >
+          <h2>Active offers</h2>
+          <div>
+            {isMobile && (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span
+                  style={{
+                    color: "#fff",
+                    marginRight: "10px",
+                    fontSize: "18px",
+                    fontFamily: "eudoxus sans",
+                    lineHeight: "24px",
+                  }}
+                >
+                  Filter
+                </span>
+                <img
+                  src={FilterImage}
+                  alt="FilterImage"
+                  onClick={filterHandle}
+                />
+              </div>
+            )}
+            {isMobile && isOpen && (
+              <Col
+                lg="auto default-active-keys absolute p-4 rounded-4 right-0"
+                style={{
+                  background: "#18191d",
+                  border: "1px solid #202020",
+                  top: "50px",
+                  width: "232px",
+                  zIndex: "9",
+                }}
+              >
+                <Select
+                  defaultValue={selectedOptionAny}
+                  value={selectedOptionAny}
+                  className="select-dropdown"
+                  isSearchable={false}
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  classNamePrefix="select-dropdown"
+                  options={data}
+                  onChange={handleChangeAny}
+                  getOptionLabel={(e) => (
+                    <div className="selected-dropdown">
+                      {e.icon}
+                      <span>{e.text}</span>
+                    </div>
+                  )}
+                />
+                <Select
+                  defaultValue={selectedOptionBTC}
+                  value={selectedOptionBTC}
+                  isSearchable={false}
+                  className="select-dropdown"
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  classNamePrefix="select-dropdown"
+                  options={data}
+                  onChange={handleChangeBTC}
+                  getOptionLabel={(e) => (
+                    <div className="selected-dropdown">
+                      {e.icon}
+                      <span>{e.text}</span>
+                    </div>
+                  )}
+                />
+                <Select
+                  defaultValue={selectedOptionAnywhere}
+                  value={selectedOptionAnywhere}
+                  isSearchable={false}
+                  className="select-dropdown"
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  classNamePrefix="select-dropdown"
+                  options={data}
+                  onChange={handleChangeAnywhere}
+                  getOptionLabel={(e) => (
+                    <div className="selected-dropdown">
+                      {e.icon}
+                      <span>{e.text}</span>
+                    </div>
+                  )}
+                />
+              </Col>
+            )}
+          </div>
+        </div>
         <Row className="justify-content-between align-items-center">
           <Col lg="auto default-active-keys ">
             <Nav defaultActiveKey="all" as="ul" className="filter-btn">
               <Nav.Item as="li">
                 {/* <Nav.Link eventKey="all">All</Nav.Link> */}
-               
-                <Nav.Link 
-                  as={Link} 
-                  className={statusFilter === 'All' ? "active" : ""}
-                  onClick={() => changeStatus('All')}
+                <Nav.Link
+                  as={Link}
+                  className={statusFilter === "All" ? "active" : ""}
+                  onClick={() => changeStatus("All")}
                 >
                   All
                 </Nav.Link>
-
               </Nav.Item>
               <Nav.Item as="li">
                 {/* <Nav.Link eventKey="buy">Buy</Nav.Link> */}
-                <Nav.Link 
-                as={Link} 
-                  className={statusFilter === 'Buy' ? "active" : ""}
-                  onClick={() => changeStatus('Buy')}
+                <Nav.Link
+                  as={Link}
+                  className={statusFilter === "Buy" ? "active" : ""}
+                  onClick={() => changeStatus("Buy")}
                 >
                   Buy
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item as="li">
                 {/* <Nav.Link eventKey="sell">Sell</Nav.Link> */}
-                <Nav.Link 
-                as={Link} 
-                  className={statusFilter === 'Sell' ? "active" : ""}
-                  onClick={() => changeStatus('Sell')}
+                <Nav.Link
+                  as={Link}
+                  className={statusFilter === "Sell" ? "active" : ""}
+                  onClick={() => changeStatus("Sell")}
                 >
                   Sell
                 </Nav.Link>
               </Nav.Item>
             </Nav>
           </Col>
-          <Col lg="auto default-active-keys">
-            <Select
-              defaultValue={selectedOptionAny}
-              value={selectedOptionAny}
-              className="select-dropdown"
-              isSearchable={false}
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              classNamePrefix="select-dropdown"
-              options={data}
-              onChange={handleChangeAny}
-              getOptionLabel={(e) => (
-                <div className="selected-dropdown">
-                  {e.icon}
-                  <span>{e.text}</span>
-                </div>
-              )}
-            />
-            <Select
-              defaultValue={selectedOptionBTC}
-              value={selectedOptionBTC}
-              isSearchable={false}
-              className="select-dropdown"
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              classNamePrefix="select-dropdown"
-              options={data}
-              onChange={handleChangeBTC}
-              getOptionLabel={(e) => (
-                <div className="selected-dropdown">
-                  {e.icon}
-                  <span>{e.text}</span>
-                </div>
-              )}
-            />
-            <Select
-              defaultValue={selectedOptionAnywhere}
-              value={selectedOptionAnywhere}
-              isSearchable={false}
-              className="select-dropdown"
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              classNamePrefix="select-dropdown"
-              options={data}
-              onChange={handleChangeAnywhere}
-              getOptionLabel={(e) => (
-                <div className="selected-dropdown">
-                  {e.icon}
-                  <span>{e.text}</span>
-                </div>
-              )}
-            />
-          </Col>
+          {!isMobile && (
+            <Col lg="auto default-active-keys">
+              <Select
+                defaultValue={selectedOptionAny}
+                value={selectedOptionAny}
+                className="select-dropdown"
+                isSearchable={false}
+                components={{
+                  IndicatorSeparator: () => null,
+                }}
+                classNamePrefix="select-dropdown"
+                options={data}
+                onChange={handleChangeAny}
+                getOptionLabel={(e) => (
+                  <div className="selected-dropdown">
+                    {e.icon}
+                    <span>{e.text}</span>
+                  </div>
+                )}
+              />
+              <Select
+                defaultValue={selectedOptionBTC}
+                value={selectedOptionBTC}
+                isSearchable={false}
+                className="select-dropdown"
+                components={{
+                  IndicatorSeparator: () => null,
+                }}
+                classNamePrefix="select-dropdown"
+                options={data}
+                onChange={handleChangeBTC}
+                getOptionLabel={(e) => (
+                  <div className="selected-dropdown">
+                    {e.icon}
+                    <span>{e.text}</span>
+                  </div>
+                )}
+              />
+              <Select
+                defaultValue={selectedOptionAnywhere}
+                value={selectedOptionAnywhere}
+                isSearchable={false}
+                className="select-dropdown"
+                components={{
+                  IndicatorSeparator: () => null,
+                }}
+                classNamePrefix="select-dropdown"
+                options={data}
+                onChange={handleChangeAnywhere}
+                getOptionLabel={(e) => (
+                  <div className="selected-dropdown">
+                    {e.icon}
+                    <span>{e.text}</span>
+                  </div>
+                )}
+              />
+            </Col>
+          )}
         </Row>
         <div className="table-responsive escrowList">
           <div className="flex-table">
@@ -320,9 +432,11 @@ export const Escrow = () => {
             ) : (
               <>
                 {escrows?.map((escrow, index) => (
-                 <> 
-                    <div className="flex-table-body escrowListBody"
-                    key={escrow?._id} > 
+                  <>
+                    <div
+                      className="flex-table-body escrowListBody"
+                      key={escrow?._id}
+                    >
                       {escrow && escrow?.price_type === "fixed" && (
                         <div className="escrow-price">
                           {escrow?.fixed_price} USD
@@ -358,10 +472,12 @@ export const Escrow = () => {
                                   : require("../../content/images/avatar.png")
                               }
                               alt={
-                                escrow?.newImage ? escrow?.newImage : "No Profile"
+                                escrow?.newImage
+                                  ? escrow?.newImage
+                                  : "No Profile"
                               }
                             />
-                            
+
                             {(userStatuses[index] === 1 ||
                               userStatuses[index] === true) && (
                               <div className="chat-status"></div>
@@ -376,7 +492,9 @@ export const Escrow = () => {
                           </div>
                           <div className="content ms-3 escrow-trade-content">
                             <h6>
-                              {escrow?.user_name ? escrow?.user_name : "John doe"}
+                              {escrow?.user_name
+                                ? escrow?.user_name
+                                : "John doe"}
                             </h6>
                             <span>(100%, 500+)</span>
                           </div>
@@ -393,7 +511,9 @@ export const Escrow = () => {
                               <Button variant="primary">Details</Button>
                             </Link>
                           ) : userData &&
-                          userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "buyer" ? (
+                            userData?.account !== escrow?.user_address &&
+                            escrow &&
+                            escrow?.escrow_type === "buyer" ? (
                             <Button
                               variant="primary"
                               onClick={() => {
@@ -402,7 +522,10 @@ export const Escrow = () => {
                             >
                               Sell
                             </Button>
-                          ) : userData && userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "seller"  ? (
+                          ) : userData &&
+                            userData?.account !== escrow?.user_address &&
+                            escrow &&
+                            escrow?.escrow_type === "seller" ? (
                             <Button
                               variant="primary"
                               onClick={() => {
@@ -416,7 +539,7 @@ export const Escrow = () => {
                       </div>
                       <div className="escrow-network">Binance Smart Chain</div>
                     </div>
-                 </>
+                  </>
                 ))}
                 {totalEscrowCount === 0 && escrowLoading === false && (
                   <div className="flex-table-body no-records justify-content-between">
@@ -449,13 +572,13 @@ export const Escrow = () => {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          <div className="table-info">
+          {/* <div className="table-info">
             {currentPage === 1
               ? `${totalEscrowCount > 0 ? 1 : 0}`
               : `${(currentPage - 1) * PageSize + 1}`}{" "}
             - {`${Math.min(currentPage * PageSize, totalEscrowCount)}`} of{" "}
             {totalEscrowCount}
-          </div>
+          </div> */}
         </div>
       )}
       {modalShow && (

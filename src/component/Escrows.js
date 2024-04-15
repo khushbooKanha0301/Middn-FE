@@ -2,7 +2,7 @@ import React from 'react';
 import { Col } from 'react-bootstrap';
 export const Escrows = (props) => {
     return (
-        <Col className={`${props.classlist > 1 ? 'col-fixed' : ''}`}>
+        <Col className={`${props?.classlist > 1 ? 'col-fixed' : ''}`}>
             <div className="escrows-item">
                 <div className="escrows-image">
                     <img src={props.imgsrc} alt='escrows' />

@@ -650,14 +650,14 @@ export const TraderProfile = (props) => {
                 pageSize={PageSize}
                 onPageChange={(page) => setCurrentPage(page)}
               />
-              <div className="table-info">
+              {/* <div className="table-info">
                 {currentPage === 1
                   ? `${totalActiveEscrowCount > 0 ? 1 : 0}`
                   : `${(currentPage - 1) * PageSize + 1}`}{" "}
                 -{" "}
                 {`${Math.min(currentPage * PageSize, totalActiveEscrowCount)}`}{" "}
                 of {totalActiveEscrowCount}
-              </div>
+              </div> */}
             </div>
           )}
         </Tab>
@@ -665,11 +665,11 @@ export const TraderProfile = (props) => {
         <Tab eventKey="reviews" title="Reviews">
           <div className="d-flex justify-content-between align-items-center">
             <h2>Reviews</h2>
-           <Form.Select aria-label="Newest">
+            <Form.Select aria-label="Newest">
               <option>Newest</option>
               <option value="1">Standard</option>
               <option value="2">Latter</option>
-          </Form.Select>
+            </Form.Select>
           </div>
           <div className="reviews-list">
             <Card className="cards-dark">
@@ -716,9 +716,9 @@ export const TraderProfile = (props) => {
                 </div>
                 <div className="reviewer-details">
                   <StarRating
-                      ratings={5}
-                      customIcon={<StarFillIcon width="12" height="12" />}
-                      customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
                   />
                   <div className="reviewer-name">
                     Gabriel <span>12 hours ago</span>
@@ -748,9 +748,9 @@ export const TraderProfile = (props) => {
                 </div>
                 <div className="reviewer-details">
                   <StarRating
-                      ratings={5}
-                      customIcon={<StarFillIcon width="12" height="12" />}
-                      customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
                   />
                   <div className="reviewer-name">
                     Gabriel <span>12 hours ago</span>
@@ -818,7 +818,7 @@ export const TraderProfile = (props) => {
         id={address}
         status="Unblock"
         setUser={setUser}
-      /> 
+      />
       <EditProfileView
         show={editProfileModalShow}
         onHide={() => setEditProfileModalShow(false)}
