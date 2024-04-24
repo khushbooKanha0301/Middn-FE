@@ -5,9 +5,7 @@ import {
   Card,
   Form,
   Button,
-  Placeholder,
-  Dropdown,
-  FormControl,
+  Placeholder
 } from "react-bootstrap";
 import { SecurityIcon } from "../../component/SVGIcon";
 import ChangePasswordView from "../../component/ChangePassword";
@@ -19,20 +17,18 @@ import {
   notificationFail,
   notificationSuccess,
 } from "../../store/slices/notificationSlice";
-import listData from "../../component/countryData";
 import { countryInfo } from "../../component/countryData";
-import {
-  defineCountry,
-  defineCurrency,
-  definePhoneCode,
-} from "../../store/slices/countrySettingSlice";
 import GoogleAuth from "./googleAuth";
 import VerifiedInfo from "./verifiedInfo";
-import Search from "../../content/images/search.svg";
+import SelectOptionDropdown from "../../component/SelectOptionDropdown";
+import SelectCurrencyDropdown from "../../component/SelectCurrencyDropdown";
+import SelectLocationDropdown from "../../component/SelectLocationDropdown";
+import listData from "../../component/countryData";
 
 export const AccountSetting = () => {
+  const [isMobile, setIsMobile] = useState(false);
   const dispatch = useDispatch();
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState("US");
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [fname, setFname] = useState("");
@@ -46,56 +42,63 @@ export const AccountSetting = () => {
   const userDetailsAll = useSelector(userGetFullDetails);
   const [loaderUpdate, setLoaderUpdate] = useState(true);
   const [city, setCity] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const userData = useSelector(userGetFullDetails);
+  const [currency, setCurrency] = useState("USD");
+ console.log("currency ", currency);
   const [is2FAEnabled, setIs2FAEnabled] = useState(userData?.is_2FA_enabled);
-  const [showOptions, setShowOptions] = useState(false);
-  const [showCountryOptions, setShowCountryOptions] = useState(false);
-  const [showCurrencyOptions, setShowCurrencyOptions] = useState(false);
-  const countryDropdownRef = useRef(null);
-  const optionsDropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [openDr, setOpenDr] = useState(true);
+ 
+  const [selectedOption, setSelectedOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
 
-  // const handleGlobalClick = (event) => {
-  //   if (
-  //     countryDropdownRef.current &&
-  //     !countryDropdownRef.current.contains(event.target) &&
-  //     optionsDropdownRef.current &&
-  //     !optionsDropdownRef.current.contains(event.target) &&
-  //     locationDropdownRef.current &&
-  //     !locationDropdownRef.current.contains(event.target)
-  //   ) {
-  //     setShowCurrencyOptions(false);
-  //     setShowCountryOptions(false);
-  //     setShowOptions(false);
-  //   }
-  // };
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobileMatch = window.matchMedia("(max-width: 767px)");
-      setIsMobile(mobileMatch.matches);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const [selectedLocationOption, setSelectedLocationOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
 
-  const handlePhoneNumberMobile = (option) => {
-    setSelectedOption(option);
-    const imageUrl = phoneCountryData(option.code);
-    setImageUrl(imageUrl);
-    setOpenDr(true);
+  const [imageUrlSet, setImageUrl] = useState("https://flagcdn.com/h40/us.png");
+  const [imageSearchUrlSet, setImageSearchUrl] = useState(
+  "https://flagcdn.com/h40/us.png"
+  );
+  
+  const [imageUrlLocationSet, setImageLocationUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [imageLocationSearchUrlSet, setImageLocationSearchUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [imageCurrencyUrlSet, setImageCurrencyUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [imageCurrencySearchUrlSet, setImageCurrencySearchUrl] = useState(
+    "https://flagcdn.com/h40/us.png"
+  );
+
+  const [searchText, setSearchText] = useState(
+    `${selectedOption?.country} (${selectedOption?.code})`
+  );
+
+  const [searchLocationText, setSearchLocationText] = useState(
+    `${selectedLocationOption?.country}`
+  );
+
+  const [currencyPre, setCurrencyPre] = useState("USD");
+
+  const [nationality, setNationality] = useState("United States");
+  const currencyValueChange = () => {
+    const result = countryInfo.find(
+      (item) => item.currency.code === currentPre
+    );
+    return result?.currency.name;
   };
-  // useEffect(() => {
-  //   document.addEventListener("click", handleGlobalClick);
-
-  //   // Remove the event listener when the component unmounts
-  //   return () => {
-  //     document.removeEventListener("click", handleGlobalClick);
-  //   };
-  // }, []);
 
   countryInfo.sort(function (a, b) {
     var textA = a.currency.code.toUpperCase();
@@ -112,63 +115,97 @@ export const AccountSetting = () => {
       setEmail(user?.email ? user?.email : "");
       setCity(user?.city ? user?.city : "");
     }
-    if (user?.currentpre) {
-      setCurrentPre(user?.currentpre);
-    } else {
-      let currency = countryInfo.find((item) => item.code === "US");
-      setCurrentPre(currency?.currency.code);
-    }
-
-    if (user?.location) {
-      setCountry(user?.location);
-    } else {
-      setCountry("US");
-    }
 
     if (user?.phoneCountry) {
       setCountryCallingCode(user?.phoneCountry);
+      const result = listData.find((item) => item?.code === user?.phoneCountry);
+      setSelectedOption(result);
+      setImageUrl(`https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`);
+      setSearchText(`${result?.country} (${result?.code})`);
+      setImageSearchUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
     } else {
       setCountryCallingCode(" +1");
     }
+
+    if (user?.currentpre) {
+      setCurrentPre(user?.currentpre);
+      setCurrencyPre(user?.currentpre);
+      const result = countryInfo.find(
+        (item) => item.currency.code === user?.currentpre
+      );
+      setImageCurrencyUrl(result?.flag);
+      setImageCurrencySearchUrl(result?.flag);
+    }
+    //  else {
+    //   let currency = countryInfo.find((item) => item.code === "US");
+    //   setCurrentPre(currency?.currency.code);
+    //   setCurrencyPre(user?.currentpre);
+    //   setImageCurrencyUrl(currency?.flag)
+    //   setImageCurrencySearchUrl(currency?.flag)
+    // }
+
+    if (user?.location) {
+      setCountry(user?.location);
+      const result = listData.find((item) => item?.iso === user?.location);
+      setSelectedLocationOption(result);
+      setImageLocationUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
+      setImageLocationSearchUrl(
+        `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`
+      );
+      setSearchLocationText(result?.country);
+    }
+    // else {
+    //   setCountry("US");
+    //   const result = listData.find((item) => item?.iso === "US");
+    //   setSelectedLocationOption(result)
+    //   setImageLocationUrl(`https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`)
+    //   setImageLocationSearchUrl(`https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`)
+    //   setSearchLocationText(result?.country)
+    // }
 
     if (userDetailsAll) {
       setLoaderUpdate(false);
     }
   }, [userDetailsAll]);
 
-  useEffect(() => {
-    let user = userDetailsAll;
-    if (user) {
-      setFname(user?.fname ? user?.fname : "");
-      setLname(user?.lname ? user?.lname : "");
-      setPhone(user?.phone ? user?.phone : "");
-      setEmail(user?.email ? user?.email : "");
-      setCity(user?.city ? user?.city : "");
-    }
+  // useEffect(() => {
+  //   let user = userDetailsAll;
 
-    if (user?.currentpre) {
-      setCurrentPre(user?.currentpre);
-    } else {
-      let currency = countryInfo.find((item) => item.code === "US");
-      setCurrentPre(currency?.currency.code);
-    }
+  //   if (user) {
+  //     setFname(user?.fname ? user?.fname : "");
+  //     setLname(user?.lname ? user?.lname : "");
+  //     setPhone(user?.phone ? user?.phone : "");
+  //     setEmail(user?.email ? user?.email : "");
+  //     setCity(user?.city ? user?.city : "");
+  //   }
 
-    if (user?.location) {
-      setCountry(user?.location);
-    } else {
-      setCountry("US");
-    }
+  //   if (user?.currentpre) {
+  //     setCurrentPre(user?.currentpre);
+  //   } else {
+  //     let currency = countryInfo.find((item) => item.code === "US");
+  //     setCurrentPre(currency?.currency.code);
+  //   }
 
-    if (user?.phoneCountry) {
-      setCountryCallingCode(user?.phoneCountry);
-    } else {
-      setCountryCallingCode(" +1");
-    }
+  //   if (user?.location) {
+  //     setCountry(user?.location);
+  //   } else {
+  //     setCountry("US");
+  //   }
 
-    if (userDetailsAll) {
-      setLoaderUpdate(false);
-    }
-  }, []);
+  //   if (user?.phoneCountry) {
+  //     setCountryCallingCode(user?.phoneCountry);
+  //   } else {
+  //     setCountryCallingCode(" +1");
+  //   }
+
+  //   if (userDetailsAll) {
+  //     setLoaderUpdate(false);
+  //   }
+  // }, []);
 
   const submitHandler = async () => {
     if (!phone) {
@@ -193,6 +230,7 @@ export const AccountSetting = () => {
         city: city,
         phoneCountry: countryCallingCode,
       };
+      console.log(formSubmit);
       let updateUser = await jwtAxios
         .put(`/users/updateAccountSettings`, formSubmit, {
           headers: {
@@ -234,112 +272,19 @@ export const AccountSetting = () => {
     }
   };
 
-  // const phoneCountry = () => {
-  //   const result = listData.find((item) => item?.code === countryCallingCode);
-  //   return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
-  // };
-
-  const phoneCountryData = (code) => {
-    const result = listData.find((item) => item?.code === code);
-    return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
-  };
-
-  const countryName = () => {
-    return `https://flagcdn.com/h40/${country?.toLowerCase()}.png`;
-  };
-
-  const currencyCountry = () => {
-    const result = countryInfo.find(
-      (item) => item.currency.code === currentPre
-    );
-    return result?.flag;
-  };
-
-  const currencyValueChange = () => {
-    const result = countryInfo.find(
-      (item) => item.currency.code === currentPre
-    );
-    return result?.currency.name;
-  };
-
   useEffect(() => {
     setIs2FAEnabled(userData?.is_2FA_enabled);
   }, [userData?.is_2FA_enabled]);
 
-  // const openModal = () => {
-  //   setIsModalOpen(true);
-  // };
-
-  // const closeModal = () => {
-  //   setIsModalOpen(false);
-  // };
-
-  // const toggleOptions = () => {
-  //   setShowOptions(!showOptions);
-  //   setShowCountryOptions(false);
-  //   setShowCurrencyOptions(false);
-  // };
-
-  const toggleCountryOptions = () => {
-    setShowCountryOptions(!showCountryOptions);
-    setShowOptions(false);
-    setShowCurrencyOptions(false);
-  };
-
-  const toggleCurrencyOptions = () => {
-    setShowCurrencyOptions(!showCurrencyOptions);
-    setShowOptions(false);
-    setShowCountryOptions(false);
-  };
-
-  const [selectedOption, setSelectedOption] = useState({
-    country: "United States",
-    code: " +1",
-    iso: "US",
-    cca3: "USA",
-  });
-  const [searchText, setSearchText] = useState("United States ( +1)");
-  const [filteredOptions, setFilteredOptions] = useState(listData);
-  const [searchTextOrigin, setSearchTextOrigin] = useState(null);
-  const [imageUrlSet, setImageUrl] = useState("https://flagcdn.com/h40/us.png");
-
-  const handleCheckboxChange = (option) => {
-    setSelectedOption(option === selectedOption ? null : option);
-    const imageUrl = phoneCountryData(option.code);
-    setImageUrl(imageUrl);
-    setSearchText(`${option.country} (${option.code})`);
-    console.log("option.code: ", option.code);
-    console.log("option.country: ", option.country);
-    setSearchTextOrigin(option);
-  };
-
-  const handleSearchChange = (event) => {
-    if (searchTextOrigin === null) {
-      setSearchText(event.target.value);
-    } else {
-      setSearchTextOrigin(null);
-    }
-
-    const searchValue = event.target.value.toLowerCase();
-    const filteredData = listData.filter(
-      (data) =>
-        data.country.toLowerCase().includes(searchValue) ||
-        data.code.toLowerCase().includes(searchValue)
-    );
-    setFilteredOptions(filteredData);
-
-    if (searchValue === "") {
-      setSearchText(null); // Set searchText to null if searchValue is empty
-      setImageUrl(null); // Reset imageUrlSet when search text is cleared
-    }
-  };
-
-  const handleDrawer = () => {
-    setOpenDr(!openDr);
-  };
-  const handleDrawerOverlay = () => {
-    setOpenDr(true);
-  };
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mobileMatch.matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
     <div className="account-setting">
@@ -405,20 +350,22 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Phone number (required)</Form.Label>
-                        <div className="d-flex items-center phone-number-dropdown justify-between relative">
+                        <div
+                          className={`d-flex items-center phone-number-dropdown justify-between relative`}
+                        >
                           {!isMobile && (
                             <>
                               <Form.Control
                                 placeholder={countryCallingCode}
                                 name="phone"
                                 type="text"
-                                value={selectedOption?.code}
+                                value={phone}
                                 onChange={(e) => {
                                   onChange(e);
                                 }}
                                 maxLength="10"
                               />
-                              {countryCallingCode ? (
+                              {selectedOption?.code ? (
                                 <img
                                   src={imageUrlSet}
                                   alt="Flag"
@@ -427,77 +374,18 @@ export const AccountSetting = () => {
                               ) : (
                                 "No Flag"
                               )}
-                              <Dropdown className="account-setting-dropdown">
-                                <Dropdown.Toggle>
-                                  {selectedOption?.country}
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 448 512"
-                                  >
-                                    <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
-                                  </svg>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu className="dropdownMenu">
-                                  <div className="dropdown-menu-inner">
-                                    {searchText && imageUrlSet ? (
-                                      <img
-                                        src={imageUrlSet}
-                                        alt="Flag"
-                                        className="rectangle-data"
-                                      />
-                                    ) : null}
-
-                                    <FormControl
-                                      type="text"
-                                      placeholder="Search..."
-                                      className="mr-3 mb-2"
-                                      value={searchText}
-                                      onChange={handleSearchChange}
-                                    />
-                                    <img
-                                      src={Search}
-                                      alt=""
-                                      className="search-icon"
-                                    />
-                                  </div>
-                                  <div className="filter-option">
-                                    {filteredOptions.map((data, key) => (
-                                      <div className="yourself-option">
-                                        <Form.Check
-                                          key={`${data.code}_${data.country}`}
-                                          type="checkbox"
-                                          id={`checkbox-${data.code}`}
-                                          label={
-                                            <>
-                                              <img
-                                                src={phoneCountryData(
-                                                  data.code
-                                                )}
-                                                alt="Flag"
-                                                className="rectangle-data"
-                                              />
-                                              {data.country} ({data.code})
-                                            </>
-                                          }
-                                          checked={selectedOption === data}
-                                          onChange={() =>
-                                            handleCheckboxChange(data)
-                                          }
-                                        />
-
-                                        <div
-                                          className={`form-check-input check-input ${
-                                            JSON.stringify(selectedOption) ===
-                                            JSON.stringify(data)
-                                              ? "selected"
-                                              : ""
-                                          }`}
-                                        />
-                                      </div>
-                                    ))}
-                                  </div>
-                                </Dropdown.Menu>
-                              </Dropdown>
+                              <SelectOptionDropdown
+                                imageUrlSet={imageUrlSet}
+                                setImageUrl={setImageUrl}
+                                selectedOption={selectedOption}
+                                setSelectedOption={setSelectedOption}
+                                setCountryCallingCode={setCountryCallingCode}
+                                countryCallingCode={countryCallingCode}
+                                setSearchText={setSearchText}
+                                searchText={searchText}
+                                setImageSearchUrl={setImageSearchUrl}
+                                imageSearchUrlSet={imageSearchUrlSet}
+                              />
                             </>
                           )}
                           {isMobile && (
@@ -506,16 +394,15 @@ export const AccountSetting = () => {
                                 placeholder={countryCallingCode}
                                 name="phone"
                                 type="text"
-                                value={selectedOption?.code}
+                                value={phone}
                                 onChange={(e) => {
                                   onChange(e);
                                 }}
                                 maxLength="10"
                                 className="md:w-auto w-full"
                               />
-
                               <div className="text-center relative mobile-setting-dropdown flex items-center">
-                                {countryCallingCode ? (
+                                {selectedOption?.code ? (
                                   <img
                                     src={imageUrlSet}
                                     alt="Flag"
@@ -524,147 +411,19 @@ export const AccountSetting = () => {
                                 ) : (
                                   "No Flag"
                                 )}
-                                <button
-                                  className="text-white font-medium rounded-lg text-sm"
-                                  type="button"
-                                  data-drawer-target="drawer-swipe"
-                                  data-drawer-show="drawer-swipe"
-                                  data-drawer-placement="bottom"
-                                  data-drawer-edge="true"
-                                  data-drawer-edge-offset="bottom-[60px]"
-                                  aria-controls="drawer-swipe"
-                                  onClick={handleDrawer}
-                                >
-                                  <p className="text-white mb-0 personalDataLocation">
-                                    {selectedOption?.country}
-                                  </p>
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 448 512"
-                                  >
-                                    <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
-                                  </svg>
-                                </button>
-                                <div
-                                  className={
-                                    !openDr
-                                      ? "mobile-setting-dropdown-overlay"
-                                      : ""
-                                  }
-                                  onClick={handleDrawerOverlay}
-                                ></div>
-                                <div
-                                  id="drawer-swipe"
-                                  className={`fixed  z-40 w-full overflow-y-auto bg-white  rounded-t-lg dark:bg-gray-800 transition-transform bottom-0 left-0 right-0 ${
-                                    openDr ? "translate-y-full" : ""
-                                  } bottom-[60px]`}
-                                  tabindex="-1"
-                                  aria-labelledby="drawer-swipe-label"
-                                >
-                                  <div className="drawer-swipe-wrapper">
-                                    <div
-                                      className="drawer-swiper"
-                                      onClick={handleDrawerOverlay}
-                                    />
-                                    <div className="dropdown-menu-inner">
-                                      {searchText && imageUrlSet ? (
-                                        <img
-                                          src={imageUrlSet}
-                                          alt="Flag"
-                                          className="rectangle-data"
-                                        />
-                                      ) : null}
-
-                                      <FormControl
-                                        type="text"
-                                        placeholder="Search..."
-                                        className="mr-3 mb-2"
-                                        value={searchText}
-                                        onChange={handleSearchChange}
-                                      />
-                                      <img
-                                        src={Search}
-                                        alt=""
-                                        className="search-icon"
-                                      />
-                                    </div>
-                                    <div className="filter-option">
-                                      {filteredOptions.map((data, key) => (
-                                        <div
-                                          className={`yourself-option ${
-                                            selectedOption === data
-                                              ? "selected"
-                                              : ""
-                                          }`}
-                                        >
-                                          <Form.Check
-                                            key={`${data.code}_${data.country}`}
-                                            type="checkbox"
-                                            id={`checkbox-${data.code}`}
-                                            label={
-                                              <>
-                                                <img
-                                                  src={phoneCountryData(
-                                                    data.code
-                                                  )}
-                                                  alt="Flag"
-                                                  className="rectangle-data"
-                                                />
-                                                {data.country} ({data.code})
-                                              </>
-                                            }
-                                            //checked={selectedOption === data}
-                                            onChange={() =>
-                                              handleCheckboxChange(data)
-                                            }
-                                          />
-
-                                          <div
-                                            className={`form-check-input check-input ${
-                                              JSON.stringify(selectedOption) ===
-                                              JSON.stringify(data)
-                                                ? "selected"
-                                                : ""
-                                            }`}
-                                          />
-                                        </div>
-                                      ))}
-                                    </div>
-                                    <div className="edit-btn flex justify-center">
-                                      {selectedOption ? (
-                                        <>
-                                          <button
-                                            type="button"
-                                            class="btn btn-primary mx-1"
-                                            onClick={() =>
-                                              handlePhoneNumberMobile(
-                                                selectedOption
-                                              )
-                                            }
-                                          >
-                                            Save
-                                          </button>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <button
-                                            type="button"
-                                            class="btn btn-primary mx-1"
-                                          >
-                                            Save
-                                          </button>
-                                        </>
-                                      )}
-                                      <button
-                                        type="button"
-                                        class="btn mx-1 bg-gray text-white"
-                                        onClick={handleDrawerOverlay}
-                                      >
-                                        Cancel
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
+                                <SelectOptionDropdown
+                                  imageUrlSet={imageUrlSet}
+                                  setImageUrl={setImageUrl}
+                                  selectedOption={selectedOption}
+                                  setSelectedOption={setSelectedOption}
+                                  setCountryCallingCode={setCountryCallingCode}
+                                  countryCallingCode={countryCallingCode}
+                                  setSearchText={setSearchText}
+                                  searchText={searchText}
+                                  setImageSearchUrl={setImageSearchUrl}
+                                  imageSearchUrlSet={imageSearchUrlSet}
+                                 
+                                />
                               </div>
                             </>
                           )}
@@ -676,168 +435,169 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Location</Form.Label>
-                        <div className="d-flex align-items-center justify-between">
-                          <Form.Control
-                            placeholder={"City"}
-                            name="city"
-                            value={city}
-                            onChange={(e) => {
-                              onChange(e);
-                            }}
-                          />
-                          {country ? (
-                            <img
-                              src={countryName()}
-                              alt="Flag"
-                              className="circle-data"
-                            />
-                          ) : (
-                            "No Flag"
+                        <div
+                          className="d-flex items-center phone-number-dropdown justify-between relative"
+                        >
+                          {!isMobile && (
+                            <>
+                              <Form.Control
+                                placeholder={"City"}
+                                name="city"
+                                type="text"
+                                value={city}
+                                onChange={(e) => {
+                                  onChange(e);
+                                }}
+                              />
+
+                              {country ? (
+                                <img
+                                  src={imageUrlLocationSet}
+                                  alt="Flag"
+                                  className="circle-data"
+                                />
+                              ) : (
+                                "No Flag"
+                              )}
+
+                              <SelectLocationDropdown
+                                  selectedLocationOption={selectedLocationOption}
+                                  setSelectedLocationOption={setSelectedLocationOption}
+                                  setImageLocationUrl={setImageLocationUrl}
+                                  imageUrlLocationSet={imageUrlLocationSet}
+                                  setImageLocationSearchUrl={setImageLocationSearchUrl}
+                                  imageLocationSearchUrlSet={imageLocationSearchUrlSet}
+                                  setSearchLocationText={setSearchLocationText}
+                                  searchLocationText={searchLocationText}
+                                  setCountry={setCountry}
+                                  country={country}
+                                  setNationality={setNationality}
+                                />
+                            </>
                           )}
-                          {/* <p className="text-white mb-0">
-                            {
-                              listData.find((item) => item?.iso === country)
-                                ?.cca3
-                            }
-                          </p> */}
-                          <div
-                            className="country-select"
-                            ref={countryDropdownRef}
-                          >
-                            {/* <Form.Select
-                              size="sm"
-                              onChange={(e) => {
-                                setCountry(e.target.value);
-                                dispatch(defineCountry(e.target.value));
-                              }}
-                              value={country}
-                              disabled={userDetailsAll.location ? true : false}
-                            >
-                              {listData.map((data) => (
-                                <option
-                                  value={`${data.iso}`}
-                                  key={`${data.iso}`}
-                                >
-                                  {data.country}
-                                </option>
-                              ))}
-                            </Form.Select> */}
-                            <div
-                              className="dropdownPersonalData form-select form-select-sm"
-                              onClick={toggleCountryOptions}
-                            >
-                              <p className="text-white mb-0 personalDataLocation">
-                                {
-                                  listData.find((item) => item?.iso === country)
-                                    ?.country
-                                }
-                              </p>
-                            </div>
-                            {showCountryOptions && (
-                              <ul
-                                className={`options locationPersonalData ${
-                                  userDetailsAll.location ? "disabled" : ""
-                                }`}
-                              >
-                                {listData.map((data, key) => (
-                                  <li
-                                    key={`${data?.iso}`}
-                                    onClick={() => {
-                                      setCountry(data?.iso);
-                                      dispatch(defineCountry(data?.iso));
-                                    }}
-                                  >
-                                    {data?.country}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
+
+                          {isMobile && (
+                            <>
+                              <Form.Control
+                                placeholder={"City"}
+                                name="city"
+                                type="text"
+                                value={city}
+                                className="md:w-auto w-full"
+                                onChange={(e) => {
+                                  onChange(e);
+                                }}
+                              />
+
+                              <div className="text-center relative mobile-setting-dropdown flex items-center">
+                                {country ? (
+                                  <img
+                                    src={imageUrlLocationSet}
+                                    alt="Flag"
+                                    className="circle-data"
+                                  />
+                                ) : (
+                                  "No Flag"
+                                )}
+                                <SelectLocationDropdown
+                                  selectedLocationOption={selectedLocationOption}
+                                  setSelectedLocationOption={setSelectedLocationOption}
+                                  setImageLocationUrl={setImageLocationUrl}
+                                  imageUrlLocationSet={imageUrlLocationSet}
+                                  setImageLocationSearchUrl={setImageLocationSearchUrl}
+                                  imageLocationSearchUrlSet={imageLocationSearchUrlSet}
+                                  setSearchLocationText={setSearchLocationText}
+                                  searchLocationText={searchLocationText}
+                                  setCountry={setCountry}
+                                  country={country}
+                                  setNationality={setNationality}
+                                />
+                              </div>
+                            </>
+                          )}
                         </div>
                       </Form.Group>
                     </Col>
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Currency preferred </Form.Label>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <Form.Control
-                            type="text"
-                            placeholder="Currency"
-                            name="currencyName"
-                            value={currencyValueChange()}
-                            onChange={onChange}
-                          />
-
-                          <div className="d-flex align-items-center">
-                            {currentPre ? (
-                              <img
-                                src={currencyCountry()}
-                                alt="Flag"
-                                className="circle-data"
+                        <div
+                          className={`d-flex items-center phone-number-dropdown justify-between relative`}
+                        >
+                          {!isMobile && (
+                            <>
+                              <Form.Control
+                                type="text"
+                                placeholder="Currency"
+                                name="currencyName"
+                                value={currency}
+                                onChange={onChange}
                               />
-                            ) : (
-                              "No Flag"
-                            )}
-                            {/* <p className="text-white mb-0">
-                              {
-                                countryInfo.find(
-                                  (item) => item.currency.code === currentPre
-                                )?.currency.code
-                              } 
-                            </p> */}
-                          </div>
-                          <div
-                            className="country-select"
-                            ref={optionsDropdownRef}
-                          >
-                            {/* <Form.Select
-                              size="sm"
-                              value={currentPre}
-                              onChange={(e) => {
-                                setCurrentPre(e.target.value);
-                                dispatch(defineCurrency(e.target.value));
-                              }}
-                            >
-                              {countryInfo.map((data) => (
-                                <option
-                                  value={`${data.currency.code}`}
-                                  key={`${data.currency.code}`}
-                                >
-                                  {data.currency?.code}
-                                </option>
-                              ))}
-                            </Form.Select> */}
+                              {currentPre ? (
+                                <img
+                                  src={imageCurrencyUrlSet}
+                                  alt="Flag"
+                                  className="circle-data"
+                                />
+                              ) : (
+                                "No Flag"
+                              )}
 
-                            <div
-                              className="dropdownPersonalData form-select form-select-sm"
-                              onClick={toggleCurrencyOptions}
-                            >
-                              <p className="text-white mb-0 ">
-                                {
-                                  countryInfo.find(
-                                    (item) => item.currency.code === currentPre
-                                  )?.currency.code
+                              <SelectCurrencyDropdown
+                                setImageCurrencyUrl={setImageCurrencyUrl}
+                                setCurrentPre={setCurrentPre}
+                                currentPre={currentPre}
+                                setCurrency={setCurrency}
+                                currency={currency}
+                                setCurrencyPre={setCurrencyPre}
+                                currencyPre={currencyPre}
+                                setImageCurrencySearchUrl={
+                                  setImageCurrencySearchUrl
                                 }
-                              </p>
-                            </div>
-                            {showCurrencyOptions && (
-                              <ul className="options">
-                                {countryInfo.map((data) => (
-                                  <li
-                                    key={`${data.currency.code}`}
-                                    onClick={() => {
-                                      setCurrentPre(data?.currency?.code);
-                                      dispatch(
-                                        defineCurrency(data.currency.code)
-                                      );
-                                    }}
-                                  >
-                                    {data.currency?.code}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
+                                imageCurrencySearchUrlSet={
+                                  imageCurrencySearchUrlSet
+                                }
+                              />
+                            </>
+                          )}
+
+                          {isMobile && (
+                            <>
+                              <Form.Control
+                                type="text"
+                                placeholder="Currency"
+                                name="currencyName"
+                                value={currency}
+                                onChange={onChange}
+                              />
+                              <div className="text-center relative mobile-setting-dropdown flex items-center">
+                                {currentPre ? (
+                                  <img
+                                    src={imageCurrencyUrlSet}
+                                    alt="Flag"
+                                    className="circle-data"
+                                  />
+                                ) : (
+                                  "No Flag"
+                                )}
+                                <SelectCurrencyDropdown
+                                  setImageCurrencyUrl={setImageCurrencyUrl}
+                                  setCurrentPre={setCurrentPre}
+                                  setCurrency={setCurrency}
+                                  currency={currency}
+                                  currentPre={currentPre}
+                                  setCurrencyPre={setCurrencyPre}
+                                  currencyPre={currencyPre}
+                                  setImageCurrencySearchUrl={
+                                    setImageCurrencySearchUrl
+                                  }
+                                  imageCurrencySearchUrlSet={
+                                    imageCurrencySearchUrlSet
+                                  }
+                                />
+                              </div>
+                            </>
+                          )}
                         </div>
                       </Form.Group>
                     </Col>
@@ -852,7 +612,6 @@ export const AccountSetting = () => {
                     </Button>
                   </div>
                 </Form>
-
                 <Card.Title as="h2" className="security-title">
                   Security
                 </Card.Title>

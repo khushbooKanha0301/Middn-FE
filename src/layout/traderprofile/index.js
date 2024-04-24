@@ -3,6 +3,7 @@ import { Col, Row, Card, Button, Tabs, Tab, Form } from "react-bootstrap";
 import EditProfileView from "../../component/EditProfile";
 import MessageView from "../../component/Message";
 import StarRating from "../../component/StarRating";
+import Select from "react-select";
 import {
   InstagramIcon,
   TelegramIcon,
@@ -42,6 +43,21 @@ function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+const data = [
+  {
+    value: 1,
+    text: "Newest",
+  },
+  {
+    value: 2,
+    text: "Standard",
+  },
+  {
+    value: 3,
+    text: "Latter",
+  },
+];
+
 export const TraderProfile = (props) => {
   const [user, setUser] = useState("");
   let PageSize = 5;
@@ -54,6 +70,11 @@ export const TraderProfile = (props) => {
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
   const [connectWalletmodalShow, setconnectWalletModalShow] = useState(false);
   const countryDetails = useSelector((state) => state.auth.countryDetails);
+
+  const [selectedOptionStatus, setSelectedOptionStatus] = useState(data[0]);
+  const handleChangeStatus = (e) => {
+    setSelectedOptionStatus(e);
+  };
 
   const modalToggle = () => setModalShow(!modalShow);
   const connectWalletModalToggle = () =>
@@ -665,11 +686,29 @@ export const TraderProfile = (props) => {
         <Tab eventKey="reviews" title="Reviews">
           <div className="d-flex justify-content-between align-items-center">
             <h2>Reviews</h2>
-            <Form.Select aria-label="Newest">
+            {/* <Form.Select aria-label="Newest">
               <option>Newest</option>
               <option value="1">Standard</option>
               <option value="2">Latter</option>
-            </Form.Select>
+            </Form.Select> */}
+
+            <Select
+              defaultValue={selectedOptionStatus}
+              value={selectedOptionStatus}
+              className="select-dropdown"
+              isSearchable={false}              
+              components={{
+                IndicatorSeparator: () => null,
+              }}
+              classNamePrefix="select-dropdown"
+              options={data}
+              onChange={handleChangeStatus}
+              getOptionLabel={(e) => (
+                <div className="selected-dropdown">{e.text}</div>
+              )}
+            />
+
+            
           </div>
           <div className="reviews-list">
             <Card className="cards-dark">

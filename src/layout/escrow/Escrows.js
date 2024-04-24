@@ -5,7 +5,6 @@ import jwtAxios from "../../service/jwtAxios";
 import { userDetails } from "../../store/slices/AuthSlice";
 import EscrowBuyer from "../../layout/escrow/EscrowBuySell";
 import EscrowSeller from "../../layout/escrow/EscrowSeller";
-//import HomePageComponent from "../../layout/homePageComponent";
 import { useNavigate } from "react-router-dom";
 
 export const Escrows = () => {
@@ -16,11 +15,8 @@ export const Escrows = () => {
     const key = state?.key
    
     const acAddress = useSelector(userDetails);
- console.log("acAddress ", acAddress?.account);
     const [isSeller, setIsSeller] = useState(false);
- console.log("isSeller ", isSeller);
     const [isBuyer, setIsBuyer] = useState(false);
- console.log("isBuyer ", isBuyer);
     const [escrowLoading, setEscrowLoading] = useState(false); 
     
     useEffect(() => {

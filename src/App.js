@@ -33,6 +33,8 @@ import { firebaseMessagesActive } from "./helper/userStatus";
 import jwtDecode from "jwt-decode";
 import TwoFAvalidate from "./component/TwoFAvalidate";
 import SnackBar from "./snackBar";
+import MarketPlaceComponent from "./layout/MarketPlaceComponent";
+import MarketPlaceBuySell from "./layout/marketPlace/MarketPlaceBuySell";
 
 export const App = () => {
   const dispatch = useDispatch();
@@ -50,7 +52,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["124.122.187.159", "103.239.146.251", "182.77.117.231"];
+  const allowedIPs = ["124.122.194.254", "122.169.39.104"];
 
   const fetchIPAddress = async () => {
     try {
@@ -243,7 +245,10 @@ export const App = () => {
   if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (
       <div>
-        <Container fluid="xxl" className={`${isOpen ? "open-sidebar" : "close-sidebar"}`}>
+        <Container
+          fluid="xxl"
+          className={`${isOpen ? "open-sidebar" : "close-sidebar"}`}
+        >
           <ToastContainer />
           <SnackBar />
           <Sidebar
@@ -313,6 +318,22 @@ export const App = () => {
                     <ProtectedRoute>
                       <ChatComponent />
                     </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/marketplace"
+                  element={
+                    // <ProtectedRoute>
+                    <MarketPlaceComponent />
+                    // </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/marketplace-buy"
+                  element={
+                    // <ProtectedRoute>
+                    <MarketPlaceBuySell />
+                    // </ProtectedRoute>
                   }
                 />
                 <Route

@@ -28,7 +28,7 @@ export const LoginView = (props) => {
   const { address, isConnected } = useAccount();
 
   const userData = useSelector(userDetails);
-  const { library, chainId, account, activate, deactivate } = useWeb3React();
+  const { library,  account, activate, deactivate } = useWeb3React();
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
   const { disconnect: disonnectWalletConnect } = useDisconnect();
@@ -221,9 +221,9 @@ export const LoginView = (props) => {
         break;
     }
 
-    if (provider) {
-      ethereum.setSelectedProvider(provider);
-    }
+    // if (provider) {
+    //   ethereum.setSelectedProvider(provider);
+    // }
   };
 
   // const setCoinbaseEvent = async () => {

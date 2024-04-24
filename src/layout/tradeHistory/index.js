@@ -30,8 +30,8 @@ export const TradeHistory = () => {
     setSelectedOptionStatus(e);
   };
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-  const createEscrowModalToggle = () =>
-    setCreateEscrowModalShow(!createEscrowModalShow);
+  const createEscrowModalToggle = () => setCreateEscrowModalShow(!createEscrowModalShow);
+  
   useEffect(() => {
     setEscrowLoading(false);
   }, []);

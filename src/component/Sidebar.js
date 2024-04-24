@@ -8,6 +8,7 @@ import {
   QuestionIcon,
   TradeHistoryIcon,
   PlusIcon,
+  MarketplaceIcon,
 } from "./SVGIcon";
 import Highcharts from "highcharts/highstock";
 import { userDetails } from "../store/slices/AuthSlice";
@@ -181,6 +182,17 @@ export const Sidebar = (props) => {
             <Nav.Item as="li">
               <Nav.Link
                 as={Link}
+                eventKey="marketplace"
+                to={"/marketplace"}
+                className={activeKey === "/marketplace" && "active"}
+              >
+                <MarketplaceIcon width="24" height="24" />{" "}
+                <span className="menu-hide">Marketplace</span>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item as="li">
+              <Nav.Link
+                as={Link}
                 eventKey="escrow"
                 to={"/escrows"}
                 className={activeKey === "/escrows" && "active"}
@@ -290,7 +302,7 @@ export const Sidebar = (props) => {
               <span className="menu-hide">Create Escrow</span>
             </Button>
           )}
-           <div className="divider"></div>
+          <div className="divider"></div>
         </PerfectScrollbar>
       </div>
       <Card className="cards-dark menu-hide">
