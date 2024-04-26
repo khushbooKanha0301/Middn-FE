@@ -54,10 +54,12 @@ export const KYCVerification = (props) => {
   const [imageUrlLocationSet, setImageLocationUrl] = useState(
     "https://flagcdn.com/h40/us.png"
   );
+  console.log("imageUrlLocationSet", imageUrlLocationSet)
 
   const [imageUrlCountrySet, setImageCountryUrl] = useState(
     "https://flagcdn.com/h40/us.png"
   );
+  console.log("imageUrlCountrySet", imageUrlCountrySet)
 
   const [imageLocationSearchUrlSet, setImageLocationSearchUrl] = useState(
     "https://flagcdn.com/h40/us.png"
@@ -282,6 +284,16 @@ export const KYCVerification = (props) => {
     }
   };
 
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mobileMatch.matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const handleCheckboxChange = (filterType) => {
     setCheckboxState((prevState) => {
       if (prevState.includes(filterType)) {
@@ -366,6 +378,10 @@ export const KYCVerification = (props) => {
       dispatch(userGetData(userGetData.userid)).unwrap();
     }
     fetchKYCData(userDetailsAll);
+    setImageLocationUrl("https://flagcdn.com/h40/us.png");
+    setImageCountryUrl("https://flagcdn.com/h40/us.png");
+    setCountry("US")
+    setLocation("US")
     setMname(null);
     setResAddress(null);
     setPostalCode(null);
@@ -679,7 +695,7 @@ export const KYCVerification = (props) => {
                       <div className="text-center relative mobile-setting-dropdown flex items-center">
                         {nationality ? (
                           <img
-                            src={imageUrlLocationSet}
+                            src={imageUrlCountrySet}
                             alt="Flag"
                             className="circle-data"
                           />
@@ -783,7 +799,7 @@ export const KYCVerification = (props) => {
                       {...getInputProps({ accept: "image/*, application/pdf" })}
                     />
                     <Row>
-                      <Col sm="12">
+                      <Col sm="12"className="d-flex items-center" >
                         <CameraLineIcon width="23" height="24" /> Take a photo
                       </Col>
                       {passport_url && (
@@ -837,7 +853,7 @@ export const KYCVerification = (props) => {
                   <div {...getRootProps({ className: "dropzone" })}>
                     <input {...getInputProps()} />
                     <Row>
-                      <Col sm="12">
+                      <Col sm="12" className="d-flex items-center">
                         <CameraLineIcon width="23" height="24" /> Take a photo
                       </Col>
                       {user_photo_url && (

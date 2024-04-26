@@ -4520,6 +4520,8 @@ body {
                 .marketplace-price {
                     display: flex;
                     gap: 8px;
+                    width: 249px;
+
 
                     .circle {
                         width: 27px;
@@ -4568,6 +4570,9 @@ body {
         border-radius: 21px;
         margin-bottom: 8px;
         color: #fff;
+        @include media-breakpoint-down(md) {
+            padding: 20px 10px;
+        }
 
         .varification {
             margin-bottom: 24px;
@@ -5702,7 +5707,7 @@ body {
 
     .flex-table-body {
         flex-wrap: wrap;
-        padding: 26px 28px;
+        padding: 26px 41px;
         background-color: $cards-bg;
         border-radius: 21px;
         margin-bottom: 16px;
@@ -8365,7 +8370,6 @@ aside.EmojiPickerReact.epr-main {
     label {
         font-size: 12px;
         color: #FFF;
-        color: #808191;
     }
 
 }
@@ -9855,6 +9859,9 @@ img.rectangle-data {
         .form-check {
             margin-right: 0px !important;
             padding-right: 0px !important;
+            input {
+                right: 12px;
+              }
         }
 
         .yourself-option {
@@ -10041,6 +10048,11 @@ img.rectangle-data {
     .marketplace-dropdown {
         display: flex;
 
+        @include media-breakpoint-down(lg) {
+            display: block;
+            margin-bottom: 20px;
+        }
+
         .marketplace-dropdown-wrapper {
             background: #1b1c1f;
             padding: 0 0px 0px 16px;
@@ -10050,6 +10062,17 @@ img.rectangle-data {
             border-radius: 16px;
             border: 1px solid #202020;
 
+            @include media-breakpoint-down(lg) {
+                width: 100%;
+                margin-bottom: 20px;
+                margin-right: 0;
+            }
+
+            .form-control::placeholder {
+                font-weight: 600;
+                font-size: 14px;
+                color: #808191;
+            }
 
             .select-dropdown {
 
@@ -10077,6 +10100,10 @@ img.rectangle-data {
     .form-group {
         .form-control {
             width: 520px;
+            @include media-breakpoint-down(lg) {
+                width: 100%;
+
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ const MarketPlace = () => {
   const handleSellClick = () => {
     setIsBuyActive(false);
     setIsSellActive(true);
-    navigate(`/marketplace-buy`);
+    // navigate(`/marketplace-buy`);
   };
 
   const onBuySellClick = async () => {
@@ -229,68 +229,90 @@ const MarketPlace = () => {
         <div style={{ overflow: "auto" }}>
           <div className="flex-table">
             <div className="flex-table-body justify-content-between">
-              <div className="marketplace-price">
-                <div className="circle" />
-                <div>
-                  <h5 className="d-flex">
-                    User 1-22
-                    <RightIcon width="13.37px" height="13.37px" />
-                    <KingIcon width="20" height="20" />
-                  </h5>
-                  <p>1024 orders</p>
-                  <p>100.00% completion</p>
+              <div style={{ width: "219px" }}>
+                <div className="marketplace-price">
+                  <div className="circle" />
+                  <div>
+                    <h5 className="d-flex">
+                      User 1-22
+                      <RightIcon width="13.37px" height="13.37px" />
+                      <KingIcon width="20" height="20" />
+                    </h5>
+                    <p>1024 orders</p>
+                    <p>100.00% completion</p>
+                  </div>
                 </div>
               </div>
-              <div className="marketplace-price">
+              <div style={{ width: "199px", textAlign: "center" }}>
                 <span>0.923 USD</span>
               </div>
-              <div className="marketplace-amount">
+              <div
+                className="marketplace-amount"
+                style={{ width: "199px", textAlign: "center" }}
+              >
                 <p>600.00 USDT</p>
                 <p>$454.000-$465.000</p>
               </div>
-              <div className="marketplace-payment">
+              <div
+                className="marketplace-payment"
+                style={{ width: "199px", textAlign: "center" }}
+              >
                 <span> Bank Transfer </span>
               </div>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  onBuySellClick();
-                }}
-              >
-                Buy
-              </Button>
+              <div style={{ width: "158px", textAlign: "center" }}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    onBuySellClick();
+                  }}
+                  style={{ width: "98px" }}
+                >
+                  Buy
+                </Button>
+              </div>
             </div>
             <div className="flex-table-body justify-content-between">
-              <div className="marketplace-price">
-                <div className="circle" />
-                <div>
-                  <h5 className="d-flex">
-                    User 1-22
-                    <RightIcon width="13.37px" height="13.37px" />
-                    <KingIcon width="20" height="20" />
-                  </h5>
-                  <p>1024 orders</p>
-                  <p>100.00% completion</p>
+              <div style={{ width: "219px" }}>
+                <div className="marketplace-price">
+                  <div className="circle" />
+                  <div>
+                    <h5 className="d-flex">
+                      User 1-22
+                      <RightIcon width="13.37px" height="13.37px" />
+                      <KingIcon width="20" height="20" />
+                    </h5>
+                    <p>1024 orders</p>
+                    <p>100.00% completion</p>
+                  </div>
                 </div>
               </div>
-              <div className="marketplace-price">
+              <div style={{ width: "199px", textAlign: "center" }}>
                 <span>0.923 USD</span>
               </div>
-              <div className="marketplace-amount">
+              <div
+                className="marketplace-amount"
+                style={{ width: "199px", textAlign: "center" }}
+              >
                 <p>600.00 USDT</p>
                 <p>$454.000-$465.000</p>
               </div>
-              <div className="marketplace-payment">
+              <div
+                className="marketplace-payment"
+                style={{ width: "199px", textAlign: "center" }}
+              >
                 <span> Bank Transfer </span>
               </div>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  onBuySellClick();
-                }}
-              >
-                Buy
-              </Button>
+              <div style={{ width: "158px", textAlign: "center" }}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    onBuySellClick();
+                  }}
+                  style={{ width: "98px" }}
+                >
+                  Buy
+                </Button>
+              </div>
             </div>
           </div>
         </div>

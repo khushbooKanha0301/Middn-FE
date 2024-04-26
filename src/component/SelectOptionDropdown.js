@@ -142,7 +142,6 @@ const SelectOptionDropdown = (props) => {
                           {data.country} ({data.code})
                         </div>
                       }
-                      //checked={selectedOption === data}
                       style={{
                         width: " 100%",
                         display: " flex",

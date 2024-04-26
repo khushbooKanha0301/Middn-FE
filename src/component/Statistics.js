@@ -77,14 +77,20 @@ export const Statistics = () => {
     }
   };
   const handleCheckboxChange = (option) => {
-    setSelectedOption(option === selectedOption ? null : option);
+    setSelectedOption(option);
     setCategory(option.label);
+    setSearchText(`${option.label}`);
+    setSearchTextOrigin(option);
+  };
+  const handleCheckboxChangeOnMobile = (option) => {
+    setSelectedOption(option);
     setSearchText(`${option.label}`);
     setSearchTextOrigin(option);
   };
 
   const handlePhoneNumberMobile = (option) => {
     setSelectedOption(option);
+    setCategory(option.label);
     setOpenDr(true);
   };
 
@@ -192,17 +198,17 @@ export const Statistics = () => {
                     </div>
                     <div className="filter-option">
                       {showOptions.map((data, key) => (
-                        <div
-                          className={`yourself-option ${
-                            selectedOption === data ? "selected" : ""
-                          }`}
-                        >
+                        <div className="yourself-option"  onChange={() => handleCheckboxChangeOnMobile(data)}>
                           <Form.Check
                             key={`${data.label}`}
                             type="checkbox"
                             id={`checkbox-${data.label}`}
                             label={data.label}
-                            onChange={() => handleCheckboxChange(data)}
+                            style={{
+                              width: " 100%",
+                              display: " flex",
+                              alignItems: "center",
+                            }}
                           />
                           <div
                             className={`form-check-input check-input ${

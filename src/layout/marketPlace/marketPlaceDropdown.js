@@ -19,6 +19,21 @@ const data = [
       </svg>
     ),
   },
+  {
+    value: 2,
+    text: "EUR",
+    icon: (
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="12" cy="12" r="12" fill="#C4C4C4" />
+      </svg>
+    ),
+  },
 ];
 const data1 = [
   {
@@ -271,8 +286,8 @@ const MarketPlaceDropdown = () => {
               className="form-action-group gap-2 d-flex"
               style={{ paddingTop: "8px" }}
             >
-              <Button variant="primary">Continue</Button>
               <Button variant="secondary">Cancel</Button>
+              <Button variant="primary">Continue</Button>
             </div>
           </div>
         </Col>
