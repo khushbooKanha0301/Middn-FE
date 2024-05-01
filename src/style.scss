@@ -1412,6 +1412,22 @@ body {
     }
 }
 
+.form-control {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    font-size: 15px;
+    line-height: 37px;
+    color: #808191;
+    border-radius: 0;
+
+    @include media-breakpoint-down(md) {
+        line-height: 40px;
+        font-size: 16px;
+    }
+}
+
 .form-group {
     border-radius: 8px;
     background-color: #202127;
@@ -1419,7 +1435,7 @@ body {
     margin-bottom: 16px;
 
     label {
-        font-weight: 700;
+        font-weight: 500;
         font-size: 12px;
         line-height: 18px;
         color: rgba($color: $white, $alpha: 0.6);
@@ -1693,6 +1709,7 @@ body {
             form {
                 .edit-btn {
                     margin-bottom: 24px;
+                    padding: 0 5px;
                 }
             }
 
@@ -1747,8 +1764,13 @@ body {
                 }
             }
 
+            .button-row {
+                padding: 0 5px;
+            }
+
             .ul-button-row {
                 margin-bottom: 16px;
+                padding: 0 5px;
 
                 &:last-child {
                     margin-bottom: 0px;
@@ -4513,7 +4535,9 @@ body {
                         font-weight: 700;
                         line-height: 20px;
                         color: #FFFFFF;
-                        text-transform: uppercase
+                        text-transform: uppercase;
+                        width: 140px;
+                        margin: 0 auto;
                     }
                 }
 
@@ -4570,6 +4594,7 @@ body {
         border-radius: 21px;
         margin-bottom: 8px;
         color: #fff;
+
         @include media-breakpoint-down(md) {
             padding: 20px 10px;
         }
@@ -7059,11 +7084,11 @@ body {
 }
 
 .edit-btn {
-    margin-top: 20px;
+    margin-top: 12px;
     margin-bottom: 28px;
 
     @include media-breakpoint-down(md) {
-        margin-top: 16px;
+        margin-top: 12px;
         margin-bottom: 12px;
     }
 
@@ -8078,17 +8103,20 @@ aside.EmojiPickerReact.epr-main {
 @media screen and (max-width: 767px) {
     .kyc-mobile-popup {
         img.circle-data {
-            margin-right: 0px;
-            margin-left: -10px;
+            margin-left: 15px;
+            margin-right: 10px;
         }
     }
-    img.circle-data{
-        margin-left: 15px;
+
+    img.circle-data {
+        margin-left: 0px;
+        margin-right: 0px;
     }
-    .personalDataLocation{
-        width:50px;
+
+    .personalDataLocation {
+        width: 50px;
     }
-   
+
 
     .kyc-verification.card {
         button {
@@ -8368,7 +8396,7 @@ aside.EmojiPickerReact.epr-main {
     }
 
     label {
-        font-size: 12px;
+        font-size: 13px;
         color: #FFF;
     }
 
@@ -8555,7 +8583,7 @@ aside.EmojiPickerReact.epr-main {
 .personalDataLocation {
     overflow: hidden;
     white-space: nowrap;
-    width: 50px;
+    width: 40px;
 }
 
 
@@ -8570,7 +8598,7 @@ aside.EmojiPickerReact.epr-main {
 }
 
 .mobile-setting-dropdown {
-    width: 250px;
+    width: 150px;
 }
 
 .statisticBox ul.options {
@@ -9207,7 +9235,6 @@ img.rectangle-data {
     }
 }
 
-
 .phone-number-dropdown {
     .dropdown-menu-inner {
         display: flex;
@@ -9219,7 +9246,7 @@ img.rectangle-data {
     }
 
     .filter-option {
-        height: 322px;
+        height: 295px;
         overflow: auto;
 
         .yourself-option {
@@ -9235,8 +9262,8 @@ img.rectangle-data {
                 height: 18px;
                 border: none;
                 box-shadow: none;
-                top: 13px;
-                right: 20px;
+                top: 11px;
+                right: 0px;
                 border-radius: 50%;
 
             }
@@ -9264,7 +9291,13 @@ img.rectangle-data {
             }
 
             .form-check-label {
-                width: 100%;
+                color: #fff;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                width: 170px;
+                line-height: 15px;
+                font-size: 13px;
             }
 
             input {
@@ -9312,7 +9345,7 @@ img.rectangle-data {
         background-color: #1E1F24;
         padding: 10px;
         width: 100%;
-        transform: translate(0%, 25%) !important;
+        transform: translate(0%, 26%) !important;
         // top: 198% !important;
     }
 }
@@ -9437,8 +9470,9 @@ img.rectangle-data {
             transform: translateX(-50%);
         }
     }
-
 }
+
+
 
 .mobile-setting-dropdown-overlay {
     background: rgba(0, 0, 0, 0.5);
@@ -9570,9 +9604,10 @@ img.rectangle-data {
         top: 8px;
         right: 5px;
     }
+
     .token-sales-filter svg {
         right: 21px !important;
-        top: 11px;
+        top: 17px;
     }
 
     .chat-view .cards-dark .back-button {
@@ -9806,12 +9841,16 @@ img.rectangle-data {
 
 //skeleton end 
 
-.phone-number-dropdown .dropdown-menu-inner .form-control,
 .phone-number-dropdown .dropdown-menu-inner .form-control {
     margin-bottom: 0px !important;
     font-size: 13px !important;
     padding: 5px 0px;
     color: #fff;
+}
+
+.phone-number-dropdown .dropdown-menu-inner .form-control:focus {
+    background: transparent;
+    box-shadow: none;
 }
 
 .phone-number-dropdown .dashboard-statistics-dropdown .form-control {
@@ -9832,7 +9871,7 @@ img.rectangle-data {
 
 .statisticBox {
     background: #1e1f24;
-    padding: 4px 10px;
+    padding: 4px 18px;
     border-radius: 10px;
     position: relative;
 
@@ -9856,12 +9895,12 @@ img.rectangle-data {
     }
 
     .filter-option {
+        height: 345px;
+        overflow: auto;
+
         .form-check {
             margin-right: 0px !important;
             padding-right: 0px !important;
-            input {
-                right: 12px;
-              }
         }
 
         .yourself-option {
@@ -9903,6 +9942,7 @@ img.rectangle-data {
     svg {
         top: 8px;
     }
+
     .personalDataLocation {
         overflow: hidden;
         white-space: nowrap;
@@ -10100,10 +10140,89 @@ img.rectangle-data {
     .form-group {
         .form-control {
             width: 520px;
+
             @include media-breakpoint-down(lg) {
                 width: 100%;
 
             }
+        }
+    }
+}
+
+.react-modal-sheet-drag-indicator {
+    background: #40434F !important;
+    width: 29.5px !important;
+    height: 8px !important;
+}
+
+.react-modal-sheet-container {
+    border-radius: 8px;
+    background-color: #1E1F24 !important;
+    padding: 10px;
+    overflow: auto;
+    height: 480px !important;
+}
+
+.react-modal-sheet-header {
+    position: fixed !important;
+    z-index: 999;
+    left: 0;
+}
+
+.react-modal-sheet-content {
+    padding-top: 40px;
+}
+
+.modal .login-modal .modal-content .kyc-step .yourself-option {
+    padding-left: 8px !important;
+    margin-top: 0px !important;
+    margin-right: 0px !important;
+}
+
+.modal .login-modal .modal-content .kyc-step .yourself-option .form-check-label {
+    font-size: 13px !important;
+    font-weight: unset !important;
+    width: 100% !important;
+    display: block !important;
+    padding: 0px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0px !important;
+}
+
+.modal .login-modal .modal-content .kyc-step .yourself-option .form-check-input.check-input {
+    right: 10px !important;
+    left: unset !important;
+    top: 10px;
+}
+
+.marketplace-view {
+    .filter-btn {
+        .nav-item {
+            .nav-link {
+                width: 148px;
+            }
+        }
+    }
+
+    .select-dropdown {
+        .select-dropdown__control {
+            .select-dropdown__value-container>div {
+                color: #808191;
+                font-size: 14px;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.enter-amount-dropdown {
+    width: 250px;
+    justify-content: end;
+
+    .selected-dropdown {
+        span {
+            padding: 0 5px;
         }
     }
 }

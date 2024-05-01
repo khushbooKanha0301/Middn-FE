@@ -20,8 +20,6 @@ import { useConnect, useSignMessage, useAccount, useDisconnect } from "wagmi";
 export const LoginView = (props) => {
   const [checkValue, setCheckValue] = useState(null);
   const [accountAddress, setAccountAddress] = useState("");
-  const [userchainId, SetUserChainId] = useState(null);
-  const [newChainId, setNewChainId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { signMessage, data, error } = useSignMessage();
@@ -226,24 +224,6 @@ export const LoginView = (props) => {
     // }
   };
 
-  // const setCoinbaseEvent = async () => {
-  //   var coinbaseProvider = await window.ethereum.providers.find(
-  //     (provider) => provider.isCoinbaseWallet
-  //   );
-
-  //   var handleAccountsChangedOnCoinbase = async (accounts) => {
-  //     if (accounts.length) {
-  //       await activateInjectedProvider("coinbaseWallet");
-  //       await connect({ connector: wagmiConnector[1] });
-  //       setProvider("coinbaseWallet");
-  //     }
-  //   };
-  //   await coinbaseProvider.on(
-  //     "accountsChanged",
-  //     handleAccountsChangedOnCoinbase
-  //   );
-  // };
-
   useEffect(() => {
     const checkIfWalletIsConnected = async () => {
       try {
@@ -264,42 +244,6 @@ export const LoginView = (props) => {
       checkIfWalletIsConnected();
     }
   }, [ethereum, userData.authToken, userData.address]);
-
-  // useEffect(() => {
-  //   if (chainId) {
-  //     SetUserChainId(chainId);
-  //   }
-  // }, [chainId]);
-  // ethereum &&
-  //   ethereum.on("chainChanged", (networkId) => {
-  //     if (userchainId !== null && userchainId !== networkId) {
-  //       setNewChainId(Web3.utils.hexToNumber(networkId));
-  //     }
-  //   });
-
-  // useEffect(() => {
-  //   const checkChain = async () => {
-  //     if (newChainId) {
-  //       const isChainSupported = await isChainIdSupported(newChainId);
-  //       if (!isChainSupported) {
-  //         await disconnect();
-  //         props.setTwoFAModal(false);
-  //         dispatch(
-  //           notificationFail(
-  //             "Network is unsupoorted, please switch to another network"
-  //           )
-  //         );
-  //       } else if (
-  //         newChainId &&
-  //         userchainId !== null &&
-  //         userchainId !== newChainId
-  //       ) {
-  //         dispatch(notificationSuccess("Network changed successfully !"));
-  //       }
-  //     }
-  //   };
-  //   checkChain();
-  // }, [newChainId]);
 
   useEffect(() => {
     props.handleaccountaddress(accountAddress);
@@ -414,9 +358,6 @@ export const LoginView = (props) => {
     }
   }, [address, userData?.account]);
 
-  // const isChainIdSupported = async (chainId) => {
-  //   return web3Connectors?.injected?.supportedChainIds?.includes(chainId);
-  // };
 
   const submitHandler = async (event) => {
     event.preventDefault();
@@ -433,33 +374,12 @@ export const LoginView = (props) => {
         setProvider("walletConnect");
         break;
       case "meta_mask":
-        //let provider;
-       // let currentChainId;
         if (!window.ethereum) {
           dispatch(
             notificationFail("Please Install Meta Mask in Your system ")
           );
           return false;
         }
-
-        // if (window.ethereum && !window.ethereum.providers) {
-        //   currentChainId = Web3.utils.hexToNumber(window.ethereum.chainId);
-        // } else {
-        //   provider = window.ethereum.providers.find(
-        //     (provider) => provider.isMetaMask
-        //   );
-        //   currentChainId = Web3.utils.hexToNumber(provider.chainId);
-        // }
-        //const isChainSupported = await isChainIdSupported(currentChainId);
-
-        // if (!isChainSupported) {
-        //   dispatch(
-        //     notificationFail(
-        //       "Network is unsupoorted, please switch to another network"
-        //     )
-        //   );
-        //   return false;
-        // }
 
         await activateInjectedProvider("injected");
         activate(web3Connectors.injected);
@@ -524,23 +444,6 @@ export const LoginView = (props) => {
                 <Form onSubmit={submitHandler}>
                   <Row>
                     <Col md="6">
-                      {/* <Form.Check
-                    className="login-option"
-                    label={
-                      <>
-                        <img
-                          src={require("../content/images/wallet-connect.png")}
-                          alt="WalletConnect"
-                        />{" "}
-                        WalletConnect
-                      </>
-                    }
-                    name="group1"
-                    type="radio"
-                    id="loginoption1"
-                    value={"wallet_connect"}
-                    onChange={onChange}
-                  /> */}
                       <div
                         className="login-option form-check"
                         onClick={() => onChange("wallet_connect")}
@@ -562,23 +465,6 @@ export const LoginView = (props) => {
                       </div>
                     </Col>
                     <Col md="6">
-                      {/* <Form.Check
-                    className="login-option"
-                    label={
-                      <span>
-                        <img
-                          src={require("../content/images/metamask.png")}
-                          alt="Metamask"
-                        />{" "}
-                        Metamask
-                      </span>
-                    }
-                    value={"meta_mask"}
-                    name="group1"
-                    type="radio"
-                    id="loginoption2"
-                    onChange={onChange}
-                  /> */}
                       <div
                         className="login-option form-check"
                         onClick={() => onChange("meta_mask")}
@@ -600,24 +486,6 @@ export const LoginView = (props) => {
                       </div>
                     </Col>
                     <Col md="6">
-                      {/* <Form.Check
-                    className="login-option"
-                    label={
-                      <span>
-                        <img
-                          src={require("../content/images/coinbase-wallet.png")}
-                          alt="Coinbase Wallet"
-                        />{" "}
-                        Coinbase Wallet
-                      </span>
-                    }
-                    onChange={onChange}
-                    value={"coinbase_wallet"}
-                    name="group1"
-                    type="radio"
-                    id="loginoption3"
-                  /> */}
-
                       <div
                         className="login-option form-check"
                         onClick={() => onChange("coinbase_wallet")}
@@ -639,23 +507,6 @@ export const LoginView = (props) => {
                       </div>
                     </Col>
                     <Col md="6">
-                      {/* <Form.Check
-                    className="login-option"
-                    label={
-                      <span>
-                        <img
-                          src={require("../content/images/fortmatic.png")}
-                          alt="Fortmatic"
-                        />{" "}
-                        Fortmatic
-                      </span>
-                    }
-                    onChange={onChange}
-                    value={"fortmatic"}
-                    name="group1"
-                    type="radio"
-                    id="loginoption4"
-                  /> */}
                       <div
                         className="login-option form-check"
                         onClick={() => onChange("fortmatic")}

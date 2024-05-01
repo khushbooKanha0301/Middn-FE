@@ -1,7 +1,10 @@
 import axios from "axios";
 import apiConfig from "../config/config";
+// Base URL for API
 const API_URL = `${apiConfig.BASE_URL}`;
 const token = localStorage.getItem("token");
+
+// Create an instance of axios with JWT authentication
 const jwtAxios = axios.create({
   baseURL: API_URL, // YOUR_API_URL HERE
   headers: {
@@ -12,6 +15,7 @@ const jwtAxios = axios.create({
   },
 });
 
+// Interceptor to handle requests
 jwtAxios.interceptors.request.use(
   (config) => {
     let throttleTime = localStorage.getItem("throttleTime");
@@ -37,6 +41,7 @@ jwtAxios.interceptors.request.use(
   }
 );
 
+// Interceptor to handle responses
 jwtAxios.interceptors.response.use(
   (res) => res,
   (err) => {
@@ -74,6 +79,8 @@ jwtAxios.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+// Function to set authentication token
 export const setAuthToken = (token) => {
   if (token) {
     jwtAxios.defaults.headers.common.Authorization = `Bearer ${token}`;

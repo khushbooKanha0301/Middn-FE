@@ -24,7 +24,9 @@ import { CalenderIcon } from "./SVGIcon";
 import { forwardRef } from "react";
 import * as flatted from "flatted";
 
+// This component is used for kyc model verification 
 export const KYCVerification = (props) => {
+  const [isOpen, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { setkycsubmitted, ...rest } = props;
   const dispatch = useDispatch();
@@ -54,12 +56,10 @@ export const KYCVerification = (props) => {
   const [imageUrlLocationSet, setImageLocationUrl] = useState(
     "https://flagcdn.com/h40/us.png"
   );
-  console.log("imageUrlLocationSet", imageUrlLocationSet)
 
   const [imageUrlCountrySet, setImageCountryUrl] = useState(
     "https://flagcdn.com/h40/us.png"
   );
-  console.log("imageUrlCountrySet", imageUrlCountrySet)
 
   const [imageLocationSearchUrlSet, setImageLocationSearchUrl] = useState(
     "https://flagcdn.com/h40/us.png"
@@ -251,7 +251,7 @@ export const KYCVerification = (props) => {
           formData.append("postal_code", postal_code);
           formData.append("country_of_issue", country_of_issue);
           formData.append("verified_with", verified_with);
-         
+
           setError(true);
           let updateUser = await jwtAxios
             .put(`/users/updateKyc`, formData, {
@@ -380,8 +380,8 @@ export const KYCVerification = (props) => {
     fetchKYCData(userDetailsAll);
     setImageLocationUrl("https://flagcdn.com/h40/us.png");
     setImageCountryUrl("https://flagcdn.com/h40/us.png");
-    setCountry("US")
-    setLocation("US")
+    setCountry("US");
+    setLocation("US");
     setMname(null);
     setResAddress(null);
     setPostalCode(null);
@@ -396,7 +396,7 @@ export const KYCVerification = (props) => {
   return (
     <Modal
       {...rest}
-      dialogClassName="login-modal kyc-verify-model"
+      dialogClassName="login-modal"
       backdropClassName="login-modal-backdrop"
       aria-labelledby="contained-modal"
       backdrop="static"
@@ -501,7 +501,7 @@ export const KYCVerification = (props) => {
                         disabled
                       />
 
-                      <div className="text-center relative mobile-setting-dropdown flex items-center">
+                      <div className="text-center relative mobile-setting-dropdown kyc-mobile-popup flex items-center">
                         {nationality ? (
                           <img
                             src={imageUrlLocationSet}
@@ -511,6 +511,7 @@ export const KYCVerification = (props) => {
                         ) : (
                           "No Flag"
                         )}
+
                         <SelectLocationDropdown
                           selectedLocationOption={selectedLocationOption}
                           setSelectedLocationOption={setSelectedLocationOption}
@@ -651,7 +652,7 @@ export const KYCVerification = (props) => {
                         disabled
                         maxLength="10"
                       />
-                     <div className="kyc-mobile-popup">
+                      <div className="kyc-mobile-popup">
                         {country_of_issue ? (
                           <img
                             src={imageUrlCountrySet}
@@ -692,7 +693,7 @@ export const KYCVerification = (props) => {
                         disabled
                       />
 
-                      <div className="text-center relative mobile-setting-dropdown flex items-center">
+                      <div className="text-center relative mobile-setting-dropdown kyc-mobile-popup flex items-center">
                         {nationality ? (
                           <img
                             src={imageUrlCountrySet}
@@ -799,7 +800,7 @@ export const KYCVerification = (props) => {
                       {...getInputProps({ accept: "image/*, application/pdf" })}
                     />
                     <Row>
-                      <Col sm="12"className="d-flex items-center" >
+                      <Col sm="12" className="d-flex items-center">
                         <CameraLineIcon width="23" height="24" /> Take a photo
                       </Col>
                       {passport_url && (

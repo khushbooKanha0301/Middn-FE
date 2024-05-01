@@ -3,6 +3,7 @@ import { NavDropdown } from "react-bootstrap";
 import { userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
 
+//Skeleton design for header
 export const HeaderLoader = () => {
   const acAddress = useSelector(userDetails);
   return (

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { userDetails, userGetFullDetails } from "../store/slices/AuthSlice";
-
-
 import { onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -24,6 +22,7 @@ import Logo from "../../src/content/images/logo.png";
 import MassageIcon from "../../src/content/images/massage.png";
 import BellIcon from "../../src/content/images/bell.png";
 
+//This component is used for header section
 export const Header = (props) => {
   const dispatch = useDispatch();
   const [position, setPosition] = useState(window.pageYOffset);

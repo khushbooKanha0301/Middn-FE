@@ -52,48 +52,7 @@ export const LatestsEscrows = () => {
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
-  // const [escrows, setEscrow] = useState([]);
-  // const [userStatuses, setUserStatuses] = useState([]);
-  //const [userList, setUserList] = useState([]);
 
-  // useEffect(() => {
-  //   setUserList(escrows.slice(0, userDisplayCal));
-  // }, [escrows]); 
-  
-
-  // const loadMoreData = () => {
-  //   setUserList(prevUserList => [...prevUserList, ...escrows.slice(prevUserList.length)]);
-  // };
-
-  // const getAllEscrow = async () => {
-  //   try {
-  //     setUserStatuses([]);
-  //     let res;
-  //     if (acAddress.authToken) {
-  //       res = await jwtAxios.get(
-  //         `/escrows/getAllOpenEscrows/${acAddress?.account}`
-  //       );
-  //       setEscrow(res.data?.data);
-  //       let statuses = await Promise.all(
-  //         res.data?.data.map(async (e) => {
-  //           const starCountRef = ref(
-  //             database,
-  //             firebaseStatus.CHAT_USERS + e.trade_address
-  //           );
-  //           const snapshot = await get(starCountRef);
-  //           return snapshot.exists() ? snapshot.val()?.isOnline : 4;
-  //         })
-  //       );
-  //       setUserStatuses(statuses);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getAllEscrow();
-  // }, [acAddress]);
 
   const createEscrowModalToggle = () => {
     if (acAddress.authToken) {
@@ -106,11 +65,6 @@ export const LatestsEscrows = () => {
   const handleAccountAddress = (address) => {
     setIsSign(false);
   };
-
-  // const openEscrow = (e) => {
-  //   navigate(`/escrow/${e._id}`, { state: { userAddress: e._id , key : "sidebar"} });
-  // };
-
   return (
     <>
       <Card className="cards-dark latests-escrows">

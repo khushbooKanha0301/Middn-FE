@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { userGetFullDetails } from "../store/slices/AuthSlice";
 import { Box } from "@mui/material";
 
+//This component is used for report user on profile page 
 export const ReportUserView = (props) => {
   const { id} = props;
   const [reason, setReason] = useState(null);

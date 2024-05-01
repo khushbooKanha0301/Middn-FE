@@ -17,8 +17,7 @@ import {
   notificationSuccess,
 } from "../store/slices/notificationSlice";
 import { ref, update,
-  get,
-  child,
+  get
 } from "firebase/database";
 import { database } from "./../helper/config";
 import { firebaseMessages } from "./../helper/chatMessage";
@@ -33,6 +32,7 @@ function simulateNetworkRequest() {
   return new Promise((resolve) => setTimeout(resolve, 2000));
 }
 
+//This component is used for edit user profile
 export const EditProfileView = (props) => {
   const dispatch = useDispatch();
 

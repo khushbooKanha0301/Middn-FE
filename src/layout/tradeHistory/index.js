@@ -1,11 +1,10 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row, Button, Nav } from "react-bootstrap";
 import { TrashIcon } from "../../component/SVGIcon";
 import Select from "react-select";
 import CreateEscrowView from "../escrow/CreateEscrow";
 import { TableLoader } from "../../helper/Loader";
 import { Box } from "@mui/material";
-
 
 const data = [
   {
@@ -30,8 +29,9 @@ export const TradeHistory = () => {
     setSelectedOptionStatus(e);
   };
   const [createEscrowModalShow, setCreateEscrowModalShow] = useState(false);
-  const createEscrowModalToggle = () => setCreateEscrowModalShow(!createEscrowModalShow);
-  
+  const createEscrowModalToggle = () =>
+    setCreateEscrowModalShow(!createEscrowModalShow);
+
   useEffect(() => {
     setEscrowLoading(false);
   }, []);
@@ -63,7 +63,8 @@ export const TradeHistory = () => {
               defaultValue={selectedOptionStatus}
               value={selectedOptionStatus}
               className="select-dropdown"
-              isSearchable={false}              
+             
+              isSearchable={false}
               components={{
                 IndicatorSeparator: () => null,
               }}
@@ -71,7 +72,7 @@ export const TradeHistory = () => {
               options={data}
               onChange={handleChangeStatus}
               getOptionLabel={(e) => (
-                <div className="selected-dropdown">{e.text}</div>
+                <div className="selected-dropdown" >{e.text}</div>
               )}
             />
             <Button variant="dark">
@@ -97,7 +98,6 @@ export const TradeHistory = () => {
               <div className="trade-price">
                 <div className="d-flex align-items-center">
                   <div className="customCheckbox" onClick={toggleCheckbox}>
-                    {/* <input type="checkbox" /> */}
                     <div className={`check ${isChecked ? "checked" : ""}`} />
                   </div>
                   <div className="content ms-3">

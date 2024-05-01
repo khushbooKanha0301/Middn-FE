@@ -1,6 +1,8 @@
 import React from "react";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
+
+//This component is used for statistic graph design 
 const colors = ["#ffffff"];
 const options = {
   chart: {

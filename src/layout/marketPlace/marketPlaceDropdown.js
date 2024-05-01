@@ -65,8 +65,8 @@ const MarketPlaceDropdown = () => {
   };
   return (
     <div className="market-place-dropdown">
-      <Row className="flex-nowrap">
-        <Col sm={7}>
+      <Row className="flex-nowrap justify-between">
+        <Col sm={6} style={{ paddingRight: "30px" }}>
           <div className="d-flex varification gap-2">
             <div className="circle" />
             <div>
@@ -76,7 +76,13 @@ const MarketPlaceDropdown = () => {
                 <KingIcon width="20" height="20" />
                 <div className="border-requires" />
                 <ShieldIcon width="16" height="16" />
-                <span style={{ color: "#808191", fontWeight: "600" }}>
+                <span
+                  style={{
+                    color: "#808191",
+                    fontWeight: "600",
+                    fontFamily: "Inter",
+                  }}
+                >
                   Requires Verification
                 </span>
               </p>
@@ -97,6 +103,7 @@ const MarketPlaceDropdown = () => {
                   color: "#808191",
                   fontWeight: "600",
                   fontSize: "13px",
+                  fontFamily: "Inter",
                 }}
               >
                 Payment Time Limit
@@ -111,6 +118,7 @@ const MarketPlaceDropdown = () => {
                   color: "#808191",
                   fontWeight: "600",
                   fontSize: "13px",
+                  fontFamily: "Inter",
                 }}
               >
                 Avg. Release Time
@@ -125,6 +133,7 @@ const MarketPlaceDropdown = () => {
                   color: "#808191",
                   fontWeight: "600",
                   fontSize: "13px",
+                  fontFamily: "Inter",
                 }}
               >
                 Available
@@ -150,7 +159,7 @@ const MarketPlaceDropdown = () => {
                 style={{
                   fontFamily: "eudoxus sans",
                   fontSize: "13px",
-                  fontWeight: "600",
+                  fontWeight: "700",
                 }}
               >
                 Advertisers' Terms (Please read carefully)
@@ -159,7 +168,7 @@ const MarketPlaceDropdown = () => {
                 style={{
                   color: "#808191",
                   fontSize: "13px",
-                  fontFamily: "eudoxus sans",
+                  fontFamily: "Inter",
                   fontWeight: "600",
                   marginBottom: " 0px",
                 }}
@@ -180,7 +189,10 @@ const MarketPlaceDropdown = () => {
                 fontFamily: "Inter",
               }}
             >
-              Price <span style={{ color: "#fff" }}>16,234</span>
+              Price{" "}
+              <span style={{ color: "#fff", fontFamily: "eudoxus sans" }}>
+                16,234
+              </span>
             </p>
             <div className="price-dropdown-wrapper">
               <span>You Pay</span>
@@ -201,7 +213,30 @@ const MarketPlaceDropdown = () => {
                         options={data}
                         onChange={handleChangeAny}
                       />
-                      <Select
+                      <div
+                        className="selected-dropdown"
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle cx="12" cy="12" r="12" fill="#C4C4C4" />
+                        </svg>
+                        <span
+                          style={{
+                            marginLeft: "4px",
+                            fontSize: "16px",
+                            fontWeight: "unset",
+                          }}
+                        >
+                          EUR
+                        </span>
+                      </div>
+                      {/* <Select
                         defaultValue={selectedOptionAny}
                         value={selectedOptionAny}
                         className="select-dropdown"
@@ -227,7 +262,7 @@ const MarketPlaceDropdown = () => {
                             </div>
                           </div>
                         )}
-                      />
+                      /> */}
                     </div>
                   </Form.Group>
                 </div>
@@ -250,7 +285,30 @@ const MarketPlaceDropdown = () => {
                         name="Binance"
                         placeholder="Binance"
                       />
-                      <Select
+                      <div
+                        className="selected-dropdown"
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle cx="12" cy="12" r="12" fill="#C4C4C4" />
+                        </svg>
+                        <span
+                          style={{
+                            marginLeft: "4px",
+                            fontSize: "16px",
+                            fontWeight: "unset",
+                          }}
+                        >
+                          BNB
+                        </span>
+                      </div>
+                      {/* <Select
                         defaultValue={selectedYouReceive}
                         value={selectedYouReceive}
                         className="select-dropdown"
@@ -276,7 +334,7 @@ const MarketPlaceDropdown = () => {
                             </div>
                           </div>
                         )}
-                      />
+                      /> */}
                     </div>
                   </Form.Group>
                 </div>

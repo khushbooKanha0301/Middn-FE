@@ -118,6 +118,26 @@ const MarketPlace = () => {
                 options={data}
                 onChange={handleChangeAny}
               />
+
+              <Select
+                defaultValue={selectedOptionAny}
+                value={selectedOptionAny}
+                className="select-dropdown enter-amount-dropdown"
+                isSearchable={false}
+                components={{
+                  IndicatorSeparator: () => null,
+                }}
+                classNamePrefix="select-dropdown"
+                options={data}
+                onChange={handleChangeAny}
+                getOptionLabel={(e) => (
+                  <div className="selected-dropdown">
+                    {e.icon}
+                    <span>{e.text}</span>
+                  </div>
+                )}
+              />
+              {/* 
               <Select
                 defaultValue={selectedOptionAny}
                 value={selectedOptionAny}
@@ -133,7 +153,7 @@ const MarketPlace = () => {
                   <div
                     style={{
                       display: "flex",
-                      width: "249px",
+                      width: "160px",
                       justifyContent: "space-between",
                       alignItems: "center",
                     }}
@@ -144,7 +164,7 @@ const MarketPlace = () => {
                     </div>
                   </div>
                 )}
-              />
+              /> */}
             </div>
           </Form.Group>
           <Select
@@ -246,10 +266,7 @@ const MarketPlace = () => {
               <div style={{ width: "199px", textAlign: "center" }}>
                 <span>0.923 USD</span>
               </div>
-              <div
-                className="marketplace-amount"
-                style={{ width: "199px", textAlign: "center" }}
-              >
+              <div className="marketplace-amount" style={{ width: "199px" }}>
                 <p>600.00 USDT</p>
                 <p>$454.000-$465.000</p>
               </div>
@@ -265,7 +282,7 @@ const MarketPlace = () => {
                   onClick={() => {
                     onBuySellClick();
                   }}
-                  style={{ width: "98px" }}
+                  style={{ width: "98px", fontFamily: "eudoxus sans" }}
                 >
                   Buy
                 </Button>
@@ -289,10 +306,7 @@ const MarketPlace = () => {
               <div style={{ width: "199px", textAlign: "center" }}>
                 <span>0.923 USD</span>
               </div>
-              <div
-                className="marketplace-amount"
-                style={{ width: "199px", textAlign: "center" }}
-              >
+              <div className="marketplace-amount" style={{ width: "199px" }}>
                 <p>600.00 USDT</p>
                 <p>$454.000-$465.000</p>
               </div>
@@ -308,7 +322,7 @@ const MarketPlace = () => {
                   onClick={() => {
                     onBuySellClick();
                   }}
-                  style={{ width: "98px" }}
+                  style={{ width: "98px", fontFamily: "eudoxus sans" }}
                 >
                   Buy
                 </Button>

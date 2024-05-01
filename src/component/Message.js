@@ -12,6 +12,7 @@ import {
   notificationSuccess,
 } from "../store/slices/notificationSlice";
 
+//This component is used for message chat start from profile page 
 export const MessageView = (props) => {
   const { otheruser } = props;
   const [content, SetContent] = useState(null);

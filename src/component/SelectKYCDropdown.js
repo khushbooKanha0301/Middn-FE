@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Form, Dropdown, FormControl } from "react-bootstrap";
 import Search from "../content/images/search.svg";
 import listData from "../component/countryData";
+import Sheet from "react-modal-sheet";
 
+//This component is used for country  dropdown applied on kyc verification model
 const SelectLocationKYCDropdown = (props) => {
   const {
     setSelectedLocationOption,
@@ -18,7 +20,7 @@ const SelectLocationKYCDropdown = (props) => {
     country,
   } = props;
   const [isMobile, setIsMobile] = useState(false);
-  const [openDr, setOpenDr] = useState(true);
+  const [openDr, setOpenDr] = useState(false);
   const [searchLocationTextOrigin, setSearchLocationTextOrigin] =
     useState(null);
   const [showCountryOptions, setFilteredLocationOptions] = useState(listData);
@@ -63,6 +65,7 @@ const SelectLocationKYCDropdown = (props) => {
     setImageLocationSearchUrl(imageUrl);
     setSearchLocationText(`${option.country}`);
     setSearchLocationTextOrigin(option);
+    setOpenDr(false);
   };
 
   const handleCheckboxLocationChangeOnMobile = (option) => {
@@ -79,7 +82,7 @@ const SelectLocationKYCDropdown = (props) => {
     setNationality(option?.country);
     const imageUrl = phoneCountryData(option.code);
     setImageLocationUrl(imageUrl);
-    setOpenDr(true);
+    setOpenDr(false);
   };
 
   const phoneCountryData = (code) => {
@@ -87,28 +90,28 @@ const SelectLocationKYCDropdown = (props) => {
     return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
   };
 
-  const handleDrawer = () => {
-    setOpenDr(!openDr);
-  };
-
   const handleDrawerOverlay = () => {
-    setOpenDr(true);
+    setOpenDr(false);
   };
-
+  
   return (
     <div
       className={`d-flex items-center phone-number-dropdown justify-between relative`}
     >
       {!isMobile && (
         <>
-          <Dropdown className="account-setting-dropdown">
+          <Dropdown
+            className="account-setting-dropdown"
+            show={openDr}
+            onToggle={(isOpen) => setOpenDr(isOpen)}
+          >
             <Dropdown.Toggle>
               {listData.find((item) => item?.iso === country)?.cca3}
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                 <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
               </svg>
             </Dropdown.Toggle>
-            <Dropdown.Menu className="dropdownMenu">
+            <Dropdown.Menu className="dropdownMenu" show={openDr}>
               <div className="dropdown-menu-inner">
                 {searchLocationText && imageLocationSearchUrlSet ? (
                   <img
@@ -129,29 +132,18 @@ const SelectLocationKYCDropdown = (props) => {
               <div className="filter-option">
                 {showCountryOptions.map((data, key) => (
                   <div
-                    className="yourself-option"
-                    onChange={() => handleCheckboxLocationChange(data)}
+                    key={`${data.country}`}
+                    className={`yourself-option form-check`}
+                    onClick={() => handleCheckboxLocationChange(data)}
                   >
-                    <Form.Check
-                      key={`${data.country}`}
-                      type="checkbox"
-                      id={`checkbox-${data.iso}`}
-                      label={
-                        <div>
-                          <img
-                            src={phoneCountryData(data.code)}
-                            alt="Flag"
-                            className="rectangle-data"
-                          />
-                          {data.country}
-                        </div>
-                      }
-                      style={{
-                        width: " 100%",
-                        display: " flex",
-                        alignItems: "center",
-                      }}
-                    />
+                    <label className="form-check-label">
+                      <img
+                        src={phoneCountryData(data.code)}
+                        alt="Flag"
+                        className="rectangle-data"
+                      />
+                      {data.country}
+                    </label>
                     <div
                       className={`form-check-input check-input ${
                         JSON.stringify(selectedLocationOption) ===
@@ -179,7 +171,7 @@ const SelectLocationKYCDropdown = (props) => {
             data-drawer-edge="true"
             data-drawer-edge-offset="bottom-[60px]"
             aria-controls="drawer-swipe"
-            onClick={handleDrawer}
+            onClick={() => setOpenDr(true)}
           >
             <p className="text-white mb-0 personalDataLocation">
               {listData.find((item) => item?.iso === country)?.cca3}
@@ -189,105 +181,96 @@ const SelectLocationKYCDropdown = (props) => {
             </svg>
           </button>
           <div
-            className={!openDr ? "mobile-setting-dropdown-overlay" : ""}
+            className={openDr ? "mobile-setting-dropdown-overlay" : ""}
             onClick={handleDrawerOverlay}
           ></div>
-          <div
-            id="drawer-swipe"
-            className={`fixed  z-40 w-full overflow-y-auto bg-white  rounded-t-lg dark:bg-gray-800 transition-transform bottom-0 left-0 right-0 ${
-              openDr ? "translate-y-full" : ""
-            } bottom-[60px]`}
-            tabindex="-1"
-            aria-labelledby="drawer-swipe-label"
-          >
-            <div className="drawer-swipe-wrapper">
-              <div className="drawer-swiper" onClick={handleDrawerOverlay} />
-              <div className="dropdown-menu-inner">
-                {searchLocationText && imageLocationSearchUrlSet ? (
-                  <img
-                    src={imageLocationSearchUrlSet}
-                    alt="Flag"
-                    className="rectangle-data"
-                  />
-                ) : null}
-                <FormControl
-                  type="text"
-                  placeholder="Search..."
-                  className="mr-3 mb-2"
-                  value={searchLocationText}
-                  onChange={handleSearchLocationChange}
-                />
-                <img src={Search} alt="" className="search-icon" />
-              </div>
-              <div className="filter-option">
-                {showCountryOptions.map((data, key) => (
-                  <>
-                    <div
-                      className="yourself-option"
-                      onChange={() => handleCheckboxLocationChangeOnMobile(data)}
-                    >
-                      <Form.Check
-                        key={`${data.country}`}
-                        type="checkbox"
-                        id={`checkbox-${data.iso}`}
-                        label={
-                          <div>
+          <Sheet isOpen={openDr} onClose={() => setOpenDr(false)}>
+            <Sheet.Container className="phone-number-dropdown">
+              <Sheet.Header />
+              <Sheet.Content>
+                <div tabindex="-1" aria-labelledby="drawer-swipe-label">
+                  <div className="drawer-swipe-wrapper">
+                    <div className="dropdown-menu-inner">
+                      {searchLocationText && imageLocationSearchUrlSet ? (
+                        <img
+                          src={imageLocationSearchUrlSet}
+                          alt="Flag"
+                          className="rectangle-data"
+                        />
+                      ) : null}
+                      <FormControl
+                        type="text"
+                        placeholder="Search..."
+                        className="mr-3 mb-2"
+                        value={searchLocationText}
+                        onChange={handleSearchLocationChange}
+                      />
+                      <img src={Search} alt="" className="search-icon" />
+                    </div>
+                    <div className="filter-option">
+                      {showCountryOptions.map((data, key) => (
+                        <div
+                          key={`${data.country}`}
+                          className={`yourself-option form-check`}
+                          onClick={() =>
+                            handleCheckboxLocationChangeOnMobile(data)
+                          }
+                        >
+                          <label className="form-check-label">
                             <img
                               src={phoneCountryData(data.code)}
                               alt="Flag"
                               className="rectangle-data"
                             />
                             {data.country}
-                          </div>
-                        }
-                        style={{
-                          width: " 100%",
-                          display: " flex",
-                          alignItems: "center",
-                        }}
-                      />
-                      <div
-                        className={`form-check-input check-input ${
-                          JSON.stringify(selectedLocationOption) ===
-                          JSON.stringify(data)
-                            ? "selected"
-                            : ""
-                        }`}
-                      />
+                          </label>
+                          <div
+                            className={`form-check-input check-input ${
+                              JSON.stringify(selectedLocationOption) ===
+                              JSON.stringify(data)
+                                ? "selected"
+                                : ""
+                            }`}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  </>
-                ))}
-              </div>
-              <div className="edit-btn flex justify-center">
-                {selectedLocationOption ? (
-                  <>
-                    <button
-                      type="button"
-                      class="btn btn-primary mx-1"
-                      onClick={() =>
-                        handlePhoneNumberLocationMobile(selectedLocationOption)
-                      }
-                    >
-                      Save
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button type="button" class="btn btn-primary mx-1">
-                      Save
-                    </button>
-                  </>
-                )}
-                <button
-                  type="button"
-                  class="btn mx-1 bg-gray text-white"
-                  onClick={handleDrawerOverlay}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+                    <div className="edit-btn flex justify-center">
+                      {selectedLocationOption ? (
+                        <>
+                          <button
+                            type="button"
+                            class="btn btn-primary mx-1"
+                            onClick={() =>
+                              handlePhoneNumberLocationMobile(
+                                selectedLocationOption
+                              )
+                            }
+                          >
+                            Save
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button type="button" class="btn btn-primary mx-1">
+                            Save
+                          </button>
+                        </>
+                      )}
+                      <button
+                        type="button"
+                        class="btn mx-1 bg-gray text-white"
+                        onClick={handleDrawerOverlay}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Sheet.Content>
+            </Sheet.Container>
+            <Sheet.Backdrop />
+          </Sheet>
         </>
       )}
     </div>

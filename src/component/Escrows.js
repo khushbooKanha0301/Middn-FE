@@ -1,5 +1,7 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
+
+//This component is used for escrow same url fetch on every tab 
 export const Escrows = (props) => {
     return (
         <Col className={`${props?.classlist > 1 ? 'col-fixed' : ''}`}>

@@ -25,7 +25,6 @@ import {
   userGetData,
   userGetFullDetails,
 } from "./store/slices/AuthSlice";
-
 import { get, ref, update, onValue } from "firebase/database";
 import { database } from "./helper/config";
 import { firebaseStatus } from "./helper/statusManage";
@@ -52,7 +51,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["124.122.194.254", "182.77.30.87"];
+  const allowedIPs = ["124.122.194.254", "110.226.29.37"];
 
   const fetchIPAddress = async () => {
     try {

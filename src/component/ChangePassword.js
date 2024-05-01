@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { EyeClosedIcon, EyeIcon } from "./SVGIcon";
 
+//This component is used for change user password
 export const ChangePasswordView = (props) => {
     const [isVisibleOldPass, setVisibleOldPass] = useState(false);
     const toggleOldPass = () => {
