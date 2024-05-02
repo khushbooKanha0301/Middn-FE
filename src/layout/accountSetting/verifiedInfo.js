@@ -24,23 +24,7 @@ export const VerifiedInfo = () => {
   const modalToggle = () => setModalShow(!modalShow);
 
   const modalKycToggle = async () => {
-    await jwtAxios
-      .get(`/users/getuser`)
-      .then((response) => {
-        if (
-          (response.data?.User?.kyc_completed === true &&
-            response.data?.User?.is_verified === 2) ||
-          response.data?.User?.kyc_completed === false ||
-          response.data?.User?.kyc_completed == undefined
-        ) {
-          setModalKYCShow(!modalShow);
-        } else {
-          dispatch(notificationFail("KYC already Submitted"));
-        }
-      })
-      .catch((error) => {
-        dispatch(notificationFail("Something went wrong with get user"));
-      });
+    setModalKYCShow(!modalShow);
   };
 
   return (

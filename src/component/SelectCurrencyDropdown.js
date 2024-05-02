@@ -59,6 +59,7 @@ const SelectCurrencyDropdown = (props) => {
   };
 
   const handleCheckboxCurrencyChange = (option) => {
+    setShowCurrencyOptions(countryInfo)
     setCurrentPre(option);
     const imageUrl = currencyCountryData(option);
     setImageCurrencyUrl(imageUrl);

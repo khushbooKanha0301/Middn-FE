@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Dropdown, FormControl } from "react-bootstrap";
+import { Dropdown, FormControl } from "react-bootstrap";
 import Search from "../content/images/search.svg";
 import listData from "../component/countryData";
 import Sheet from "react-modal-sheet";
@@ -56,6 +56,7 @@ const SelectLocationDropdown = (props) => {
   };
 
   const handleCheckboxLocationChange = (option) => {
+    setFilteredLocationOptions(listData)
     setSelectedLocationOption(option);
     setCountry(option.iso);
     setNationality(option?.country);

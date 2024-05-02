@@ -41,6 +41,7 @@ const MarketPlace = () => {
   const [selectedOptionAnywhere, setSelectedOptionAnywhere] = useState(data[2]);
   const [isBuyActive, setIsBuyActive] = useState(true);
   const [isSellActive, setIsSellActive] = useState(false);
+  const [amount, setAmount] = useState("");
 
   const handleBuyClick = () => {
     setIsBuyActive(true);
@@ -51,7 +52,6 @@ const MarketPlace = () => {
   const handleSellClick = () => {
     setIsBuyActive(false);
     setIsSellActive(true);
-    // navigate(`/marketplace-buy`);
   };
 
   const onBuySellClick = async () => {
@@ -61,6 +61,13 @@ const MarketPlace = () => {
   const handleChangeAny = (e) => {
     setSelectedOptionAny(e);
   };
+
+  const handleChange = (e) => {
+    if (e.target.name === "price") {
+      setAmount(e.target.value);
+    } 
+  }
+
   const handleChangeBTC = (e) => {
     setSelectedOptionBTC(e);
   };
@@ -115,8 +122,8 @@ const MarketPlace = () => {
                 type="text"
                 name="price"
                 placeholder="Enter Amount"
-                options={data}
-                onChange={handleChangeAny}
+                value={amount}
+                onChange={handleChange}
               />
 
               <Select
@@ -137,34 +144,6 @@ const MarketPlace = () => {
                   </div>
                 )}
               />
-              {/* 
-              <Select
-                defaultValue={selectedOptionAny}
-                value={selectedOptionAny}
-                className="select-dropdown"
-                isSearchable={false}
-                components={{
-                  IndicatorSeparator: () => null,
-                }}
-                classNamePrefix="select-dropdown"
-                options={data}
-                onChange={handleChangeAny}
-                getOptionLabel={(e) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      width: "160px",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div className="selected-dropdown">
-                      {e.icon}
-                      <span>{e.text}</span>
-                    </div>
-                  </div>
-                )}
-              /> */}
             </div>
           </Form.Group>
           <Select

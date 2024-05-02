@@ -44,7 +44,6 @@ export const AccountSetting = () => {
   const [city, setCity] = useState("");
   const userData = useSelector(userGetFullDetails);
   const [currency, setCurrency] = useState("USD");
- console.log("currency ", currency);
   const [is2FAEnabled, setIs2FAEnabled] = useState(userData?.is_2FA_enabled);
  
   const [selectedOption, setSelectedOption] = useState({
@@ -172,41 +171,7 @@ export const AccountSetting = () => {
     }
   }, [userDetailsAll]);
 
-  // useEffect(() => {
-  //   let user = userDetailsAll;
-
-  //   if (user) {
-  //     setFname(user?.fname ? user?.fname : "");
-  //     setLname(user?.lname ? user?.lname : "");
-  //     setPhone(user?.phone ? user?.phone : "");
-  //     setEmail(user?.email ? user?.email : "");
-  //     setCity(user?.city ? user?.city : "");
-  //   }
-
-  //   if (user?.currentpre) {
-  //     setCurrentPre(user?.currentpre);
-  //   } else {
-  //     let currency = countryInfo.find((item) => item.code === "US");
-  //     setCurrentPre(currency?.currency.code);
-  //   }
-
-  //   if (user?.location) {
-  //     setCountry(user?.location);
-  //   } else {
-  //     setCountry("US");
-  //   }
-
-  //   if (user?.phoneCountry) {
-  //     setCountryCallingCode(user?.phoneCountry);
-  //   } else {
-  //     setCountryCallingCode(" +1");
-  //   }
-
-  //   if (userDetailsAll) {
-  //     setLoaderUpdate(false);
-  //   }
-  // }, []);
-
+ 
   const submitHandler = async () => {
     if (!phone) {
       dispatch(notificationFail("Please Enter phone number"));

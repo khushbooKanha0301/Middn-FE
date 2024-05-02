@@ -21,7 +21,7 @@ const SelectOptionDropdown = (props) => {
   const [searchTextOrigin, setSearchTextOrigin] = useState(null);
   const [openDr, setOpenDr] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState(listData);
-
+ 
   useEffect(() => {
     const checkMobile = () => {
       const mobileMatch = window.matchMedia("(max-width: 767px)");
@@ -54,6 +54,7 @@ const SelectOptionDropdown = (props) => {
   };
 
   const handleCheckboxChange = (option) => {
+    setFilteredOptions(listData)
     setSelectedOption(option);
     setCountryCallingCode(option.code);
     const imageUrl = phoneCountryData(option.code);
@@ -121,7 +122,6 @@ const SelectOptionDropdown = (props) => {
                   className="mr-3 mb-2"
                   value={searchText}
                   onChange={handleSearchChange}
-                  disabled
                 />
                 <img src={Search} alt="" className="search-icon" />
               </div>

@@ -51,7 +51,7 @@ export const App = () => {
   const [ipAddress, setIPAddress] = useState(null);
   const [isIpGetted, setIsIpGetted] = useState(false);
   const [error, setError] = useState(null);
-  const allowedIPs = ["124.122.194.254", "110.226.29.37"];
+  const allowedIPs = ["122.170.147.236", "110.226.29.37"];
 
   const fetchIPAddress = async () => {
     try {

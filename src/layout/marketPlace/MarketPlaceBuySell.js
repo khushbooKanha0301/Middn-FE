@@ -221,10 +221,10 @@ export const MarketPlaceBuySell = (props) => {
     setMessageText(event.target.value);
   };
 
-  const handleFileSelection = async (event) => {
-    const selectedFile = event.target.files[0];
-    setMessageFile(selectedFile);
-  };
+  // const handleFileSelection = async (event) => {
+  //   const selectedFile = event.target.files[0];
+  //   setMessageFile(selectedFile);
+  // };
 
   const handleDeselctImage = () => {
     setMessageFile("");
@@ -242,204 +242,9 @@ export const MarketPlaceBuySell = (props) => {
     event.target.removeAttribute("placeholder");
   };
 
-  const handleInputKeyPress = (event) => {
-    if (event.key === "Enter") {
-      const input = event.target;
-      const newText = input.value.trim();
-      if (newText !== "") {
-        const selectedEmojisText = selectedEmoji.join("");
-        const updatedText = `${messageText} ${selectedEmojisText} ${newText}`;
-        setSelectedEmoji([]);
-        input.value = updatedText.trim();
-      }
-    }
-  };
+  
 
-  const onEmojiClick = (emojiData, event) => {
-    const emoji = emojiData.emoji;
-    setMessageText(`${messageText}${emoji}`);
-    const selectedIndex = selectedEmoji.indexOf(emoji);
-    if (selectedIndex === -1) {
-      setSelectedEmoji([...selectedEmoji, emoji]);
-    } else {
-      const updatedSelectedEmojis = [...selectedEmoji];
-      updatedSelectedEmojis.splice(selectedIndex, 1);
-      setSelectedEmoji(updatedSelectedEmojis);
-    }
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    const messageText = e.target.elements?.content.value;
-    let noError = true;
-    const array_of_allowed_files = [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "bmp",
-      "tiff",
-      "doc",
-      "docx",
-      "xls",
-      "xlsx",
-      "ppt",
-      "pptx",
-      "odt",
-      "rtf",
-      "mp3",
-      "wav",
-      "aiff",
-      "aac",
-      "mp4",
-      "avi",
-      "mov",
-      "wmv",
-    ];
-    // Check if the uploaded file is allowed
-    let file = {};
-    if (messageFile) {
-      const file_extension = messageFile.name.slice(
-        ((messageFile.name.lastIndexOf(".") - 1) >>> 0) + 2
-      );
-      if (!array_of_allowed_files.includes(file_extension)) {
-        noError = false;
-        dispatch(notificationFail("Inappropriate file type"));
-      } else {
-        const allowed_file_size = 5;
-        if (file.size / (1024 * 1024) > allowed_file_size || file.size < 1) {
-          noError = false;
-        } else {
-          noError = true;
-          let base64 = await converImageToBase64(messageFile);
-          file = {
-            name: messageFile?.name,
-            size: messageFile?.size,
-            type: messageFile?.type,
-            url: base64,
-          };
-        }
-      }
-    }
-    if (messageText !== "" || messageFile !== "" || !file) {
-      if (acAddress?.wallet_address && receiverAddress && noError == true) {
-        await addUserInFirebase(acAddress?.wallet_address);
-        await addUserInFirebase(receiverAddress);
-        sendMessage(
-          //CHAT_ROOM,
-          acAddress?.wallet_address,
-          receiverAddress,
-          id,
-          escrow?.escrow_type,
-          messageText,
-          messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
-          file
-        );
-        // e.target.elements.content.value = "";
-        setMessageFile("");
-        setMessageText("");
-      }
-    }
-  };
-
-  const modalToggle = async (id, status) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to ${status} this user?`,
-      showCancelButton: true,
-      confirmButtonColor: "red",
-      cancelButtonColor: "#808080",
-      confirmButtonText: "Yes",
-      customClass: {
-        popup: "suspend",
-      },
-    }).then(async (result) => {
-      let user;
-      if (status === "Block") {
-        user = {
-          userStatus: true,
-        };
-      } else {
-        user = {
-          userStatus: false,
-        };
-      }
-      jwtAxios
-        .put(`/users/userBlocked/${id}`, user)
-        .then(async (res) => {
-          Swal.fire(`${status}!`, "This User has been Blocked ...", "danger");
-          const userRef = ref(database, firebaseStatus?.CHAT_USERS + id);
-          await update(userRef, user);
-          const updatedSnapshot = await get(userRef);
-          setUser((prevData) => ({
-            ...prevData,
-            userStatus: updatedSnapshot.val()?.userStatus,
-          }));
-        })
-        .catch((error) => {
-          if (typeof error == "string") {
-            dispatch(notificationFail(error));
-          }
-          if (error?.response?.data?.message === "") {
-            dispatch(notificationFail("Invalid "));
-          }
-          if (error?.response?.data?.message) {
-            dispatch(notificationFail(error?.response?.data?.message));
-          }
-        });
-    });
-  };
-
-  const addUserInFirebase = (address) => {
-    jwtAxios
-      .get(`/users/getUserByAddress/${address}`)
-      .then((res) => {
-        const user = res.data?.data;
-        const userRef = ref(
-          database,
-          firebaseMessagesEscrow?.CHAT_USERS + user?.wallet_address
-        );
-        get(userRef)
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              // User exists, update the data
-              update(userRef, {
-                fname_alias: user.fname_alias || "John",
-                lname_alias: user.lname_alias || "Doe",
-                imageUrl: user?.imageUrl ? user?.imageUrl : "",
-              });
-            } else {
-              // User doesn't exist, add new data
-              set(userRef, {
-                wallet_address: user?.wallet_address,
-                fname_alias: user.fname_alias || "John",
-                lname_alias: user.lname_alias || "Doe",
-                imageUrl: user?.imageUrl ? user?.imageUrl : "",
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error adding/updating user in Firebase:", error);
-            dispatch(notificationFail("Something went wrong!"));
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handleCheckboxChange = (filterType) => {
-    setEscrowType(filterType);
-  };
-
-  const handleCheckboxChangeFund = (filterType) => {
-    setEscrowFund(filterType);
-  };
-
-  const handleCheckboxChangeCompleted = (filterType) => {
-    setEscrowCompleted(filterType);
-  };
+  
 
   return (
     <>
@@ -530,31 +335,6 @@ export const MarketPlaceBuySell = (props) => {
                             </Button>
                           </>
                         )}
-                        {/* <Box sx={{ mb: 2, color: "#fff" }}>
-                          <div>
-                            <Button
-                              variant="contained"
-                              onClick={handleNextStepper}
-                              sx={{
-                                mt: 1,
-                                mr: 1,
-                                background: "#373A43",
-                                color: "#fff",
-                              }}
-                            >
-                              {index === steps.length - 1
-                                ? "Finish"
-                                : "Continue"}
-                            </Button>
-                            <Button
-                              disabled={index === 0}
-                              onClick={handleBackStepper}
-                              sx={{ mt: 1, mr: 1, color: "#fff" }}
-                            >
-                              Back
-                            </Button>
-                          </div>
-                        </Box> */}
                       </StepContent>
                     </Step>
                   ))}
@@ -688,7 +468,7 @@ export const MarketPlaceBuySell = (props) => {
                   {showSmily && (
                     <div userRef={emojiPickerRef} className="emoji-picker">
                       <Picker
-                        onEmojiClick={onEmojiClick}
+                        //onEmojiClick={onEmojiClick}
                         autoFocusSearch={true}
                         className="emoji-popup"
                         theme="dark"
@@ -724,13 +504,14 @@ export const MarketPlaceBuySell = (props) => {
 
                     <div className="messsge">
                       <div className="button-container">
-                        <Button variant="link" onClick={() => smilyOpen()}>
+                        {/* <Button variant="link" onClick={() => smilyOpen()}> */}
+                        <Button variant="link" >
                           <SmileyIcon width="20" height="20" />
                         </Button>
                         <Button
                           variant="link"
                           className="ms-3"
-                          onClick={handleButtonClick}
+                          //onClick={handleButtonClick}
                         >
                           <LinkSimpleIcon width="20" height="20" />
                         </Button>
@@ -738,14 +519,11 @@ export const MarketPlaceBuySell = (props) => {
 
                       <Form
                         className="input-container"
-                        // onSubmit={(e) => {
-                        //   onSubmit(e);
-                        // }}
                       >
                         <input
                           userRef={fileInputRef}
                           type="file"
-                          onChange={handleFileSelection}
+                          //onChange={handleFileSelection}
                           style={{ display: "none" }}
                         />
 
@@ -755,9 +533,9 @@ export const MarketPlaceBuySell = (props) => {
                           placeholder="Send a message…"
                           name="content"
                           value={messageText}
-                          onChange={handleTextChange}
-                          onKeyPress={handleInputKeyPress}
-                          onFocus={handleInputFocus}
+                          //onChange={handleTextChange}
+                          //onKeyPress={handleInputKeyPress}
+                          //onFocus={handleInputFocus}
                           autoComplete="off"
                         />
 

@@ -19,6 +19,7 @@ const SelectLocationKYCDropdown = (props) => {
 
     country,
   } = props;
+  
   const [isMobile, setIsMobile] = useState(false);
   const [openDr, setOpenDr] = useState(false);
   const [searchLocationTextOrigin, setSearchLocationTextOrigin] =
@@ -57,6 +58,7 @@ const SelectLocationKYCDropdown = (props) => {
   };
 
   const handleCheckboxLocationChange = (option) => {
+    setFilteredLocationOptions(listData)
     setSelectedLocationOption(option);
     setCountry(option.iso);
     setNationality(option?.country);
