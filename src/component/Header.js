@@ -25,6 +25,7 @@ import BellIcon from "../../src/content/images/bell.png";
 //This component is used for header section
 export const Header = (props) => {
   const dispatch = useDispatch();
+  const [isMobile, setIsMobile] = useState(false);
   const [position, setPosition] = useState(window.pageYOffset);
   const [visible, setVisible] = useState(true);
   const [messageCount, setMessageCount] = useState(0);
@@ -37,7 +38,11 @@ export const Header = (props) => {
   const modalToggle = () => setModalShow(!modalShow);
 
   const [modalNotifyShow, setModalNofificationShow] = useState(false);
-  const modalNotifyToggle = () => setModalNofificationShow(!modalShow);
+  const modalNotifyToggle = () => setModalNofificationShow(!modalNotifyShow);
+
+  const [modalMessageShow, setModalMessageShow] = useState(false);
+  const modalMessageToggle = () => setModalMessageShow(!modalMessageShow);
+
   const [isSign, setIsSign] = useState(null);
 
   let addressLine = "";
@@ -130,12 +135,25 @@ export const Header = (props) => {
   });
 
   const handleLinkClick = () => {
-    setModalShow(true);
+    setModalMessageShow(true);
   };
+  const handleModelClick = () => {
+    setModalShow(true);
+  }
 
   const handleNotificationClick = () => {
     setModalNofificationShow(true);
   };
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileMatch = window.matchMedia("(max-width: 767px)");
+      setIsMobile(mobileMatch.matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const cls = visible ? "visible" : "hidden";
   return (
@@ -155,7 +173,6 @@ export const Header = (props) => {
             {messageCount > 0 ? (
               <Nav.Item as="li" className="items">
                 <Nav.Link as={Link} to="/chat">
-                  {/* <NotificationIcon width="26" height="24" /> */}
                   <img src={MassageIcon} alt="MassageIcon" />
                   <span className="notification-badge">{messageCount}</span>
                 </Nav.Link>
@@ -164,8 +181,6 @@ export const Header = (props) => {
               <Nav.Item as="li">
                 <Nav.Link as={Link} to="/chat">
                   <img src={MassageIcon} alt="MassageIcon" />
-
-                  {/* <NotificationIcon width="26" height="24" /> */}
                   {messageCount > 0 && (
                     <span className="notification-badge">{messageCount}</span>
                   )}
@@ -174,7 +189,6 @@ export const Header = (props) => {
             )}
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/notification">
-                {/* <BellIcon width="20" height="22" /> */}
                 <img src={BellIcon} alt="BellIcon" />
                 {notificationCount > 0 && (
                   <span className="notification-badge">
@@ -188,14 +202,12 @@ export const Header = (props) => {
           <>
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/chat" onClick={handleLinkClick}>
-                {/* <NotificationIcon width="26" height="24" /> */}
-                
                 <img src={MassageIcon} alt="MassageIcon" />
               </Nav.Link>
-              {modalShow && (
+              {modalMessageShow && (
                 <LoginView
-                  show={modalShow}
-                  onHide={() => setModalShow(false)}
+                  show={modalMessageShow}
+                  onHide={() => setModalMessageShow(false)}
                   handleaccountaddress={handleAccountAddress}
                   isSign={isSign}
                 />
@@ -218,6 +230,25 @@ export const Header = (props) => {
                 />
               )}
             </Nav.Item>
+            {isMobile && (
+              <>
+                <div onClick={handleModelClick}>
+                  <img
+                    className="rounded-circle"
+                    src={require("../content/images/avatar1.png")}
+                    alt="No Profile"
+                  />
+                </div>
+                {modalShow && (
+                  <LoginView
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                    handleaccountaddress={handleAccountAddress}
+                    isSign={isSign}
+                  />
+                )}
+              </>
+            )}
           </>
         )}
         <Nav.Item

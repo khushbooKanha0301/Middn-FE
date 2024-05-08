@@ -984,7 +984,8 @@ body {
                 border-radius: 12px;
 
                 svg {
-                    stroke: rgba($color: $white, $alpha: 0.5);
+                    stroke: #fff;
+                    opacity: 0.5;
                 }
 
                 &.active {
@@ -992,7 +993,8 @@ body {
                     color: $black;
 
                     svg {
-                        stroke: rgba($color: $black, $alpha: 1);
+                        stroke: black;
+                        opacity: 1;
                     }
                 }
             }

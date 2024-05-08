@@ -18,6 +18,7 @@ import {
 import { useConnect, useSignMessage, useAccount, useDisconnect } from "wagmi";
 
 export const LoginView = (props) => {
+ console.log("props ", props);
   const [checkValue, setCheckValue] = useState(null);
   const [accountAddress, setAccountAddress] = useState("");
   const dispatch = useDispatch();
@@ -405,6 +406,8 @@ export const LoginView = (props) => {
   };
 
   const cancelButtonHandler = () => {
+    console.log("cancel")
+    console.log("props.onHide()", props.onHide())
     props.onHide();
     setCheckValue(null);
   };
