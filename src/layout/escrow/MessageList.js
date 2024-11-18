@@ -2,16 +2,16 @@ import { child, get, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useSelector } from "react-redux";
-import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
+import { userDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
 import { database, generateFirebaseChatRootKey } from "../../helper/config";
-import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import { firebaseMessagesEscrow } from "../../helper/configVariables";
 import { setUnReadCountZero } from "../../helper/firebaseConfigEscrow";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
 export const MessageList = (props) => {
   const { ReciverId , escrowId} = props;
-  const userDetailsAll = useSelector(userGetFullDetails);
+  const acAddress = useSelector(userDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
@@ -104,7 +104,7 @@ export const MessageList = (props) => {
         messages.map((message, index) => (
           <>
             <li key={message?.sender + index + "receiverData"}>
-              {message?.senderID !== userDetailsAll?.wallet_address && (
+              {message?.senderID !== acAddress?.account && (
                 <>
                   <div className="chat-image">
                     <img
@@ -153,7 +153,7 @@ export const MessageList = (props) => {
             </li>
 
             <li key={message?.senderID + index + "sender"}>
-              {message?.senderID === userDetailsAll?.wallet_address && (
+              {message?.senderID === acAddress?.account && (
                 <>
                   <div className="name">
                     You <span>{Timestamp(message?.sendTime * 1000)}</span>

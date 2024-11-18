@@ -5,11 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 import { IoIosCloseCircle } from "react-icons/io";
 import {
-  BackArrow,
   LinkSimpleIcon,
   SmileyIcon,
-  SimpleDotedIcon,
-  EyeIcon,
 } from "../../component/SVGIcon";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import {
@@ -17,16 +14,16 @@ import {
   sendMessage,
 } from "../../helper/firebaseConfigEscrow";
 import { Nav, NavDropdown } from "react-bootstrap";
-import { userGetFullDetails } from "../../store/slices/AuthSlice";
+import { userDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "../chat/MessageList";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import jwtAxios from "../../service/jwtAxios";
 import { get, ref, set, update } from "firebase/database";
 import { database } from "../../helper/config";
-import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import { firebaseMessagesEscrow } from "../../helper/configVariables";
 import Swal from "sweetalert2/src/sweetalert2.js";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
@@ -66,6 +63,7 @@ const steps = [
           background: "#212121",
           border: "1px solid #3F3F3F",
           borderRadius: "11px",
+          marginTop: "12px",
         }}
       >
         <CardContent
@@ -132,15 +130,30 @@ const steps = [
           lineHeight: "18px",
           color: "#808191",
           marginBottom: "32px",
+          marginTop: "6px",
         }}
       >
-        `After payment, remember to click the ‘Transferred, Notify Seller’
-        button facilitate the crypto release by the seller`
+        After payment, remember to click the ‘Transferred, Notify Seller’
+        button facilitate the crypto release by the seller
       </p>
     ),
   },
 ];
-
+const CustomStepIcon = (props) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      class="bi bi-check-circle"
+      viewBox="0 0 16 16"
+    >
+      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+      <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05" />
+    </svg>
+  );
+};
 export const MarketPlaceBuySell = (props) => {
   const [user, setUser] = useState({});
   const [escrowType, setEscrowType] = useState(null);
@@ -149,12 +162,12 @@ export const MarketPlaceBuySell = (props) => {
   const { id } = props;
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
-  const acAddress = useSelector(userGetFullDetails);
+  const acAddress = useSelector(userDetails);
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
   const [escrow, setEscrow] = useState(null);
   const receiverAddress =
-    acAddress?.wallet_address === escrow?.user_address
+    acAddress?.account === escrow?.user_address
       ? escrow?.trade_address
       : escrow?.user_address;
 
@@ -166,15 +179,26 @@ export const MarketPlaceBuySell = (props) => {
   const [escrowLoading, setEscrowLoading] = useState(false);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
   const [activeStep, setActiveStep] = React.useState(0);
+  const [pageStepperArr, setPageStepperArr] = useState([0]);
+  console.log("pageStepperArr ", pageStepperArr);
 
-  const handleNextStepper = () => {
-    if (activeStep === steps.length - 1) {
-      handleReset(); // Reset to the initial step
+  const handleNextStepper = (indexnUM) => {
+    if (activeStep < steps.length - 1) {
+      const indexValue = [...new Set([...pageStepperArr, indexnUM])].sort(
+        (a, b) => a - b
+      );
+      if (
+        (!String(indexnUM)?.includes("2") || indexnUM === 2) &&
+        indexValue?.filter((x) => [0, 1]?.includes(x))?.length === 2
+      ) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setPageStepperArr(indexValue);
+      }
     } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      handleReset();
+      setPageStepperArr([0]);
     }
   };
-
   const handleReset = () => {
     setActiveStep(0);
   };
@@ -242,13 +266,9 @@ export const MarketPlaceBuySell = (props) => {
     event.target.removeAttribute("placeholder");
   };
 
-  
-
-  
-
   return (
     <>
-      <div className="escrowPay market-place-buy-sell">
+      <div className="chat-messages market-place-buy-sell">
         <Row>
           <Col lg="7">
             <Card className="cards-dark">
@@ -294,20 +314,27 @@ export const MarketPlaceBuySell = (props) => {
                   padding: "20px 24px",
                 }}
               >
-                <Stepper activeStep={activeStep} orientation="vertical">
+                <Stepper
+                  activeStep={activeStep}
+                  orientation="vertical"
+                  className="stepper-container market-stepper-container"
+                >
                   {steps.map((step, index) => (
                     <Step
                       key={step.label}
-                      sx={{ color: "#fff", cursor: "pointer" }}
+                      active={pageStepperArr?.includes(index)}
                     >
-                      <StepLabel onClick={handleNextStepper}>
+                      <StepLabel
+                        StepIconComponent={CustomStepIcon}
+                        onClick={() => handleNextStepper(index)}
+                        className="step-label"
+                      >
                         {step.label}
                       </StepLabel>
                       <StepContent>
                         <Typography sx={{ color: "#fff" }}>
                           {step.description}
                         </Typography>
-
                         {index === steps.length - 1 && (
                           <>
                             <Button
@@ -468,7 +495,6 @@ export const MarketPlaceBuySell = (props) => {
                   {showSmily && (
                     <div userRef={emojiPickerRef} className="emoji-picker">
                       <Picker
-                        //onEmojiClick={onEmojiClick}
                         autoFocusSearch={true}
                         className="emoji-popup"
                         theme="dark"
@@ -504,26 +530,20 @@ export const MarketPlaceBuySell = (props) => {
 
                     <div className="messsge">
                       <div className="button-container">
-                        {/* <Button variant="link" onClick={() => smilyOpen()}> */}
-                        <Button variant="link" >
+                        <Button variant="link">
                           <SmileyIcon width="20" height="20" />
                         </Button>
                         <Button
                           variant="link"
-                          className="ms-3"
-                          //onClick={handleButtonClick}
-                        >
+                          className="ms-3">
                           <LinkSimpleIcon width="20" height="20" />
                         </Button>
                       </div>
 
-                      <Form
-                        className="input-container"
-                      >
+                      <Form className="input-container">
                         <input
                           userRef={fileInputRef}
                           type="file"
-                          //onChange={handleFileSelection}
                           style={{ display: "none" }}
                         />
 
@@ -533,9 +553,6 @@ export const MarketPlaceBuySell = (props) => {
                           placeholder="Send a message…"
                           name="content"
                           value={messageText}
-                          //onChange={handleTextChange}
-                          //onKeyPress={handleInputKeyPress}
-                          //onFocus={handleInputFocus}
                           autoComplete="off"
                         />
 

@@ -22,9 +22,9 @@ export const CreateEscrowView = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [object, setObject] = useState("Jewelery");
+  const [object, setObject] = useState("Jewlery");
   const [showObjects, setShowObject] = useState(false);
-  const objects = [{ value: "Jewelery", label: "Jewelery" }];
+  const objects = [{ value: "Jewlery", label: "Jewlery" }];
 
   const [category, setCategory] = useState("high_value_items");
   const [showOptions, setShowOptions] = useState(false);
@@ -465,17 +465,17 @@ export const CreateEscrowView = (props) => {
                     <Form.Label>Object</Form.Label>
                     {/* <Form.Select
                       name="object"
-                      aria-label="Jewelery"
+                      aria-label="Jewlery"
                       onChange={inputChangeHandler}
                     >
-                      <option value="Jewelery">Jewelery</option>
+                      <option value="Jewlery">Jewlery</option>
                     </Form.Select> */}
 
                     <div className="customSelectBox" ref={optionsDropdownRef}>
                       <div
                         className="form-select"
                         onClick={toggleObjectOptions}
-                        aria-label="Jewelery"
+                        aria-label="Jewlery"
                       >
                         {objects.find((cat) => cat.value === object)?.label ||
                           "Select Object"}

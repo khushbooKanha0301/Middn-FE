@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { notificationFail } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import { onValue, ref } from "firebase/database";
 import EscrowSeller from "../../layout/escrow/EscrowSeller";
 
@@ -49,7 +49,6 @@ export const EscrowBuyer = (props) => {
   useEffect(() => {
     // Add global click event listener
     document.addEventListener("click", handleGlobalClick);
-
     // Remove the event listener when the component unmounts
     return () => {
       document.removeEventListener("click", handleGlobalClick);
@@ -241,7 +240,7 @@ export const EscrowBuyer = (props) => {
               <Row>
                 <Col lg="12">
                   <div className="d-flex main-limit mb-3">
-                    <div className="limit-txt">Limit: </div>
+                    <div className="limit-txt">Limit &nbsp;: &nbsp;</div>
                     <div className="limit-txt-right">0.1-0.6 MID</div>
                   </div>
 
@@ -256,9 +255,7 @@ export const EscrowBuyer = (props) => {
                   </div>
 
                   <div className="d-flex main-limit">
-                    <div className="limit-txt-right">
-                      Amount to transfer to Middn{" "}
-                    </div>
+                    <div className="limit-txt-right">Amount to transfer </div>
                     <div className="limit-txt-left-amount">
                       {amount || "0"}{" "}
                       {currentCurrency ? currentCurrency : "MID"}
@@ -371,7 +368,9 @@ export const EscrowBuyer = (props) => {
                   </div>
 
                   <div className="d-flex justify-content-between align-items-center buyerDetails">
-                    <span className="card-txt-left">Typical finalization time</span>
+                    <span className="card-txt-left">
+                      Typical finalization time
+                    </span>
                     <strong className="card-txt">20 minutes</strong>
                   </div>
                 </Card.Body>

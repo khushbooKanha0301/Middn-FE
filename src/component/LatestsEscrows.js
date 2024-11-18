@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, Col, Row, Button } from "react-bootstrap";
-import { DotedIcon } from "./SVGIcon";
 import { PlusIcon } from "./SVGIcon";
 import CreateEscrowView from "../layout/escrow/CreateEscrow";
 import { userDetails } from "../store/slices/AuthSlice";
@@ -8,7 +7,7 @@ import { useSelector } from "react-redux";
 import LoginView from "../component/Login";
 import jwtAxios from "../service/jwtAxios";
 import { database } from "../helper/config";
-import { firebaseStatus } from "../helper/statusManage";
+import { firebaseStatus } from "../helper/configVariables";
 import { get, ref } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
@@ -94,61 +93,6 @@ export const LatestsEscrows = () => {
                             Create Escrow
                           </span>
                         </Button>
-
-                      {/* {userList.map((item, index) => (
-                        <Button
-                          variant="link"
-                          className="dashboard-escrows"
-                          onClick={() => openEscrow(item)}
-                        >
-                          <img
-                            src={
-                              item?.newImage
-                                ? item?.newImage
-                                : require("../content/images/avatar.png")
-                            }
-                            alt={require("../content/images/avatar.png")}
-                          />
-                          {userStatuses[index] === 1 && (
-                            <div className="chat-status"></div>
-                          )}
-                          {userStatuses[index] === 2 && (
-                            <div className="chat-status-absent"></div>
-                          )}
-                          {userStatuses[index] === 3 && (
-                            <div className="chat-status-offline"></div>
-                          )}
-                          <p className="escrow-name">
-                            {item.user_name ? item.user_name : "John Doe"}
-                          </p>
-                        </Button>
-                      ))} */}
-
-                      {/* {escrows.length === userList.length ? (
-                        <Button
-                          variant="link"
-                          onClick={createEscrowModalToggle}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'}}
-                        >
-                          <span className="see-more ms-0">
-                            <PlusIcon width="34" height="26" />
-                          </span>
-                          <span className="create-escrow-text">
-                            Create Escrow
-                          </span>
-                        </Button>
-                      ) : (
-                        <Button variant="link" onClick={loadMoreData}>
-                          <span className="see-more">
-                            <DotedIcon width="34" height="26" />
-                          </span>
-                          See more
-                        </Button>
-                      )} */}
                     </>
                   )}
 

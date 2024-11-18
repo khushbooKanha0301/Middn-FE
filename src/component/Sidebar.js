@@ -9,6 +9,8 @@ import {
   TradeHistoryIcon,
   PlusIcon,
   MarketplaceIcon,
+  DepositCryptoIcon,
+  WithdrawIcon,
 } from "./SVGIcon";
 import Highcharts from "highcharts/highstock";
 import { userDetails } from "../store/slices/AuthSlice";
@@ -17,7 +19,7 @@ import CreateEscrowView from "../layout/escrow/CreateEscrow";
 import LoginView from "../component/Login";
 import jwtAxios from "../service/jwtAxios";
 import { database } from "../helper/config";
-import { firebaseStatus } from "../helper/statusManage";
+import { firebaseStatus } from "../helper/configVariables";
 import { get, ref } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 let divSize = 0;
@@ -48,7 +50,7 @@ export const Sidebar = (props) => {
   const [activeKey, setActiveKey] = useState();
   const [escrows, setEscrow] = useState([]);
   const [userStatuses, setUserStatuses] = useState([]);
- 
+
   const [userList, setUserList] = useState(
     escrows.filter((item, index) => index < userDisplayCount)
   );
@@ -194,6 +196,7 @@ export const Sidebar = (props) => {
               <Nav.Link
                 as={Link}
                 eventKey="escrow"
+                i
                 to={"/escrows"}
                 className={activeKey === "/escrows" && "active"}
               >
@@ -201,6 +204,31 @@ export const Sidebar = (props) => {
                 <span className="menu-hide">Escrow</span>
               </Nav.Link>
             </Nav.Item>
+
+            <Nav.Item as="li">
+              <Nav.Link
+                as={Link}
+                eventKey="deposit"
+                to={"/deposit"}
+                className={activeKey === "/deposit" && "active"}
+              >
+                <DepositCryptoIcon width="24" height="24" />{" "}
+                <span className="menu-hide">Deposit</span>
+              </Nav.Link>
+            </Nav.Item>
+
+            <Nav.Item as="li">
+              <Nav.Link
+                as={Link}
+                eventKey="withdraw"
+                to={"/withdraw"}
+                className={activeKey === "/withdraw" && "active"}
+              >
+                <WithdrawIcon width="24" height="24" />{" "}
+                <span className="menu-hide">Withdraw</span>
+              </Nav.Link>
+            </Nav.Item>
+
             <Nav.Item as="li">
               <Nav.Link
                 as={Link}
@@ -225,7 +253,10 @@ export const Sidebar = (props) => {
             </Nav.Item>
           </Nav>
           <div className="divider"></div>
-          <div className="nav-title" style={{ marginBottom: "20px" }}>
+          <div
+            className="nav-title"
+            style={{ marginBottom: "20px", display: "block" }}
+          >
             Active Trader
           </div>
           {acAddress?.authToken && (
@@ -289,7 +320,6 @@ export const Sidebar = (props) => {
               )}
             </>
           )}
-
           {!acAddress?.authToken && (
             <Button
               variant="link"
@@ -305,7 +335,7 @@ export const Sidebar = (props) => {
           <div className="divider"></div>
         </PerfectScrollbar>
       </div>
-      <Card className="cards-dark menu-hide">
+      <Card className="cards-dark menu-hide"> 
         <Card.Body>
           <Card.Title>Contact us</Card.Title>
           <Card.Text>

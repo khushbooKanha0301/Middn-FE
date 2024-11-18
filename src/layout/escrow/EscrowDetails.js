@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import EscrowDetailLoader from "./EscrowDetailLoader";
 
 import { database } from "../../helper/config";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import { onValue, ref } from "firebase/database";
 
 function EscrowDetails() {

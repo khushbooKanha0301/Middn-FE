@@ -8,9 +8,9 @@ import { notificationFail } from "../../store/slices/notificationSlice";
 
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import { database } from "../../helper/config";
-import { firebaseMessages } from "../../helper/chatMessage";
+import { firebaseMessages } from "../../helper/configVariables";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import jwtAxios from "../../service/jwtAxios";
 
 export const UserList = (props) => {

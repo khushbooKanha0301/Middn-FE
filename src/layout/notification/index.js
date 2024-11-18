@@ -16,7 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { database } from "../../helper/config";
-import { firebaseMessagesEscrow } from "../../helper/configEscrow";
+import { firebaseMessagesEscrow } from "../../helper/configVariables";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import {
   CheckIcon,
@@ -24,6 +24,8 @@ import {
   SimpleTrashIcon,
   TrashIcon,
 } from "../../component/SVGIcon";
+import NotificationAccordion from "./NotificationAccordion";
+import { NavDropdown } from "react-bootstrap";
 
 export const AccountSetting = () => {
   const userRef = useRef(null);
@@ -190,7 +192,7 @@ export const AccountSetting = () => {
                   className="flex-column"
                 >
                   <Nav.Item as="li">
-                    <Nav.Link eventKey="all">
+                    <Nav.Link eventKey="create">
                       <span>All</span>
                       <span className="notification-count">0</span>
                     </Nav.Link>
@@ -224,75 +226,114 @@ export const AccountSetting = () => {
             </Card>
           </Col>
           <Col lg="9">
+            <div className="notification-list">
+              <div className="d-flex justify-content-between align-items-center">
+                <h2>Notification</h2>
+                <div className="btn-action-group" ref={userRef}>
+                  <div className="tooltip">
+                    <Button variant="dark">
+                      <CheckIcon width="32" height="32" />
+                    </Button>
+                    <span className="tooltiptext">Mark all as read </span>
+                  </div>
+                  <Button variant="dark">
+                    <TrashIcon width="32" height="32" />
+                  </Button>
+                  <Button variant="dark" className="clear-all-dropdown">
+                    <NavDropdown
+                      title={<SimpleDotedIcon width="32" height="32" />}
+                      id="nav-dropdown"
+                    >
+                      <NavDropdown.Item>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                        >
+                          <path
+                            d="M16.875 4.375H3.125"
+                            stroke="#9F9F9F"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M6.875 1.875H13.125"
+                            stroke="#9F9F9F"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path
+                            d="M15.625 4.375V16.25C15.625 16.4158 15.5592 16.5747 15.4419 16.6919C15.3247 16.8092 15.1658 16.875 15 16.875H5C4.83424 16.875 4.67527 16.8092 4.55806 16.6919C4.44085 16.5747 4.375 16.4158 4.375 16.25V4.375"
+                            stroke="#9F9F9F"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>{" "}
+                        Clear all
+                      </NavDropdown.Item>
+                    </NavDropdown>
+                  </Button>
+                </div>
+              </div>
+            </div>
             <Tab.Content>
               <Tab.Pane eventKey="create">
-                <div className="notification-list">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h2>Notification</h2>
-                    <div className="btn-action-group" ref={userRef}>
-                      <OverlayTrigger
-                        placement="top"
-                        container={userRef}
-                        overlay={
-                          <Tooltip id="tooltip-check">Mark all as read</Tooltip>
-                        }
+                <div
+                  className="notification-list"
+                  style={{ marginTop: "38px" }}
+                >
+                  <div className="notification-scroll">
+                    <PerfectScrollbar
+                      id="scrollBottom"
+                      options={{ suppressScrollX: true }}
+                    >
+                      <Accordion
+                        defaultActiveKey="0"
+                        className="notification-accordion"
                       >
-                        <Button variant="dark">
-                          <CheckIcon width="25" height="18" />
-                        </Button>
-                      </OverlayTrigger>
-                      <Button variant="dark">
-                        <TrashIcon width="35" height="35" />
-                      </Button>
-                      <OverlayTrigger
-                        placement="bottom right"
-                        container={userRef}
-                        overlay={
-                          <Tooltip id="tooltip-more">
-                            <SimpleTrashIcon width="20" height="20" /> Clear all
-                          </Tooltip>
-                        }
-                      >
-                        <Button variant="dark">
-                          <SimpleDotedIcon width="25" height="4" />
-                        </Button>
-                      </OverlayTrigger>
-                    </div>
-                  </div>
-                  <Accordion defaultActiveKey="0">
-                    <PerfectScrollbar options={{ suppressScrollX: true }}>
-                      <Accordion.Item eventKey="0">
-                        <div className="accordion-body">
-                          <div className="accordion-title">
-                            <h5>No Notification yet</h5>
-                            <div className="notification-time"></div>
-                          </div>
-                          <span className="accordion-text no-notification">
-                            There's no notification yet
-                          </span>
-                        </div>
-                      </Accordion.Item>
+                        <NotificationAccordion />
+                      </Accordion>
                     </PerfectScrollbar>
-                  </Accordion>
+                  </div>
                 </div>
               </Tab.Pane>
               <Tab.Pane eventKey="escrowmsg">
                 <div
                   className={`${receiverData !== null ? "hide-mobile" : ""}`}
                 >
-                  <Card className="cards-dark messageEscrow">
-                    <Card.Body>
-                      <Card.Title as="h2">Escrow Messages</Card.Title>
-                      <ul className="chat-list alluser-chat">
-                        <PerfectScrollbar options={{ suppressScrollX: true }}>
+                  <div
+                    className="notification-list"
+                    style={{ marginTop: "38px" }}
+                  >
+                    <div className="notification-scroll">
+                      <PerfectScrollbar
+                        id="scrollBottom"
+                        options={{ suppressScrollX: true }}
+                      >
+                        {" "}
+                        <ul className="chat-list alluser-chat">
                           {allusers &&
                             allusers?.map((user, index) => (
                               <li
                                 key={index}
-                                className={`active}${
+                                className={`active ${
                                   user?.unreadCount > 0 ? "unreaded-msg" : ""
                                 }`}
                                 onClick={() => getChatUser(user)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "22px",
+                                  background: " #18191D",
+                                  padding: "15px 24px",
+                                  borderRadius: "24px",
+                                  marginBottom: "16px",
+                                }}
                               >
                                 <div className="chat-image">
                                   <img
@@ -302,6 +343,7 @@ export const AccountSetting = () => {
                                         : require("../../content/images/avatar.png")
                                     }
                                     alt={user?.fname_alias}
+                                    style={{ width: "62px" }}
                                   />
 
                                   {(user?.isOnline === 1 ||
@@ -316,27 +358,24 @@ export const AccountSetting = () => {
                                     <div className="chat-status-offline"></div>
                                   )}
                                 </div>
-
                                 <div>
-                                  <div>
-                                    <div className="chat-name">
-                                      {user?.fname_alias
-                                        ? user?.fname_alias
-                                        : null}
-                                      {user?.lname_alias
-                                        ? user?.lname_alias
-                                        : null}
-                                    </div>
+                                  <div
+                                    className="chat-name"
+                                    style={{ color: "#808191" }}
+                                  >
+                                    {user?.fname_alias
+                                      ? user?.fname_alias
+                                      : null}
+                                    {user?.lname_alias
+                                      ? user?.lname_alias
+                                      : null}
                                   </div>
-
-                                  <div>
-                                    <p>
-                                      {user?.last_message?.slice(0, 50) +
-                                        (user?.last_message?.length > 50
-                                          ? "..."
-                                          : "")}
-                                    </p>
-                                  </div>
+                                  <p  style={{ color: "#808191" }}>
+                                    {user?.last_message?.slice(0, 50) +
+                                      (user?.last_message?.length > 50
+                                        ? "..."
+                                        : "")}
+                                  </p>
                                 </div>
                                 {user?.unreadCount > 0 && (
                                   <span className="notification-badge-chat">
@@ -347,16 +386,88 @@ export const AccountSetting = () => {
                             ))}
                           {allusers.length === 0 && (
                             <li className="active no-message">
-                              No Messages yet
+                              <Card className="cards-dark messageEscrow">
+                                <Card.Body>
+                                  No Messages yet
+                                  <p
+                                    className="accordion-text no-notification"
+                                    style={{
+                                      marginTop: "5px",
+                                      marginBottom: "0px",
+                                    }}
+                                  >
+                                    There's no notification yet
+                                  </p>
+                                </Card.Body>
+                              </Card>
                             </li>
                           )}
-                        </PerfectScrollbar>
-                      </ul>
-                    </Card.Body>
-                  </Card>
+                        </ul>
+                      </PerfectScrollbar>
+                    </div>
+                  </div>
                 </div>
               </Tab.Pane>
-              <Tab.Pane eventKey="escrowmsg1"></Tab.Pane>
+              <Tab.Pane eventKey="trade">
+                <div
+                  className="notification-list"
+                  style={{ marginTop: "38px" }}
+                >
+                  <Accordion
+                    defaultActiveKey="0"
+                    className="notification-scroll"
+                  >
+                    <PerfectScrollbar
+                      options={{ suppressScrollX: true }}
+                      id="scrollBottom"
+                      className="notification-scroll"
+                    >
+                      <Card
+                        className="cards-dark messageEscrow"
+                        style={{ marginRight: "24px" }}
+                      >
+                        <Card.Body>
+                          No Messages yet
+                          <p
+                            className="accordion-text no-notification"
+                            style={{ marginTop: "5px", marginBottom: "0px" }}
+                          >
+                            There's no notification yet
+                          </p>
+                        </Card.Body>
+                      </Card>
+                    </PerfectScrollbar>
+                  </Accordion>
+                </div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="system">
+                <div
+                  className="notification-list"
+                  style={{ marginTop: "38px" }}
+                >
+                  <Accordion
+                    defaultActiveKey="0"
+                    className="notification-scroll"
+                  >
+                    <PerfectScrollbar
+                      options={{ suppressScrollX: true }}
+                      id="scrollBottom"
+                    >
+                      <Card className="cards-dark messageEscrow">
+                        <Card.Body>
+                          No Messages yet
+                          <p
+                            className="accordion-text no-notification"
+                            style={{ marginTop: "5px", marginBottom: "0px" }}
+                          >
+                            There's no notification yet
+                          </p>
+                        </Card.Body>
+                      </Card>
+                    </PerfectScrollbar>
+                  </Accordion>
+                </div>
+              </Tab.Pane>
             </Tab.Content>
           </Col>
         </Row>

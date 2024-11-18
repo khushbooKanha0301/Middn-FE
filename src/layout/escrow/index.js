@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { userDetails } from "../../store/slices/AuthSlice";
 import { Link } from "react-router-dom";
 import { database } from "../../helper/config";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import { get, ref } from "firebase/database";
 import { TableLoader } from "../../helper/Loader";
 import { useNavigate } from "react-router-dom";
@@ -130,7 +130,6 @@ export const Escrow = () => {
   };
   const filterHandle = () => {
     setIsOpen(!isOpen);
-    console.log("!isOpen: ", !isOpen);
   };
   useEffect(() => {
     if (isComponentMounted) {
@@ -215,7 +214,7 @@ export const Escrow = () => {
               </Form.Group>
               <div className="d-flex justify-content-between align-items-center expired">
                 <div>Expired</div>
-                <div>23:20 24/02/2022</div>
+                <div>23:20&nbsp;&nbsp; 24/02/2022</div>
               </div>
             </Card.Body>
           </Card>
@@ -326,7 +325,6 @@ export const Escrow = () => {
           <Col lg="auto default-active-keys ">
             <Nav defaultActiveKey="all" as="ul" className="filter-btn">
               <Nav.Item as="li">
-                {/* <Nav.Link eventKey="all">All</Nav.Link> */}
                 <Nav.Link
                   as={Link}
                   className={statusFilter === "All" ? "active" : ""}
@@ -336,7 +334,6 @@ export const Escrow = () => {
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item as="li">
-                {/* <Nav.Link eventKey="buy">Buy</Nav.Link> */}
                 <Nav.Link
                   as={Link}
                   className={statusFilter === "Buy" ? "active" : ""}
@@ -346,7 +343,6 @@ export const Escrow = () => {
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item as="li">
-                {/* <Nav.Link eventKey="sell">Sell</Nav.Link> */}
                 <Nav.Link
                   as={Link}
                   className={statusFilter === "Sell" ? "active" : ""}
@@ -463,7 +459,7 @@ export const Escrow = () => {
                         {escrow?.time_constraints}
                       </div>
                       <div className="escrow-trader d-flex align-items-center justify-content-start">
-                        <div className="d-flex">
+                        <div className="d-flex items-center">
                           <div className="chat-image">
                             <img
                               src={

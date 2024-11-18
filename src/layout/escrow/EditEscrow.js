@@ -24,23 +24,18 @@ export const EditEscrowView = (props) => {
   const acAddress = useSelector(userDetails);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   // const [category, setCategory] = useState("");
   // const [object, setObject] = useState("");
   // const [processTime, setProcessTime] = useState("");
-
   const [object, setObject] = useState("");
   const [showObjects, setShowObject] = useState(false);
-  const objects = [{ value: "Jewelery", label: "Jewelery" }];
-
+  const objects = [{ value: "Jewlery", label: "Jewlery" }];
   const [category, setCategory] = useState("");
   const [showOptions, setShowOptions] = useState(false);
   const categories = [{ value: "high_value_items", label: "High-value items" }];
-
   const [processTime, setProcessTime] = useState("");
   const [showProcessTime, setShowProcessTime] = useState(false);
   const processTimes = [{ value: "24 Hours", label: "24 Hours" }];
-
   const countryDropdownRef = useRef(null);
   const optionsDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
@@ -70,7 +65,6 @@ export const EditEscrowView = (props) => {
       setStep(step + 1);
     }
   };
-
   const handleBack = () => {
     setStep(step - 1);
   };
@@ -93,11 +87,10 @@ export const EditEscrowView = (props) => {
 
   useEffect(() => {
     // Add global click event listener
-    document.addEventListener('click', handleGlobalClick);
-
+    document.addEventListener("click", handleGlobalClick);
     // Remove the event listener when the component unmounts
     return () => {
-      document.removeEventListener('click', handleGlobalClick);
+      document.removeEventListener("click", handleGlobalClick);
     };
   }, []);
 
@@ -178,7 +171,7 @@ export const EditEscrowView = (props) => {
 
   const inputChangeHandler = (e) => {
     let numericRegex = /[^0-9.]/g;
-  
+
     switch (e.target.name) {
       // case "radiooption":
       //   setEscrowType(e.target.value);
@@ -347,7 +340,6 @@ export const EditEscrowView = (props) => {
     setShowObject(false);
   };
 
-
   const toggleOptions = () => {
     setShowOptions(!showOptions);
     setShowObject(false);
@@ -511,18 +503,18 @@ export const EditEscrowView = (props) => {
                     <Form.Label>Object</Form.Label>
                     {/* <Form.Select
                       name="object"
-                      aria-label="Jewelery"
+                      aria-label="Jewlery"
                       onChange={inputChangeHandler}
                       value={object}
                     >
-                      <option value="Jewelery">Jewelery</option>
+                      <option value="Jewlery">Jewlery</option>
                     </Form.Select> */}
 
                     <div className="customSelectBox" ref={optionsDropdownRef}>
                       <div
                         className="form-select"
                         onClick={toggleObjectOptions}
-                        aria-label="Jewelery"
+                        aria-label="Jewlery"
                       >
                         {objects.find((cat) => cat.value === object)?.label ||
                           object}

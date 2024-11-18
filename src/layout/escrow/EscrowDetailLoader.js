@@ -1,5 +1,5 @@
 import React from "react";
-import { Col, Row, Card, Form, Button, Placeholder} from "react-bootstrap";
+import { Col, Row, Card, Form, Button, Placeholder } from "react-bootstrap";
 
 function EscrowDetailLoader() {
   return (
@@ -94,7 +94,9 @@ function EscrowDetailLoader() {
               </div>
 
               <div className="d-flex main-limit">
-                <div className="limit-txt-right">Amount to transfer to Middn </div>
+                <div className="limit-txt-right">
+                  Amount to transfer to Middn{" "}
+                </div>
                 <div className="limit-txt-left-amount">105,02 BNB</div>
               </div>
 

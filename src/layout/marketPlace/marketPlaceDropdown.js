@@ -89,7 +89,9 @@ const MarketPlaceDropdown = () => {
               <p className="d-flex items-center gap-3">
                 <span>1024 orders</span>
                 <div className="border-requires" />
-                <span>100.00% completion</span>
+                <span style={{ textTransform: "uppercase" }}>
+                  100.00% completion
+                </span>
               </p>
             </div>
           </div>

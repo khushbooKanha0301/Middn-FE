@@ -10,7 +10,7 @@ import {
   SmileyIcon,
   SimpleDotedIcon,
 } from "../../component/SVGIcon";
-import { userGetFullDetails } from "../../store/slices/AuthSlice";
+import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { setIsChatPage } from "../../store/slices/chatSlice";
 import ChatLoader from "./ChatLoader";
 import { messageTypes } from "../../helper/config";
@@ -24,8 +24,7 @@ import jwtAxios from "../../service/jwtAxios";
 
 export const Chat = () => {
   const [user, setUser] = useState("");
- console.log("user ", user);
-  const userDetailsAll = useSelector(userGetFullDetails);
+  const acAddress = useSelector(userDetails);
   const [messages, setMessages] = useState([]);
   const [showSmily, setShowSmily] = useState(false);
   const [messageText, setMessageText] = useState("");
@@ -35,7 +34,6 @@ export const Chat = () => {
   const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
- console.log("receiverData ", receiverData);
   const [ReciverId, setReciverId] = useState(null);
   const [reportModelOpen, setReportModelOpen] = useState(false);
   const [reportModelData, setReportModelData] = useState(null);
@@ -209,13 +207,13 @@ export const Chat = () => {
     }
     if (messageText !== "" || messageFile !== "" || !file) {
       if (
-        userDetailsAll?.wallet_address &&
+        acAddress?.account &&
         receiverData?.id &&
         noError == true
       ) {
         try {
           const reqData = {
-            block_from_user_address: userDetailsAll?.wallet_address,
+            block_from_user_address: acAddress?.account,
             block_to_user_address: receiverData?.id,
           };
           const result = await jwtAxios.post(
@@ -227,7 +225,7 @@ export const Chat = () => {
             sendMessage(
               result?.data?.reportUser?.userStatus,
               messageText,
-              userDetailsAll?.wallet_address,
+              acAddress?.account,
               receiverData?.id,
               messageFile ? messageTypes.ATTACHMENT : messageTypes.TEXT,
               file
@@ -308,7 +306,7 @@ export const Chat = () => {
                     <p>Messages</p>
                   </Card.Title>
                   {receiverData ? (
-                    <>
+                    <div style={{ paddingRight: "32px"}}>
                       <Nav as="ul">
                         <NavDropdown
                           as="li"
@@ -342,7 +340,7 @@ export const Chat = () => {
                           </NavDropdown.Item>
                         </NavDropdown>
                       </Nav>
-                    </>
+                    </div>
                   ) : null}
 
                 </div>

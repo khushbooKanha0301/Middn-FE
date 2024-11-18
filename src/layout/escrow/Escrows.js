@@ -27,7 +27,6 @@ export const Escrows = () => {
               .get(`/trade/getTradeByEscrow/${id}`)
               .then((res) => {
                 if (res.data?.data) {
-                  console.log("res.data?.data ", res.data?.data);
                   if(acAddress.account === res.data?.data?.user_address || acAddress.account === res.data?.data?.trade_address){
                     setIsSeller(true);
                     setEscrowLoading(true);

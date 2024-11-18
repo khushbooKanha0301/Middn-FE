@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , forwardRef} from "react";
 import { Button, Col, Form, Modal, ProgressBar, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -15,35 +15,38 @@ import {
 } from "../store/slices/notificationSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { userGetData, userGetFullDetails } from "../store/slices/AuthSlice";
+import { userDetails, userGetData, userGetFullDetails } from "../store/slices/AuthSlice";
 import moment from "moment";
 import SelectLocationDropdown from "./SelectLocationDropdown";
 import SelectLocationKYCDropdown from "./SelectKYCDropdown";
 import jwtAxios from "../service/jwtAxios";
 import { CalenderIcon } from "./SVGIcon";
-import { forwardRef } from "react";
 import * as flatted from "flatted";
 
-// This component is used for kyc model verification 
+// This component is used for kyc model verification
 export const KYCVerification = (props) => {
   const [isOpen, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { setkycsubmitted, ...rest } = props;
   const dispatch = useDispatch();
   const [step, setStep] = useState(1);
-  const [fname, setFname] = useState(null);
-  const [lname, setLname] = useState(null);
   const [dob, setDob] = useState(new Date());
-  const [country_of_issue, setCountryOfIssue] = useState("United States");
-  const [city, setCity] = useState(null);
-  const [mname, setMname] = useState(null);
-  const [postal_code, setPostalCode] = useState(null);
-  const [verified_with, setVerifiedWith] = useState(null);
-  const [res_address, setResAddress] = useState(null);
-  const [passport_url, setPassportUrl] = useState(null);
-  const [user_photo_url, setUserPhotoUrl] = useState(null);
-  const [wallet_type, setWalletType] = useState(null);
-  const [wallet_address, setWalletAddress] = useState(null);
+  const [userData, setUserData] = useState({
+    fname: null,
+    lname: null,
+    country_of_issue: "United States",
+    city: null,
+    mname: null,
+    postal_code: null,
+    verified_with: null,
+    res_address: null,
+    passport_url: null,
+    user_photo_url: null,
+    wallet_type: null,
+    wallet_address: null,
+    nationality: "United States",
+  });
+  const acAddress = useSelector(userDetails);
   const userDetailsAll = useSelector(userGetFullDetails);
   const [isLoading, setLoading] = useState(false);
   const [isError, setError] = useState(false);
@@ -52,6 +55,216 @@ export const KYCVerification = (props) => {
   const [checkboxState, setCheckboxState] = useState(
     flatted.parse(flatted.stringify([]))
   );
+
+  const [selectedLocationOption, setSelectedLocationOption] = useState({
+    country: "United States",
+    code: " +1",
+    iso: "US",
+    cca3: "USA",
+  });
+
+  const [searchLocationText, setSearchLocationText] = useState(`${selectedLocationOption?.country}`);
+  const [searchCountryText, setSearchCountryText] = useState(`${selectedLocationOption?.country}`);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setUserData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const DatepickerCustomInput = forwardRef(({ value, onClick }, ref) => (
+    <div style={{ display: "flex" }} onClick={onClick}>
+      <Form.Control className="example-custom-input" ref={ref} value={value} readOnly placeholder="DD/MM/YYYY" />
+      <CalenderIcon width={30} height={30} />
+    </div>
+  ));
+
+  const currentDate = (date) => {
+    const formattedDate = date
+      .toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\//g, "-");
+      console.log("formattedDate ", formattedDate);
+    return formattedDate;
+  };
+
+  const handleNext = async () => {
+    if (isError) return;
+  
+    setLoading(true);
+    switch (step) {
+      case 1:
+        setStep(step + 1);
+        break;
+      case 2:
+        if (userData.nationality === null) {
+          dispatch(notificationFail("Please Enter Nationality"));
+        } else if (userData.fname === null) {
+          dispatch(notificationFail("Please Enter First Name"));
+        } else if (userData.lname === null) {
+          dispatch(notificationFail("Please Enter Last Name"));
+        } else if (dob === null) {
+          dispatch(notificationFail("Please Enter Date of Birth"));
+        } else {
+          setStep(step + 1);
+        }
+        break;
+      case 3:
+        if (userData.res_address === null) {
+          dispatch(notificationFail("Please Enter Residential Address"));
+        } else if (userData.postal_code === null) {
+          dispatch(notificationFail("Please Enter Postal Code"));
+        } else if (userData.city === null) {
+          dispatch(notificationFail("Please Enter City"));
+        } else {
+          setStep(step + 1);
+        }
+        break;
+      case 4:
+        if (userData.country_of_issue === null) {
+          dispatch(notificationFail("Please Enter Country"));
+        } else if (userData.verified_with === null) {
+          setLoading(false);
+          dispatch(notificationFail("Please Select Verification ID Proof"));
+        } else {
+          setLoading(true);
+          setStep(step + 1);
+        }
+        break;
+      case 5:
+        if (userData.passport_url === null) {
+          setLoading(false);
+          dispatch(notificationFail("Please Select Passport Photo"));
+        } else {
+          setStep(step + 1);
+        }
+        break;
+      case 6:
+        if (!userData.user_photo_url) {
+          setLoading(false);
+          dispatch(notificationFail("Please upload user photo"));
+        } else {
+          setStep(step + 1);
+        }
+        break;
+      case 7:
+        if (!userData.wallet_address || !checkboxState.includes("terms")) {
+          dispatch(notificationFail("Please agree to terms and conditions"));
+        } else {
+          const formData = new FormData();
+          Object.keys(userData).forEach((key) => {
+            if (userData[key]) formData.append(key, userData[key]);
+          });
+          formData.append("dob", dob.toLocaleDateString("en-GB"));
+          setError(true);
+          let updateUser = await jwtAxios.put("/users/updateKyc", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          }).catch((error) => {
+            setError(false);
+            dispatch(notificationFail(error?.response?.data?.message || "Error"));
+          });
+  
+          if (updateUser) {
+            setISKYCSubmitted(true);
+            setkycsubmitted(true);
+            setError(false);
+            setStep(step + 1);
+            dispatch(notificationSuccess("KYC verification is submitted"));
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  };
+  const checkMobile = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+
+  useEffect(() => {
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleCheckboxChange = (filterType) => {
+    setCheckboxState((prevState) => prevState.includes(filterType)
+      ? prevState.filter((f) => f !== filterType)
+      : [...prevState, filterType]);
+  };
+
+  const simulateNetworkRequest = () => new Promise((resolve) => setTimeout(resolve, 2000));
+
+  useEffect(() => {
+    if (isLoading) {
+      simulateNetworkRequest().then(() => {
+        if (!isError) setLoading(false);
+      });
+    }
+  }, [isLoading, isError]);
+
+  const fetchKYCData = (userDetailsAll) => {
+    const user = userDetailsAll;
+    if (user) {
+      setUserData((prevData) => ({
+        ...prevData,
+        fname: user?.fname || null,
+        lname: user?.lname || null,
+        nationality: user?.nationality || "United States",
+        city: user?.city || null,
+        wallet_type: user?.wallet_type || null,
+        wallet_address: acAddress?.account || null,
+        country_of_issue: user?.country_of_issue || "United States",
+      }));
+      setDob(user?.dob ? moment(user?.dob, "DD/MM/YYYY").toDate() : null);
+    }
+  };
+
+  useEffect(() => {
+    fetchKYCData(userDetailsAll);
+  }, [userDetailsAll]);
+
+  const handleFileUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    setError(true);
+    setLoading(true);
+    const response = await jwtAxios.post("/users/validate-file-type", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }).catch((err) => {
+      setError(false);
+      setLoading(false);
+      dispatch(notificationFail(err.response?.data?.message));
+    });
+    setError(false);
+    setLoading(false);
+  };
+
+  const cancleKYC = () => {
+    if (isKYCSubmitted) {
+      dispatch(userGetData(userGetData.userid)).unwrap();
+    }
+    fetchKYCData(userDetailsAll);
+    setImageLocationUrl("https://flagcdn.com/h40/us.png");
+    setImageCountryUrl("https://flagcdn.com/h40/us.png");
+    setCountry("US");
+    setLocation("US");
+    setUserData({
+      ...userData,
+      mname: null,
+      res_address: null,
+      postal_code: null,
+      verified_with: null,
+      passport_url: null,
+      user_photo_url: null,
+    });
+    setCheckboxState([]);
+    props.onHide();
+    setStep(1);
+  };
 
   const [imageUrlLocationSet, setImageLocationUrl] = useState(
     "https://flagcdn.com/h40/us.png"
@@ -69,328 +282,19 @@ export const KYCVerification = (props) => {
     "https://flagcdn.com/h40/us.png"
   );
 
-  const [selectedLocationOption, setSelectedLocationOption] = useState({
-    country: "United States",
-    code: " +1",
-    iso: "US",
-    cca3: "USA",
-  });
-
   const [selectedCountryOption, setSelectedCountryOption] = useState({
     country: "United States",
     code: " +1",
     iso: "US",
     cca3: "USA",
   });
-
-  const [searchLocationText, setSearchLocationText] = useState(
-    `${selectedLocationOption?.country}`
-  );
-
-  const [searchCountryText, setSearchCountryText] = useState(
-    `${selectedCountryOption?.country}`
-  );
-
   const [country, setCountry] = useState("US");
   const [location, setLocation] = useState("US");
-  const [nationality, setNationality] = useState("United States");
-
-  const onChange = (e) => {
-    if (e.target.name === "nationality") {
-      setNationality(e.target.value);
-    }
-    if (e.target.name === "fname") {
-      setFname(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "lname") {
-      setLname(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "mname") {
-      setMname(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "dob") {
-      setDob(e.target.value);
-    }
-    if (e.target.name === "res_address") {
-      setResAddress(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "postal_code") {
-      let nonAlphanumericRegex = /[^a-zA-Z0-9]/g;
-      e.target.value = e.target.value.replace(nonAlphanumericRegex, "");
-      setPostalCode(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "city") {
-      setCity(e.target.value ? e.target.value : null);
-    }
-    if (e.target.name === "country") {
-      setCountryOfIssue(e.target.value);
-    }
-    // if (e.target.name === "verified_with") {
-    //   setVerifiedWith(e.target.value);
-    // }
-    if (e.target.name === "wallet_type") {
-      setWalletType(e.target.value);
-    }
-    if (e.target.name === "wallet_address") {
-      setWalletAddress(e.target.value);
-    }
-  };
-
   const verifiedWith = (verifiedDoc) => {
-    setVerifiedWith(verifiedDoc);
-  };
-
-  const DatepickerCustomInput = forwardRef(({ value, onClick }, ref) => (
-    <div style={{ display: "flex" }} onClick={onClick}>
-      <Form.Control
-        className="example-custom-input"
-        ref={ref}
-        value={value}
-        readOnly
-        placeholder="DD/MM/YYYY"
-      />
-      <CalenderIcon width={30} height={30} />
-    </div>
-  ));
-
-  const currentDate = (date) => {
-    const formattedDate = date
-      .toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .replace(/\//g, "-");
-    return formattedDate;
-  };
-
-  const handleNext = async () => {
-    if (isError) {
-      return;
-    }
-    setLoading(true);
-    if (step === 1) {
-      setStep(step + 1);
-    }
-    if (step === 2) {
-      if (nationality === null) {
-        dispatch(notificationFail("Please Enter Nationality"));
-      } else if (fname === null) {
-        dispatch(notificationFail("Please Enter First Name"));
-      } else if (lname === null) {
-        dispatch(notificationFail("Please Enter Last Name"));
-      } else if (dob === null) {
-        dispatch(notificationFail("Please Enter Date of Birth"));
-      } else {
-        setStep(step + 1);
-      }
-    }
-    if (step === 3) {
-      if (res_address === null) {
-        dispatch(notificationFail("Please Enter Residential Address"));
-      } else if (postal_code === null) {
-        dispatch(notificationFail("Please Enter Postal Code"));
-      } else if (city === null) {
-        dispatch(notificationFail("Please Enter City"));
-      } else {
-        setStep(step + 1);
-      }
-    }
-    if (step === 4) {
-      if (country_of_issue === null) {
-        dispatch(notificationFail("Please Enter Country"));
-      } else if (verified_with === null) {
-        setLoading(false);
-        dispatch(notificationFail("Please Select Verification ID Proof"));
-      } else {
-        setLoading(true);
-        setStep(step + 1);
-      }
-    }
-    if (step === 5) {
-      if (passport_url === null) {
-        setLoading(false);
-        dispatch(notificationFail("Please Select Passport Photo"));
-      } else {
-        setStep(step + 1);
-      }
-    }
-    if (step === 6) {
-      if (user_photo_url === null) {
-        setLoading(false);
-        dispatch(notificationFail("Please Select User Photo"));
-      } else {
-        setStep(step + 1);
-      }
-    }
-    if (step === 7) {
-      if (wallet_address === null) {
-        dispatch(notificationFail("Please Select User Wallet Address"));
-      } else {
-        if (
-          ["terms", "personal", "registering", "participate"].every((option) =>
-            checkboxState.includes(option)
-          )
-        ) {
-          let formData = new FormData();
-          formData.append(
-            "user_photo_url",
-            user_photo_url,
-            user_photo_url.name
-          );
-          formData.append("passport_url", passport_url, passport_url.name);
-          formData.append("fname", fname);
-          formData.append("lname", lname);
-          if (mname) {
-            formData.append("mname", mname);
-          }
-          formData.append("nationality", nationality);
-          formData.append("dob", dob.toLocaleDateString("en-GB"));
-          formData.append("res_address", res_address);
-          formData.append("city", city);
-          formData.append("postal_code", postal_code);
-          formData.append("country_of_issue", country_of_issue);
-          formData.append("verified_with", verified_with);
-
-          setError(true);
-          let updateUser = await jwtAxios
-            .put(`/users/updateKyc`, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            })
-            .catch((error) => {
-              setError(false);
-              if (error?.response?.data?.message === "") {
-                dispatch(notificationFail("Invalid"));
-              }
-              dispatch(notificationFail(error?.response?.data?.message));
-            });
-          if (updateUser) {
-            console.log("updateUser ", updateUser);
-            setISKYCSubmitted(true);
-            setkycsubmitted(true);
-            setError(false);
-            // dispatch(userGetData(userGetData.userid));
-            setStep(step + 1);
-            dispatch(notificationSuccess("KYC verification is submitted"));
-          }
-        } else {
-          dispatch(notificationFail("Please Check terms and conditions"));
-        }
-      }
-    }
-    if (step === 8) {
-    }
-  };
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobileMatch = window.matchMedia("(max-width: 767px)");
-      setIsMobile(mobileMatch.matches);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  const handleCheckboxChange = (filterType) => {
-    setCheckboxState((prevState) => {
-      if (prevState.includes(filterType)) {
-        return prevState.filter((f) => f !== filterType);
-      } else {
-        return [...prevState, filterType];
-      }
-    });
-  };
-
-  function simulateNetworkRequest() {
-    return new Promise((resolve) => setTimeout(resolve, 2000));
-  }
-
-  useEffect(() => {
-    if (isLoading) {
-      simulateNetworkRequest().then(() => {
-        if (!isError) {
-          setLoading(false);
-        }
-      });
-    }
-  }, [isLoading, isError]);
-
-  const fetchKYCData = (userDetailsAll) => {
-    let user = userDetailsAll;
-    if (user) {
-      setFname(user?.fname ? user.fname : null);
-      setLname(user?.lname ? user.lname : null);
-      setNationality(user?.nationality ? user.nationality : "United States");
-      setCity(user?.city ? user?.city : null);
-      setWalletType(user?.wallet_type ? user?.wallet_type : null);
-      setWalletAddress(user?.wallet_address ? user?.wallet_address : null);
-      setDob(user?.dob ? moment(user?.dob, "DD/MM/YYYY").toDate() : null);
-    }
-
-    if (user?.nationality) {
-      setNationality(user?.nationality);
-    } else {
-      setNationality("United States");
-    }
-
-    if (user?.country_of_issue) {
-      setCountryOfIssue(user?.country_of_issue);
-    } else {
-      setCountryOfIssue("United States");
-    }
-  };
-
-  useEffect(() => {
-    fetchKYCData(userDetailsAll);
-  }, [userDetailsAll]);
-
-  const handleFileUpload = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    setError(true);
-    setLoading(true);
-    const response = await jwtAxios
-      .post("/users/validate-file-type", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .catch((err) => {
-        if (step == 5) {
-          setPassportUrl(null);
-        }
-        if (step == 6) {
-          setUserPhotoUrl(null);
-        }
-        // setError(true);
-        setLoading(false);
-        dispatch(notificationFail(err.response?.data?.message));
-      });
-    setError(false);
-    setLoading(false);
-  };
-
-  const cancleKYC = () => {
-    if (isKYCSubmitted) {
-      dispatch(userGetData(userGetData.userid)).unwrap();
-    }
-    fetchKYCData(userDetailsAll);
-    setImageLocationUrl("https://flagcdn.com/h40/us.png");
-    setImageCountryUrl("https://flagcdn.com/h40/us.png");
-    setCountry("US");
-    setLocation("US");
-    setMname(null);
-    setResAddress(null);
-    setPostalCode(null);
-    setVerifiedWith(null);
-    setPassportUrl(null);
-    setUserPhotoUrl(null);
-    setCheckboxState([]);
-    props.onHide();
-    setStep(1);
+    setUserData((prevState) => ({
+      ...prevState,
+      verified_with: verifiedDoc, // Update the field in state
+    }));
   };
 
   return (
@@ -448,86 +352,47 @@ export const KYCVerification = (props) => {
               <Form.Group className="form-group">
                 <Form.Label>Nationality</Form.Label>
                 <div className="d-flex items-center phone-number-dropdown justify-between phone-number-dropdown-kyc">
-                  {!isMobile && (
-                    <>
-                      <Form.Control
-                        name="nationality"
-                        placeholder={nationality}
-                        type="text"
-                        value={nationality}
-                        onChange={(e) => {
-                          onChange(e);
-                        }}
-                        disabled
-                        maxLength="10"
-                      />
-                      <div className="kyc-mobile-popup">
-                        {nationality ? (
-                          <img
-                            src={imageUrlLocationSet}
-                            alt="Flag"
-                            className="circle-data"
-                          />
-                        ) : (
-                          "No Flag"
-                        )}
-                        <SelectLocationDropdown
-                          selectedLocationOption={selectedLocationOption}
-                          setSelectedLocationOption={setSelectedLocationOption}
-                          setImageLocationUrl={setImageLocationUrl}
-                          imageUrlLocationSet={imageUrlLocationSet}
-                          setImageLocationSearchUrl={setImageLocationSearchUrl}
-                          imageLocationSearchUrlSet={imageLocationSearchUrlSet}
-                          setSearchLocationText={setSearchLocationText}
-                          searchLocationText={searchLocationText}
-                          setCountry={setCountry}
-                          country={country}
-                          setNationality={setNationality}
-                        />
-                      </div>
-                    </>
-                  )}
-                  {isMobile && (
-                    <>
-                      <Form.Control
-                        name="nationality"
-                        placeholder={nationality}
-                        type="text"
-                        value={nationality}
-                        onChange={(e) => {
-                          onChange(e);
-                        }}
-                        className="md:w-auto w-full"
-                        disabled
-                      />
+                  <Form.Control
+                    name="nationality"
+                    placeholder={userData.nationality}
+                    type="text"
+                    value={userData.nationality}
+                    onChange={onChange}
+                    disabled
+                    maxLength="10"
+                    className={isMobile ? "md:w-auto w-full" : ""}
+                  />
 
-                      <div className="text-center relative mobile-setting-dropdown kyc-mobile-popup flex items-center">
-                        {nationality ? (
-                          <img
-                            src={imageUrlLocationSet}
-                            alt="Flag"
-                            className="circle-data"
-                          />
-                        ) : (
-                          "No Flag"
-                        )}
+                  <div
+                    className={`kyc-mobile-popup ${
+                      isMobile
+                        ? "text-center relative mobile-setting-dropdown flex items-center"
+                        : ""
+                    }`}
+                  >
+                    {userData.nationality ? (
+                      <img
+                        src={imageUrlLocationSet}
+                        alt="Flag"
+                        className="circle-data"
+                      />
+                    ) : (
+                      "No Flag"
+                    )}
 
-                        <SelectLocationDropdown
-                          selectedLocationOption={selectedLocationOption}
-                          setSelectedLocationOption={setSelectedLocationOption}
-                          setImageLocationUrl={setImageLocationUrl}
-                          imageUrlLocationSet={imageUrlLocationSet}
-                          setImageLocationSearchUrl={setImageLocationSearchUrl}
-                          imageLocationSearchUrlSet={imageLocationSearchUrlSet}
-                          setSearchLocationText={setSearchLocationText}
-                          searchLocationText={searchLocationText}
-                          setCountry={setCountry}
-                          country={country}
-                          setNationality={setNationality}
-                        />
-                      </div>
-                    </>
-                  )}
+                    <SelectLocationDropdown
+                      selectedLocationOption={selectedLocationOption}
+                      setSelectedLocationOption={setSelectedLocationOption}
+                      setImageLocationUrl={setImageLocationUrl}
+                      imageUrlLocationSet={imageUrlLocationSet}
+                      setImageLocationSearchUrl={setImageLocationSearchUrl}
+                      imageLocationSearchUrlSet={imageLocationSearchUrlSet}
+                      setSearchLocationText={setSearchLocationText}
+                      searchLocationText={searchLocationText}
+                      setCountry={setCountry}
+                      country={country}
+                    />
+                  </div>
                 </div>
               </Form.Group>
               <Row>
@@ -538,7 +403,7 @@ export const KYCVerification = (props) => {
                       type="text"
                       placeholder="Alex"
                       name="fname"
-                      value={fname}
+                      value={userData.fname}
                       onChange={(e) => onChange(e)}
                       disabled={userDetailsAll?.fname ? true : false}
                     />
@@ -551,7 +416,7 @@ export const KYCVerification = (props) => {
                       type="text"
                       placeholder="Last name"
                       name="lname"
-                      value={lname}
+                      value={userData.lname}
                       onChange={(e) => onChange(e)}
                       disabled={userDetailsAll?.lname ? true : false}
                     />
@@ -566,7 +431,7 @@ export const KYCVerification = (props) => {
                       type="text"
                       placeholder="1"
                       name="mname"
-                      value={mname}
+                      value={userData.mname}
                       onChange={(e) => onChange(e)}
                     />
                   </Form.Group>
@@ -574,7 +439,6 @@ export const KYCVerification = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Date of birth</Form.Label>
-
                     <DatePicker
                       selected={dob}
                       onChange={(date) => setDob(date)}
@@ -601,7 +465,7 @@ export const KYCVerification = (props) => {
                   type="text"
                   placeholder="Your address"
                   name="res_address"
-                  value={res_address}
+                  value={userData.res_address}
                   onChange={(e) => onChange(e)}
                 />
               </Form.Group>
@@ -613,7 +477,7 @@ export const KYCVerification = (props) => {
                       type="text"
                       placeholder="Postal code"
                       name="postal_code"
-                      value={postal_code}
+                      value={userData.postal_code}
                       onChange={(e) => onChange(e)}
                     />
                   </Form.Group>
@@ -625,7 +489,7 @@ export const KYCVerification = (props) => {
                       type="text"
                       placeholder="City"
                       name="city"
-                      value={city}
+                      value={userData.city}
                       onChange={(e) => onChange(e)}
                       disabled={userDetailsAll?.city ? true : false}
                     />
@@ -638,87 +502,49 @@ export const KYCVerification = (props) => {
             <>
               <Form.Group className="form-group mb-4">
                 <Form.Label>Country/Region of Issue</Form.Label>
-                <div className="d-flex items-center phone-number-dropdown justify-between phone-number-dropdown-kyc ">
-                  {!isMobile && (
-                    <>
-                      <Form.Control
-                        name="country"
-                        placeholder={country_of_issue}
-                        type="text"
-                        value={country_of_issue}
-                        onChange={(e) => {
-                          onChange(e);
-                        }}
-                        disabled
-                        maxLength="10"
-                      />
-                      <div className="kyc-mobile-popup">
-                        {country_of_issue ? (
-                          <img
-                            src={imageUrlCountrySet}
-                            alt="Flag"
-                            className="circle-data"
-                          />
-                        ) : (
-                          "No Flag"
-                        )}
+                <div className="d-flex items-center phone-number-dropdown justify-between phone-number-dropdown-kyc">
+                  <Form.Control
+                    name="country"
+                    placeholder={userData.country_of_issue}
+                    type="text"
+                    value={userData.country_of_issue}
+                    onChange={onChange}
+                    disabled
+                    maxLength="10"
+                    className={isMobile ? "md:w-auto w-full" : ""}
+                  />
 
-                        <SelectLocationKYCDropdown
-                          selectedLocationOption={selectedCountryOption}
-                          setSelectedLocationOption={setSelectedCountryOption}
-                          setImageLocationUrl={setImageCountryUrl}
-                          imageUrlLocationSet={imageUrlCountrySet}
-                          setImageLocationSearchUrl={setImageCountrySearchUrl}
-                          imageLocationSearchUrlSet={imageCountrySearchUrlSet}
-                          setSearchLocationText={setSearchCountryText}
-                          searchLocationText={searchCountryText}
-                          setCountry={setLocation}
-                          country={location}
-                          setNationality={setCountryOfIssue}
-                        />
-                      </div>
-                    </>
-                  )}
-                  {isMobile && (
-                    <>
-                      <Form.Control
-                        name="country"
-                        placeholder={country_of_issue}
-                        type="text"
-                        value={country_of_issue}
-                        onChange={(e) => {
-                          onChange(e);
-                        }}
-                        className="md:w-auto w-full"
-                        disabled
+                  <div
+                    className={`kyc-mobile-popup ${
+                      isMobile
+                        ? "text-center relative mobile-setting-dropdown flex items-center"
+                        : ""
+                    }`}
+                  >
+                    {userData.country_of_issue ? (
+                      <img
+                        src={imageUrlCountrySet}
+                        alt="Flag"
+                        className="circle-data"
                       />
+                    ) : (
+                      "No Flag"
+                    )}
 
-                      <div className="text-center relative mobile-setting-dropdown kyc-mobile-popup flex items-center">
-                        {nationality ? (
-                          <img
-                            src={imageUrlCountrySet}
-                            alt="Flag"
-                            className="circle-data"
-                          />
-                        ) : (
-                          "No Flag"
-                        )}
-                        <SelectLocationKYCDropdown
-                          selectedLocationOption={selectedCountryOption}
-                          setSelectedLocationOption={setSelectedCountryOption}
-                          setImageLocationUrl={setImageCountryUrl}
-                          imageUrlLocationSet={imageUrlCountrySet}
-                          setImageLocationSearchUrl={setImageCountrySearchUrl}
-                          imageLocationSearchUrlSet={imageCountrySearchUrlSet}
-                          setSearchLocationText={setSearchCountryText}
-                          searchLocationText={searchCountryText}
-                          setCountry={setLocation}
-                          country={location}
-                          setNationality={setCountryOfIssue}
-                        />
-                      </div>
-                    </>
-                  )}
+                    <SelectLocationKYCDropdown
+                      selectedLocationOption={selectedCountryOption}
+                      setSelectedLocationOption={setSelectedCountryOption}
+                      setImageLocationUrl={setImageCountryUrl}
+                      imageUrlLocationSet={imageUrlCountrySet}
+                      setImageLocationSearchUrl={setImageCountrySearchUrl}
+                      imageLocationSearchUrlSet={imageCountrySearchUrlSet}
+                      setSearchLocationText={setSearchCountryText}
+                      searchLocationText={searchCountryText}
+                      setCountry={setLocation}
+                      country={location}
+                      setNationality={(country) => setUserData((prevData) => ({ ...prevData, country_of_issue: country }))}
+                    />
+                  </div>
                 </div>
               </Form.Group>
               <h4>Use a valid government-issued document</h4>
@@ -726,25 +552,22 @@ export const KYCVerification = (props) => {
                 Only the following documents listed below will be accepted, all
                 other documents will be rejected.
               </p>
-
               <div
-                className="document-issued form-check"
-                onClick={() => verifiedWith("government-passport")}
-              >
-                <div
-                  className={`form-check-input ${
-                    verified_with === "government-passport" ? "checked" : ""
-                  }`}
-                />
-                <label className="form-check-label">
-                  <>
-                    Passport
-                    <div className="checkmark">
-                      <CheckmarkIcon width="10" height="8" />
-                    </div>
-                  </>
-                </label>
-              </div>
+                  className="document-issued form-check"
+                  onClick={() => verifiedWith("government-passport")}
+                >
+                  <div
+                    className={`form-check-input ${userData.verified_with === "government-passport" ? "checked" : ""}`}
+                  />
+                  <label className="form-check-label">
+                    <>
+                      Passport
+                      <div className="checkmark">
+                        <CheckmarkIcon width="10" height="8" />
+                      </div>
+                    </>
+                  </label>
+                </div>
 
               <div
                 className="document-issued form-check DrivingLicenseMargin"
@@ -752,7 +575,7 @@ export const KYCVerification = (props) => {
               >
                 <div
                   className={`form-check-input ${
-                    verified_with === "government-license" ? "checked" : ""
+                    userData.verified_with === "government-license" ? "checked" : ""
                   }`}
                 />
                 <label className="form-check-label">
@@ -789,7 +612,10 @@ export const KYCVerification = (props) => {
               </ul>
               <Dropzone
                 onDrop={(acceptedFiles) => {
-                  setPassportUrl(acceptedFiles[0]);
+                  setUserData((prevData) => ({
+                    ...prevData,
+                    passport_url: acceptedFiles[0],
+                  }));
                   handleFileUpload(acceptedFiles[0]);
                 }}
                 name="passport_url"
@@ -803,12 +629,12 @@ export const KYCVerification = (props) => {
                       <Col sm="12" className="d-flex items-center">
                         <CameraLineIcon width="23" height="24" /> Take a photo
                       </Col>
-                      {passport_url && (
+                      {userData.passport_url && (
                         <ul>
-                          {passport_url && (
-                            <li key={passport_url.path}>
-                              {passport_url.path} -{" "}
-                              {(passport_url.size / 1024).toFixed(2)} KB
+                          {userData.passport_url && (
+                            <li key={userData.passport_url.path}>
+                              {userData.passport_url.path} -{" "}
+                              {(userData.passport_url.size / 1024).toFixed(2)} KB
                             </li>
                           )}
                         </ul>
@@ -845,7 +671,10 @@ export const KYCVerification = (props) => {
               </ul>
               <Dropzone
                 onDrop={(acceptedFiles) => {
-                  setUserPhotoUrl(acceptedFiles[0]);
+                  setUserData((prevData) => ({
+                    ...prevData,
+                    user_photo_url: acceptedFiles[0],  // Update user_photo_url field
+                  }));
                   handleFileUpload(acceptedFiles[0]);
                 }}
                 name="user_photo_url"
@@ -857,12 +686,12 @@ export const KYCVerification = (props) => {
                       <Col sm="12" className="d-flex items-center">
                         <CameraLineIcon width="23" height="24" /> Take a photo
                       </Col>
-                      {user_photo_url && (
+                      {userData.user_photo_url && (
                         <ul>
-                          {user_photo_url && (
-                            <li key={user_photo_url.path}>
-                              {user_photo_url.path} -{" "}
-                              {(user_photo_url.size / 1024).toFixed(2)} KB
+                          {userData.user_photo_url && (
+                            <li key={userData.user_photo_url.path}>
+                              {userData.user_photo_url.path} -{" "}
+                              {(userData.user_photo_url.size / 1024).toFixed(2)} KB
                             </li>
                           )}
                         </ul>
@@ -887,9 +716,12 @@ export const KYCVerification = (props) => {
                   placeholder="Enter your wallet Type"
                   name="wallet_type"
                   onChange={(e) => {
-                    setWalletType(e.target.value);
+                    setUserData((prevData) => ({
+                      ...prevData,
+                      wallet_type: e.target.value
+                    }));
                   }}
-                  value={wallet_type}
+                  value={userData.wallet_type}
                   disabled={userDetailsAll?.wallet_type ? true : false}
                 />
               </Form.Group>
@@ -900,9 +732,12 @@ export const KYCVerification = (props) => {
                   placeholder="Enter your wallet address"
                   name="wallet_address"
                   onChange={(e) => {
-                    setWalletAddress(e.target.value);
+                    setUserData((prevData) => ({
+                      ...prevData,
+                      wallet_address: e.target.value,
+                    }));
                   }}
-                  value={wallet_address}
+                  value={userData.wallet_address}
                 />
               </Form.Group>
               <p className="mb-4">

@@ -6,7 +6,7 @@ import {
 } from "../store/slices/notificationSlice";
 import jwtAxios from "../service/jwtAxios";
 import { useDispatch, useSelector } from "react-redux";
-import { userGetFullDetails } from "../store/slices/AuthSlice";
+import { userDetails } from "../store/slices/AuthSlice";
 import { Box } from "@mui/material";
 
 //This component is used for report user on profile page 
@@ -14,7 +14,7 @@ export const ReportUserView = (props) => {
   const { id} = props;
   const [reason, setReason] = useState(null);
   const dispatch = useDispatch();
-  const userData = useSelector(userGetFullDetails);
+  const userData = useSelector(userDetails);
 
   useEffect(() => {
     if (props.show) {
@@ -35,7 +35,7 @@ export const ReportUserView = (props) => {
       dispatch(notificationFail("Please select any one reason"));
     } else {
       const reqData = {
-        report_from_user_address: userData?.wallet_address,
+        report_from_user_address: userData?.account,
         to_report_user: id,
         reason,
       };
@@ -119,7 +119,6 @@ export const ReportUserView = (props) => {
                   name="reason"
                   placeholder="Other reason"
                   onChange={(e) => setReason(e.target.value)}
-                  //value={reason === "" ? "" : reason}
                 />
               </div>
             </Box>

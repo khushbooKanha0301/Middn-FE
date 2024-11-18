@@ -1,231 +1,119 @@
 import "react-toastify/dist/ReactToastify.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { CameraIcon } from "./SVGIcon";
-import { useSelector } from "react-redux";
-import {
-  userDetails,
-  userGetData,
-  userGetFullDetails,
-} from "../store/slices/AuthSlice";
-
+import { useSelector, useDispatch } from "react-redux";
+import { userDetails, userGetData, userGetFullDetails } from "../store/slices/AuthSlice";
+import { notificationFail, notificationSuccess } from "../store/slices/notificationSlice";
 import { FaTrashAlt } from "react-icons/fa";
-import { useDispatch } from "react-redux";
 import jwtAxios from "../service/jwtAxios";
-import {
-  notificationFail,
-  notificationSuccess,
-} from "../store/slices/notificationSlice";
-import { ref, update,
-  get
-} from "firebase/database";
-import { database } from "./../helper/config";
-import { firebaseMessages } from "./../helper/chatMessage";
-import { firebaseMessagesEscrow } from "./../helper/configEscrow";
-import { firebaseStatus } from "./../helper/statusManage";
-
-import {
-  converImageToBase64,
-} from "./../helper/firebaseConfig";
-
-function simulateNetworkRequest() {
-  return new Promise((resolve) => setTimeout(resolve, 2000));
-}
+import { ref, update, get } from "firebase/database";
+import { database } from "./../helper/config"
+import { firebaseMessages, firebaseMessagesEscrow, firebaseStatus } from "../helper/configVariables";
+import { converImageToBase64 } from "./../helper/firebaseConfig";
 
 //This component is used for edit user profile
 export const EditProfileView = (props) => {
+ console.log("onHide ", props);
   const dispatch = useDispatch();
-
-  const [country, setCountry] = useState();
-  const [errFname, setErrFname] = useState(null);
-  const [errLname, setErrLname] = useState(null);
-  const [fname, setFname] = useState("");
-  const [lname, setLname] = useState("");
-  const [bio, setBio] = useState("");
-  const [profile, setProfile] = useState("");
-  const [isProfileDeleted,setIsProfileDeleted] = useState(false);
-  const [profileUrl, setProfileUrl] = useState("");
-  const [location, setLocation] = useState(null);
-  const [imageSrc, setImageSrc] = useState("");
-  const [isLoading, setLoading] = useState(false);
-  const [countryCode, setCountryCode] = useState("");
   const userData = useSelector(userDetails);
-
   const userDetailsAll = useSelector(userGetFullDetails);
-  const countryDetails = useSelector((state) => state.auth.countryDetails);
+  const countryDetails = useSelector((state) => state.auth.countryDetails);  
 
-  useEffect(() => {
-    if (countryDetails) {
-      setCountry(countryDetails?.country_name);
-      setCountryCode(countryDetails?.country_code);
-    }
-  }, [countryDetails]);
+  const country = countryDetails?.country_name || "";
+  const countryCode = countryDetails?.country_code || "";
+  const flagUrl = countryCode ? `https://flagcdn.com/h40/${countryCode.toLowerCase()}.png` : "";
 
-  useEffect(() => {
-    if (userDetailsAll) {
-      let user = userDetailsAll;
-      setFname(user?.fname_alias ? user?.fname_alias : "");
-      setLname(user?.lname_alias ? user?.lname_alias : "");
-      setLocation(user?.location ? user?.location : null);
-      setBio(user?.bio ? user?.bio : "");
-      setProfile(user?.profile ? user?.profile : null);
-      setImageSrc(user?.imageUrl ? user?.imageUrl : null);
-    }
-  }, [userDetailsAll]);
+  const [fname, setFname] = useState(userDetailsAll?.fname_alias || "");
+  const [lname, setLname] = useState(userDetailsAll?.lname_alias || "");
+  const [bio, setBio] = useState(userDetailsAll?.bio || "");
+  const [profile, setProfile] = useState(userDetailsAll?.profile || "");
+  const [imageSrc, setImageSrc] = useState(userDetailsAll?.imageUrl || "");
+  const [isProfileDeleted, setIsProfileDeleted] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const onChange = (e) => {
-    if (e.target.name == "fname") {
-      setFname(e.target.value);
-    } else if (e.target.name == "lname") {
-      setLname(e.target.value);
-    } else if (e.target.name == "bio") {
-      setBio(e.target.value);
-    } else if (e.target.name == "profile") {
-      setIsProfileDeleted(false);
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      if (file && !file.type.includes("image/")) {
+    const { name, value, files } = e.target;
+    if (name === "fname") setFname(value);
+    else if (name === "lname") setLname(value);
+    else if (name === "bio") setBio(value);
+    else if (name === "profile" && files[0]) {
+      const file = files[0];
+      if (!file.type.includes("image/")) {
         dispatch(notificationFail("Please select a valid image file"));
         return;
       }
-      reader.onload = () => {
-        setImageSrc(reader.result);
-      };
-
-      if (file) {
-        reader.readAsDataURL(file);
-      }
-
-      setProfile(e.target.files[0]);
+      setIsProfileDeleted(false);
+      setProfile(file);
+      const reader = new FileReader();
+      reader.onload = () => setImageSrc(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
   const onDeleteImage = async (e) => {
     e.preventDefault();
     setImageSrc("");
-    setProfileUrl("");
     setProfile("");
     setIsProfileDeleted(true);
   };
 
-  const submitHandler = async () => {
-    setLoading(true);
-
-    if (!fname || !lname) {
-      dispatch(notificationFail("Please Enter First & Last name"));
-    }
-    if (!errFname && !errLname && fname && lname) {
-      let formSubmit = {
-        fname_alias: fname,
-        lname_alias: lname,
-        bio: bio,
-        profile: profile,
-      };
-
-      if (typeof profile == "string") {
-        delete formSubmit.profile;
-      }
-      if(isProfileDeleted)
-      {
-        formSubmit.is_profile_deleted = true;
-      }
-
-      await jwtAxios
-        .put(`/users`, formSubmit, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(async (response) => {
-          if (response?.status === 200) {
-            dispatch(userGetData(userData.userid)).unwrap();
-            dispatch(notificationSuccess(response?.data.message));
-            let file = {};
-            let updateArr = {};
-            if (typeof profile != "string" && profile) {
-              let base64 = await converImageToBase64(profile);
-              file = {
-                name: profile?.name,
-                size: profile?.size,
-                type: profile?.type,
-                url: base64,
-              };
-              updateArr.imageUrl = `data:${file.type};base64,${file?.url}`;
-            }
-            if (fname) {
-              updateArr.fname_alias = fname;
-            }
-            if (lname) {
-              updateArr.lname_alias = lname;
-            }
-            const userRef = ref(database, firebaseMessages?.CHAT_USERS + userData?.account);
-            const userEscrowRef = ref(database, firebaseMessagesEscrow?.CHAT_USERS + userData?.account);
-            const userStatusRef = ref(database, firebaseStatus?.CHAT_USERS + userData?.account);
-            await get(userRef)
-            .then((snapshot) => {
-               if (snapshot.exists()) {
-                update(
-                  userRef,
-                  updateArr
-                );
-              } 
-            })
-            .catch((error) => {
-              dispatch(notificationFail("Something went wrong!"));
-            });
-
-            await get(userEscrowRef)
-            .then((snapshot) => {
-               if (snapshot.exists()) {
-                update(
-                  userEscrowRef,
-                  updateArr
-                );
-              } 
-            })
-            .catch((error) => {
-              dispatch(notificationFail("Something went wrong!"));
-            });
-
-            await get(userStatusRef)
-            .then((snapshot) => {
-               if (snapshot.exists()) {
-                update(
-                  userStatusRef,
-                  updateArr
-                );
-              } 
-            })
-            .catch((error) => {
-              dispatch(notificationFail("Something went wrong!"));
-            });
-            props.onHide();
-            //getActiveEscrows();
-            //window.location.reload();
-          }
-        })
-        .catch((error) => {
-          if(typeof error == "string")
-          {
-            dispatch(notificationFail(error));
-          }else{
-            dispatch(notificationFail(error?.response?.data?.message));
-          }
-        });
-      }
+  const updateFirebaseData = async (path, data) => {
+    const userRef = ref(database, path);
+    const snapshot = await get(userRef);
+    if (snapshot.exists()) await update(userRef, data);
   };
 
-  useEffect(() => {
-    if (isLoading) {
-      simulateNetworkRequest().then(() => {
-        setLoading(false);
-      });
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!fname || !lname) {
+      dispatch(notificationFail("Please enter first & last name"));
+      setLoading(false);
+      return;
     }
-  }, [isLoading]);
 
-  const flagUrl = countryCode
-    ? `https://flagcdn.com/h40/${countryCode?.toLowerCase()}.png`
-    : "";
+    const formSubmit = {
+      fname_alias: fname,
+      lname_alias: lname,
+      bio,
+      profile: typeof profile === "string" ? undefined : profile,
+      is_profile_deleted: isProfileDeleted,
+    };
+
+    try {
+      const response = await jwtAxios.put("/users", formSubmit, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (response.status === 200) {
+        dispatch(userGetData(userData.userid)).unwrap();
+        dispatch(notificationSuccess(response.data.message));
+
+        let updateArr = {
+          fname_alias: fname,
+          lname_alias: lname,
+        };
+        if (profile && typeof profile !== "string") {
+          const base64 = await converImageToBase64(profile);
+          updateArr.imageUrl = `data:${profile.type};base64,${base64}`;
+        }
+
+        const firebasePaths = [
+          `${firebaseMessages.CHAT_USERS}${userData.account}`,
+          `${firebaseMessagesEscrow.CHAT_USERS}${userData.account}`,
+          `${firebaseStatus.CHAT_USERS}${userData.account}`,
+        ];
+
+        await Promise.all(firebasePaths.map((path) => updateFirebaseData(path, updateArr)));
+
+        props.onHide();
+      }
+    } catch (error) {
+      const message = typeof error === "string" ? error : error?.response?.data?.message;
+      dispatch(notificationFail(message));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal
@@ -246,17 +134,7 @@ export const EditProfileView = (props) => {
             style={{ display: "flex", alignItems: "center" }}
           >
             <Form.Label>
-              <img
-                src={
-                  imageSrc
-                    ? imageSrc
-                    : profileUrl || require("../content/images/avatar.png")
-                }
-                id="output"
-                alt={imageSrc || profile ? profile : "No Image"}
-                width="135"
-                height="135"
-              />
+              <img src={imageSrc || profile || require("../content/images/avatar.png")} id="output" alt="Profile" width="135" height="135" />
               <CameraIcon width="16" height="15" />
               {profile && (
                 <FaTrashAlt

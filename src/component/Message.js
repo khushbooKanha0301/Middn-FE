@@ -4,78 +4,98 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { database, messageTypes } from "./../helper/config";
-import { firebaseMessages } from "./../helper/chatMessage";
+import { firebaseMessages } from "./../helper/configVariables";
 import { sendMessage } from "./../helper/firebaseConfig";
-import { userGetFullDetails } from "../store/slices/AuthSlice";
+import {userDetails,  userGetFullDetails } from "../store/slices/AuthSlice";
 import {
   notificationFail,
   notificationSuccess,
 } from "../store/slices/notificationSlice";
-
+import jwtAxios from "../service/jwtAxios";
 //This component is used for message chat start from profile page 
 export const MessageView = (props) => {
   const { otheruser } = props;
+  const dispatch = useDispatch();
   const [content, SetContent] = useState(null);
   const [errContent, setErrContent] = useState(null);
+  const userData = useSelector(userDetails);
   const usergetdata = useSelector(userGetFullDetails);
-  const dispatch = useDispatch();
-  const dbRef = ref(database);
-
   const onChangeMessage = (e) => {
     SetContent(e.target.value);
   };
 
   const addUserInFirebase = (user) => {
-    const userRef = ref(database, firebaseMessages?.CHAT_USERS + user.wallet_address);
-    get(userRef)
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        // User exists, update the data
-      } else {
-        // User doesn't exist, add new data
-        set(userRef, {
-          wallet_address: user?.wallet_address,
-          fname_alias: user.fname_alias || "John",
-          lname_alias: user.lname_alias || "Doe",
-          imageUrl: user?.imageUrl ? user?.imageUrl : "",
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error adding/updating user in Firebase:", error);
-      dispatch(notificationFail("Something went wrong!"));
-    });
+    const userRef = ref(database, `${firebaseMessages?.CHAT_USERS}${user.wallet_address}`);
+  
+    // Prepare user data
+    const userData = {
+      wallet_address: user.wallet_address,
+      fname_alias: user.fname_alias || "John",
+      lname_alias: user.lname_alias || "Doe",
+      imageUrl: user.imageUrl || "",  
+    };
+  
+    // Attempt to set user data in Firebase
+    set(userRef, userData)
+      .catch((error) => {
+        console.error("Error adding/updating user in Firebase:", error);
+        dispatch(notificationFail("Something went wrong!"));
+      });
   };
+  
 
   const onSubmit = async () => {
+    // Check for missing content early
     if (!content) {
       setErrContent("Please Enter Message here");
+      return;
     }
-    if (!errContent && content) {
-      setErrContent(null);
+    setErrContent(null);
 
-      if (usergetdata && otheruser) {
-        await addUserInFirebase(usergetdata);
-        await addUserInFirebase(otheruser);
+    if (usergetdata && otheruser) {
+      const updatedUserGetData = { 
+        ...usergetdata, 
+        wallet_address: userData?.account || "" 
+      };
+      try {
+        await Promise.all([
+          addUserInFirebase(updatedUserGetData),
+          addUserInFirebase(otheruser)
+        ]);
+  
+        // Send the message
         await sendMessage(
           false,
           content,
-          usergetdata?.wallet_address,
+          userData?.account,
           otheruser?.wallet_address,
           messageTypes.TEXT,
           ""
         );
-
+  
         props.onHide();
         SetContent(null);
-
+  
+        // Send message to backend API
+        await jwtAxios.post("users/SendNewMessage", { message: content });
         dispatch(notificationSuccess("Message Sent successfully !"));
+  
+        // Redirect after 1 second
         setTimeout(() => {
           window.location.href = "/chat";
         }, 1000);
+      } catch (err) {
+        // Simplified error handling
+        const errorMessage = typeof err === "string" 
+          ? err 
+          : err?.response?.data?.message || "An error occurred during the transaction. Please try again.";
+        
+        dispatch(notificationFail(errorMessage));
       }
     }
   };
+
+  
   return (
     <Modal
       {...props}

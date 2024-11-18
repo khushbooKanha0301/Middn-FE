@@ -69,6 +69,7 @@ export const GoogleAuth = () => {
       }
     });
   };
+  
   return (
     <Card className="cards-dark mb-32">
       <Card.Body className="two-f-a"> 

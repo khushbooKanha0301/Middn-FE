@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { userDetails, userGetFullDetails } from "../store/slices/AuthSlice";
 import { onValue, ref } from "firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { database } from "./../helper/config";
-import { firebaseMessages } from "./../helper/chatMessage";
-import { firebaseMessagesEscrow } from "./../helper/configEscrow";
-
+import { firebaseMessages, firebaseMessagesEscrow } from "./../helper/configVariables";
 import { hideAddress } from "../utils";
 import LoginView from "../component/Login";
 import {
-  // BellIcon,
+  BellIcon,
   LogoutIcon,
   NotificationIcon,
   SettingIcon,
@@ -19,8 +17,6 @@ import {
 } from "./SVGIcon";
 import { HeaderLoader } from "./HeaderLoader";
 import Logo from "../../src/content/images/logo.png";
-import MassageIcon from "../../src/content/images/massage.png";
-import BellIcon from "../../src/content/images/bell.png";
 
 //This component is used for header section
 export const Header = (props) => {
@@ -30,137 +26,122 @@ export const Header = (props) => {
   const [visible, setVisible] = useState(true);
   const [messageCount, setMessageCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [modalShow, setModalShow] = useState(false);
+  const [modalNotifyShow, setModalNofificationShow] = useState(false);
+  const [modalMessageShow, setModalMessageShow] = useState(false);
+  const [addressLine, setAddressLine] = useState("");
+  const [showAddressError, setShowAddressError] = useState(false);
   const acAddress = useSelector(userDetails);
-  let usergetdata = useSelector(userGetFullDetails);
   const userDetailsAll = useSelector(userGetFullDetails);
 
-  const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
-
-  const [modalNotifyShow, setModalNofificationShow] = useState(false);
   const modalNotifyToggle = () => setModalNofificationShow(!modalNotifyShow);
-
-  const [modalMessageShow, setModalMessageShow] = useState(false);
   const modalMessageToggle = () => setModalMessageShow(!modalMessageShow);
 
-  const [isSign, setIsSign] = useState(null);
+  // Function to update the address line
+  const updateAddressLine = () => {
+    if (
+      acAddress?.account &&
+      userDetailsAll?.is_2FA_login_verified
+    ) {
+      setAddressLine(hideAddress(acAddress.account, 5)); // Hide address if verified
+    } else {
+      setAddressLine("Connect Wallet");
+    }
+  };
 
-  let addressLine = "";
-  if (acAddress?.account === "Connect Wallet" && userDetailsAll === undefined) {
-    addressLine = "Connect Wallet";
-  } else if (
-    acAddress?.account !== "Connect Wallet" &&
-    userDetailsAll === undefined
-  ) {
-    addressLine = "";
-  } else if (
-    acAddress?.account !== "Connect Wallet" &&
-    userDetailsAll?.is_2FA_login_verified !== false &&
-    acAddress?.account == userDetailsAll?.wallet_address
-  ) {
-    addressLine = hideAddress(acAddress?.account, 5);
-  } else {
-    addressLine = "Connect Wallet";
-  }
+  useEffect(() => {
+    updateAddressLine();
+  }, [acAddress, userDetailsAll]); // Trigger when acAddress or userDetailsAll changes
 
-  const findFirebaseUserList = async () => {
+  const checkAddressIntegrity = () => {
+    const element = document.querySelector(".user-name");
+    if (element && element.innerText === "") {
+      setShowAddressError(true); // Set error if the address line is empty
+    } else {
+      setShowAddressError(false); // Reset error if address line is visible
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(checkAddressIntegrity, 500);
+    return () => clearInterval(interval);
+  }, [acAddress.authToken, addressLine]);
+
+  const findFirebaseUserList = useCallback(async () => {
     if (acAddress?.authToken) {
       const starCountRef = ref(database, firebaseMessages.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const allunreadCount = Object.keys(snapshot.val())
-            .filter((element) => {
-              return element.includes(acAddress?.account);
-            })
-            ?.filter((object) => {
-              const name = acAddress?.account;
-              return (
-                name &&
-                snapshot &&
-                snapshot.val() &&
-                snapshot.val()[object] &&
-                snapshot.val()[object]?.unreadcount &&
-                snapshot.val()[object]?.unreadcount[name] > 0
-              );
-            });
-          setMessageCount(allunreadCount.length);
+          const allUnreadCount = Object.keys(snapshot.val()).filter(
+            (element) => element.includes(acAddress?.account) && snapshot.val()[element]?.unreadcount?.[acAddress.account] > 0
+          );
+          setMessageCount(allUnreadCount.length);
         }
       });
     }
-  };
+  }, [acAddress]);
 
-  const findFirebaseUserListNotification = async () => {
+  const findFirebaseUserListNotification = useCallback(async () => {
     if (acAddress?.authToken) {
       const starCountRef = ref(database, firebaseMessagesEscrow.CHAT_ROOM);
       onValue(starCountRef, (snapshot) => {
         if (snapshot.val()) {
-          const unreadCount = Object.values(snapshot.val()).filter((e) => {
-            return Object.keys(e).some((element) => {
-              const ReciverId = element.split("_")[0];
-              const name = acAddress?.account;
+          const unreadCount = Object.values(snapshot.val()).filter((e) =>
+            Object.keys(e).some((element) => {
+              const receiverId = element.split("_")[0];
               return (
-                ReciverId === name &&
-                e[element]?.unreadcount &&
-                e[element]?.unreadcount[name] > 0
+                receiverId === acAddress?.account &&
+                e[element]?.unreadcount?.[acAddress.account] > 0
               );
-            });
-          });
+            })
+          );
           setNotificationCount(unreadCount.length);
         }
       });
     }
-  };
-
-  const handleAccountAddress = (address) => {
-    setIsSign(false);
-  };
+  }, [acAddress]);
 
   useEffect(() => {
     if (acAddress.authToken) {
       findFirebaseUserList();
       findFirebaseUserListNotification();
     }
-  }, []);
+  }, [acAddress.authToken, findFirebaseUserList, findFirebaseUserListNotification]);
 
   useEffect(() => {
     const handleScroll = () => {
-      let moving = window.pageYOffset;
+      const moving = window.pageYOffset;
       setVisible(position > moving);
       setPosition(moving);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  });
-
-  const handleLinkClick = () => {
-    setModalMessageShow(true);
-  };
-  const handleModelClick = () => {
-    setModalShow(true);
-  }
-
-  const handleNotificationClick = () => {
-    setModalNofificationShow(true);
-  };
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [position]);
 
   useEffect(() => {
     const checkMobile = () => {
-      const mobileMatch = window.matchMedia("(max-width: 767px)");
-      setIsMobile(mobileMatch.matches);
+      setIsMobile(window.matchMedia("(max-width: 767px)").matches);
     };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const renderModal = (show, handleClose) => (
+    <LoginView
+      show={show}
+      onHide={handleClose}
+      handleaccountaddress={() => setModalShow(false)}
+    />
+  );
+
   const cls = visible ? "visible" : "hidden";
   return (
     <div className={`header d-flex ${cls}`}>
       <Navbar.Toggle
         onClick={props.clickHandler}
-        style={{paddingLeft: "14px"}}
+        style={{ paddingLeft: "14px" }}
         className="d-block d-md-none"
         aria-controls="basic-navbar-nav"
       />
@@ -170,26 +151,17 @@ export const Header = (props) => {
       <Nav className="ms-auto" as="ul">
         {acAddress?.authToken ? (
           <>
-            {messageCount > 0 ? (
-              <Nav.Item as="li" className="items">
-                <Nav.Link as={Link} to="/chat">
-                  <img src={MassageIcon} alt="MassageIcon" />
+            <Nav.Item as="li">
+              <Nav.Link as={Link} to="/chat">
+                <NotificationIcon width="24" height="24" />
+                {messageCount > 0 && (
                   <span className="notification-badge">{messageCount}</span>
-                </Nav.Link>
-              </Nav.Item>
-            ) : (
-              <Nav.Item as="li">
-                <Nav.Link as={Link} to="/chat">
-                  <img src={MassageIcon} alt="MassageIcon" />
-                  {messageCount > 0 && (
-                    <span className="notification-badge">{messageCount}</span>
-                  )}
-                </Nav.Link>
-              </Nav.Item>
-            )}
+                )}
+              </Nav.Link>
+            </Nav.Item>
             <Nav.Item as="li">
               <Nav.Link as={Link} to="/notification">
-                <img src={BellIcon} alt="BellIcon" />
+                <BellIcon width="24" height="24" />
                 {notificationCount > 0 && (
                   <span className="notification-badge">
                     {notificationCount}
@@ -201,52 +173,40 @@ export const Header = (props) => {
         ) : (
           <>
             <Nav.Item as="li">
-              <Nav.Link as={Link} to="/chat" onClick={handleLinkClick}>
-                <img src={MassageIcon} alt="MassageIcon" />
+              <Nav.Link
+                as={Link}
+                to="/chat"
+                onClick={() => setModalMessageShow(true)}
+              >
+                <NotificationIcon width="24" height="24" />
               </Nav.Link>
-              {modalMessageShow && (
-                <LoginView
-                  show={modalMessageShow}
-                  onHide={() => setModalMessageShow(false)}
-                  handleaccountaddress={handleAccountAddress}
-                  isSign={isSign}
-                />
-              )}
+              {modalMessageShow &&
+                renderModal(modalMessageShow, () => setModalMessageShow(false))}
             </Nav.Item>
             <Nav.Item as="li">
               <Nav.Link
                 as={Link}
-                to={acAddress.authToken && "/notification"}
-                onClick={handleNotificationClick}
+                to="/notification"
+                onClick={() => setModalNofificationShow(true)}
               >
-               <img src={BellIcon} alt="BellIcon" />
+                <BellIcon width="24" height="24" />
               </Nav.Link>
-              {modalNotifyShow && (
-                <LoginView
-                  show={modalNotifyShow}
-                  onHide={() => setModalNofificationShow(false)}
-                  handleaccountaddress={handleAccountAddress}
-                  isSign={isSign}
-                />
-              )}
+              {modalNotifyShow &&
+                renderModal(modalNotifyShow, () =>
+                  setModalNofificationShow(false)
+                )}
             </Nav.Item>
             {isMobile && (
               <>
-                <div onClick={handleModelClick}>
+                <div className="nav-item" onClick={() => setModalShow(true)}>
                   <img
                     className="rounded-circle"
                     src={require("../content/images/avatar1.png")}
                     alt="No Profile"
+                    style={{ width: "48px", height: "48px" }}
                   />
                 </div>
-                {modalShow && (
-                  <LoginView
-                    show={modalShow}
-                    onHide={() => setModalShow(false)}
-                    handleaccountaddress={handleAccountAddress}
-                    isSign={isSign}
-                  />
-                )}
+                {renderModal(modalShow, () => setModalShow(false))}
               </>
             )}
           </>
@@ -257,19 +217,17 @@ export const Header = (props) => {
           className="login-menu"
         >
           {acAddress && (
-            <span className="user-name d-none d-md-block">{addressLine}</span>
-          )}
-
-          {acAddress && (
-            <span className="login-btn d-flex d-md-none text-white">
+            <span
+              className={`user-name d-none d-md-block`}
+              style={showAddressError ? { border: "1px solid red" } : {}}
+            >
               {addressLine}
             </span>
           )}
         </Nav.Item>
         {acAddress &&
         acAddress?.authToken &&
-        userDetailsAll?.is_2FA_login_verified === true &&
-        acAddress.account == userDetailsAll.wallet_address ? (
+        userDetailsAll?.is_2FA_login_verified  ? (
           <NavDropdown
             className="dropdownProfile"
             as="li"
@@ -277,26 +235,23 @@ export const Header = (props) => {
               <img
                 className="rounded-circle"
                 src={
-                  usergetdata?.imageUrl
-                    ? usergetdata?.imageUrl
-                    : require("../content/images/avatar1.png")
+                  userDetailsAll?.imageUrl ||
+                  require("../content/images/avatar1.png")
                 }
                 alt="No Profile"
+                style={{ width: "48px", height: "48px" }}
               />
             }
             id="nav-dropdown"
           >
             <NavDropdown.Item as={Link} to={`/profile/${acAddress.account}`}>
-              <UserIcon width="18" height="18" />
-              Profile
+              <UserIcon width="18" height="18" /> Profile
             </NavDropdown.Item>
             <NavDropdown.Item as={Link} to="/settings">
-              <SettingIcon width="18" height="18" />
-              Account settings
+              <SettingIcon width="18" height="18" /> Account settings
             </NavDropdown.Item>
             <NavDropdown.Item onClick={props.signOut}>
-              <LogoutIcon width="18" height="18" />
-              Sign out
+              <LogoutIcon width="18" height="18" /> Sign out
             </NavDropdown.Item>
           </NavDropdown>
         ) : (

@@ -5,17 +5,17 @@ import { useSelector } from "react-redux";
 import { userDetails, userGetFullDetails } from "../../store/slices/AuthSlice";
 import { Timestamp } from "../../utils";
 import { database, generateFirebaseChatRootKey } from "../../helper/config";
-import { firebaseMessages } from "../../helper/chatMessage";
+import { firebaseMessages } from "../../helper/configVariables";
 import { setUnReadCountZero } from "../../helper/firebaseConfig";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 
 export const MessageList = () => {
-  const userDetailsAll = useSelector(userGetFullDetails);
+  const acAddress = useSelector(userDetails);
   const [messages, setMessages] = useState([]);
   var scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
-
+ 
   const mainFunction = async () => {
     if (userData?.account && receiverData) {
       let firebaseRootKey = generateFirebaseChatRootKey(
@@ -99,7 +99,7 @@ export const MessageList = () => {
         messages.map((message, index) => (
           <>
             <li key={message?.sender + index + "receiverData"}>
-              {message?.senderID !== userDetailsAll?.wallet_address && (
+              {message?.senderID !== acAddress?.account && (
                 <>
                   <div className="chat-image">
                     <img
@@ -148,7 +148,7 @@ export const MessageList = () => {
             </li>
 
             <li key={message?.senderID + index + "sender"}>
-              {message?.senderID === userDetailsAll?.wallet_address && (
+              {message?.senderID === acAddress?.account && (
                 <>
                   <div className="name">
                     You <span>{Timestamp(message?.sendTime * 1000)}</span>

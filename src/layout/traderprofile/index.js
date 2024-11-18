@@ -11,7 +11,7 @@ import {
   SimpleCheckIcon,
   TwitterIcon,
   StarFillIcon,
-  StarEmptyIcon
+  StarEmptyIcon,
 } from "../../component/SVGIcon";
 import { useSelector } from "react-redux";
 import {
@@ -28,14 +28,12 @@ import { InfoLoader, ProfileLoader } from "./Loader";
 import { TableLoader } from "../../helper/Loader";
 import { notificationSuccess } from "../../store/slices/notificationSlice";
 import { database } from "../../helper/config";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import { onValue, ref, get } from "firebase/database";
-// import ReviewTransactionView from "../../component/ReviewTransaction";
 import ReportUserView from "../../component/ReportUser";
 import PaginationComponent from "../../component/Pagination";
 import CreateEscrowView from "../../layout/escrow/CreateEscrow";
 import KYCVerification from "../../component/KYCVerification";
-import { notificationFail } from "../../store/slices/notificationSlice";
 import { Link } from "react-router-dom";
 import { Box } from "@mui/material";
 
@@ -80,10 +78,8 @@ export const TraderProfile = (props) => {
   const connectWalletModalToggle = () =>
     setconnectWalletModalShow(!connectWalletmodalShow);
 
-  // const [reportModalShow, setReportModalShow] = useState(false);
   const [reportModelOpen, setReportModelOpen] = useState(false);
   const reportModalToggle = () => setReportModelOpen(!reportModelOpen);
-  const [reportModelData, setReportModelData] = useState({ id: null, status: null });
   const [editProfileModalShow, setEditProfileModalShow] = useState(false);
   const editProfileModalToggle = () =>
     setEditProfileModalShow(!editProfileModalShow);
@@ -113,23 +109,6 @@ export const TraderProfile = (props) => {
 
   const modalKycToggle = async () => {
     setModalKYCShow(!modalShow);
-    // await jwtAxios
-    //   .get(`/users/getuser`)
-    //   .then((response) => {
-    //     if (
-    //       (response.data?.User?.kyc_completed === true &&
-    //         response.data?.User?.is_verified === 2) ||
-    //       response.data?.User?.kyc_completed === false ||
-    //       response.data?.User?.kyc_completed == undefined
-    //     ) {
-          
-    //     } else {
-    //       dispatch(notificationFail("KYC already Submitted"));
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     dispatch(notificationFail("Something went wrong with get user"));
-    //   });
   };
 
   useEffect(() => {
@@ -217,7 +196,7 @@ export const TraderProfile = (props) => {
         setLoader(false);
         navigate("/");
       } else {
-        if (loginuserdata && address === loginuserdata?.wallet_address) {
+        if (loginuserdata && address === userData?.account) {
           setisAuthAddress(true);
           setLoader(false);
         } else {
@@ -240,10 +219,10 @@ export const TraderProfile = (props) => {
         setUserStatus(snapshot.val()?.isOnline);
       });
     }
-    if (loginuserdata && loginuserdata?.wallet_address) {
+    if (loginuserdata && userData?.account) {
       const starCountRef = ref(
         database,
-        firebaseStatus.CHAT_USERS + loginuserdata?.wallet_address
+        firebaseStatus.CHAT_USERS + userData?.account
       );
       onValue(starCountRef, (snapshot) => {
         setUserStatus(snapshot.val()?.isOnline);
@@ -466,7 +445,13 @@ export const TraderProfile = (props) => {
                     <Col xs="7">
                       <label>Location</label>
                     </Col>
-                    <Col>
+                    <Col
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "5px",
+                      }}
+                    >
                       {flagUrl && (
                         <img
                           src={flagUrl}
@@ -523,21 +508,9 @@ export const TraderProfile = (props) => {
           </Col>
         )}
       </Row>
-
       <Tabs defaultActiveKey="active-offers" id="profile-tab">
         <Tab eventKey="active-offers" title="Active offers">
           <h2>Active offers</h2>
-          {/* <Nav defaultActiveKey="all" as="ul" className="filter-btn">
-            <Nav.Item as="li">
-              <Nav.Link eventKey="all">All</Nav.Link>
-            </Nav.Item>
-            <Nav.Item as="li">
-              <Nav.Link eventKey="buy">Buy</Nav.Link>
-            </Nav.Item>
-            <Nav.Item as="li">
-              <Nav.Link eventKey="sell">Sell</Nav.Link>
-            </Nav.Item>
-          </Nav> */}
           <div className="table-responsive tradeList">
             <div className="flex-table">
               <div className="flex-table-header">
@@ -593,7 +566,6 @@ export const TraderProfile = (props) => {
                                   : "No Profile"
                               }
                             />
-                            {/* <span className="circle"></span> */}
                             {(userStatuses[i] === 0 ||
                               userStatuses[i] === false) && (
                               <div className="chat-status-offline"></div>
@@ -615,30 +587,25 @@ export const TraderProfile = (props) => {
                         </div>
                       </div>
                       <div className="actions profile-action text-center">
-                        
-                           {userData &&
-                          userData?.account === escrow?.user_address ? (
-                            <Link
-                              className="action"
-                              to={`/escrow/details/${escrow?._id}`}
-                            >
-                              <Button variant="primary">Details</Button>
-                            </Link>
-                          ) : userData &&
-                          userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "buyer" ? (
-                            <Button
-                              variant="primary"
-              
-                            >
-                              Sell
-                            </Button>
-                          ) : userData && userData?.account !== escrow?.user_address && escrow && escrow?.escrow_type === "seller"  ? (
-                            <Button
-                              variant="primary"
-                            >
-                              Buy
-                            </Button>
-                          ) : null}
+                        {userData &&
+                        userData?.account === escrow?.user_address ? (
+                          <Link
+                            className="action"
+                            to={`/escrow/details/${escrow?._id}`}
+                          >
+                            <Button variant="primary">Details</Button>
+                          </Link>
+                        ) : userData &&
+                          userData?.account !== escrow?.user_address &&
+                          escrow &&
+                          escrow?.escrow_type === "buyer" ? (
+                          <Button variant="primary">Sell</Button>
+                        ) : userData &&
+                          userData?.account !== escrow?.user_address &&
+                          escrow &&
+                          escrow?.escrow_type === "seller" ? (
+                          <Button variant="primary">Buy</Button>
+                        ) : null}
                       </div>
                     </div>
                   ))}
@@ -672,32 +639,17 @@ export const TraderProfile = (props) => {
                 pageSize={PageSize}
                 onPageChange={(page) => setCurrentPage(page)}
               />
-              {/* <div className="table-info">
-                {currentPage === 1
-                  ? `${totalActiveEscrowCount > 0 ? 1 : 0}`
-                  : `${(currentPage - 1) * PageSize + 1}`}{" "}
-                -{" "}
-                {`${Math.min(currentPage * PageSize, totalActiveEscrowCount)}`}{" "}
-                of {totalActiveEscrowCount}
-              </div> */}
             </div>
           )}
         </Tab>
-
         <Tab eventKey="reviews" title="Reviews">
           <div className="d-flex justify-content-between align-items-center">
             <h2>Reviews</h2>
-            {/* <Form.Select aria-label="Newest">
-              <option>Newest</option>
-              <option value="1">Standard</option>
-              <option value="2">Latter</option>
-            </Form.Select> */}
-
             <Select
               defaultValue={selectedOptionStatus}
               value={selectedOptionStatus}
               className="select-dropdown"
-              isSearchable={false}              
+              isSearchable={false}
               components={{
                 IndicatorSeparator: () => null,
               }}
@@ -708,8 +660,6 @@ export const TraderProfile = (props) => {
                 <div className="selected-dropdown">{e.text}</div>
               )}
             />
-
-            
           </div>
           <div className="reviews-list">
             <Card className="cards-dark">
@@ -728,33 +678,21 @@ export const TraderProfile = (props) => {
                     customIcon={<StarFillIcon width="12" height="12" />}
                     customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
                   />
-                  <div className="reviewer-name">
-                    Gabriel <span>12 hours ago</span>
-                  </div>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
-                    elit, sed do eiusmod tempor incididunt ut labore et dolore
-                    magna aliqua.
-                  </p>
-                  <div className="reviewer-transaction">
-                    Transaction : <strong>Buy 5 BTC</strong>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-            <Card className="cards-dark">
-              <Card.Body>
-                <div className="reviewer-image">
-                  <img
-                    src={require("../../content/images/escrows-5.png")}
-                    alt="Gabriel  Erickson"
-                    width="51"
-                    height="51"
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
                   />
-                </div>
-                <div className="reviewer-details">
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
                   <StarRating
                     ratings={5}
                     customIcon={<StarFillIcon width="12" height="12" />}
@@ -792,6 +730,26 @@ export const TraderProfile = (props) => {
                     customIcon={<StarFillIcon width="12" height="12" />}
                     customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
                   />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
                   <div className="reviewer-name">
                     Gabriel <span>12 hours ago</span>
                   </div>
@@ -819,6 +777,78 @@ export const TraderProfile = (props) => {
                   />
                 </div>
                 <div className="reviewer-details">
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <div className="reviewer-name">
+                    Gabriel <span>12 hours ago</span>
+                  </div>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing
+                    elit, sed do eiusmod tempor incididunt ut labore et dolore
+                    magna aliqua.
+                  </p>
+                  <div className="reviewer-transaction">
+                    Transaction : <strong>Buy 5 BTC</strong>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+            <Card className="cards-dark">
+              <Card.Body>
+                <div className="reviewer-image">
+                  <img
+                    src={require("../../content/images/escrows-5.png")}
+                    alt="Gabriel  Erickson"
+                    width="51"
+                    height="51"
+                  />
+                </div>
+                <div className="reviewer-details">
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
+                  <StarRating
+                    ratings={5}
+                    customIcon={<StarFillIcon width="12" height="12" />}
+                    customEmptyIcon={<StarEmptyIcon width="12" height="12" />}
+                  />
                   <StarRating
                     ratings={5}
                     customIcon={<StarFillIcon width="12" height="12" />}
@@ -843,15 +873,12 @@ export const TraderProfile = (props) => {
           </div>
         </Tab>
       </Tabs>
+
       <MessageView
         show={modalShow}
         onHide={() => setModalShow(false)}
         otheruser={otherUserData ? otherUserData : ""}
       />
-      {/* <ReviewTransactionView
-        show={reportModalShow}
-        onHide={() => setReportModalShow(false)}
-      /> */}
       <ReportUserView
         show={reportModelOpen}
         onHide={() => setReportModelOpen(false)}

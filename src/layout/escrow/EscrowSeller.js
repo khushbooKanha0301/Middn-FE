@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, Col, Row, Button, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { formateSize, RenderIcon } from "../../helper/RenderIcon";
+import { Stepper, Step, StepLabel } from "@mui/material";
 import { IoIosCloseCircle } from "react-icons/io";
 import {
   BackArrow,
@@ -16,20 +17,22 @@ import {
   converImageToBase64,
   sendMessage,
 } from "../../helper/firebaseConfigEscrow";
-import { Nav, NavDropdown } from "react-bootstrap";
-import { userGetFullDetails } from "../../store/slices/AuthSlice";
+import { userDetails } from "../../store/slices/AuthSlice";
 import { messageTypes } from "../../helper/config";
 import MessageList from "./MessageList";
 import { setIsChatEscrowPage } from "../../store/slices/chatEscrowSlice";
 import jwtAxios from "../../service/jwtAxios";
 import { get, ref, set, update } from "firebase/database";
 import { database } from "../../helper/config";
-import { firebaseMessagesEscrow } from "../../helper/configEscrow";
-
+import {
+  firebaseMessagesEscrow,
+  firebaseStatus,
+} from "../../helper/configVariables";
 import Swal from "sweetalert2/src/sweetalert2.js";
-import { firebaseStatus } from "../../helper/statusManage";
 
 export const EscrowSeller = (props) => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [pageStepperArr, setPageStepperArr] = useState([0]);
   const [user, setUser] = useState({});
   const [escrowType, setEscrowType] = useState(null);
   const [escrowFund, setEscrowFund] = useState(null);
@@ -37,15 +40,16 @@ export const EscrowSeller = (props) => {
   const { id } = props;
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
-  const acAddress = useSelector(userGetFullDetails);
+  const acAddress = useSelector(userDetails);
+  console.log("acAddress ", acAddress.account);
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
   const [escrow, setEscrow] = useState(null);
   const receiverAddress =
-    acAddress?.wallet_address === escrow?.user_address
+    acAddress?.account === escrow?.user_address
       ? escrow?.trade_address
       : escrow?.user_address;
-
+  console.log("-----", receiverAddress)
   const userRef = useRef(null);
   const fileInputRef = useRef(null);
   const { onClickOutside } = <Picker />;
@@ -53,7 +57,58 @@ export const EscrowSeller = (props) => {
   const [messageFile, setMessageFile] = useState("");
   const [escrowLoading, setEscrowLoading] = useState(false);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
-
+  const steps = [
+    {
+      label: "Buyer to make payment",
+      status: "105,02 BNB",
+    },
+    {
+      label: "The funds is locked in Middn",
+      status: "105,02 BNB",
+    },
+    {
+      label: "Check for Payment",
+      status: "Completed",
+    },
+  ];
+  const CustomStepIcon = (props) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-check-circle"
+        viewBox="0 0 16 16"
+      >
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+        <path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05" />
+      </svg>
+    );
+  };
+  const handleStepClick = (indexnUM) => {
+    const indexValue = [...new Set([...pageStepperArr, indexnUM])].sort(
+      (a, b) => a - b
+    );
+    if (indexnUM === 0) {
+      setActiveStep(0);
+      setPageStepperArr([0]);
+    } else if (activeStep < steps.length - 1) {
+      if (
+        (!String(indexnUM)?.includes("2") || indexnUM === 2) &&
+        indexValue?.filter((x) => [0, 1]?.includes(x))?.length === 2
+      ) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setPageStepperArr(indexValue);
+      }
+    } else {
+      handleReset();
+      setPageStepperArr([0]);
+    }
+  };
+  const handleReset = () => {
+    setActiveStep(0);
+  };
   useEffect(() => {
     document.addEventListener("click", handleClickOutside, true);
     return () => {
@@ -198,12 +253,12 @@ export const EscrowSeller = (props) => {
       }
     }
     if (messageText !== "" || messageFile !== "" || !file) {
-      if (acAddress?.wallet_address && receiverAddress && noError == true) {
-        await addUserInFirebase(acAddress?.wallet_address);
-        await addUserInFirebase(receiverAddress);
+      if (acAddress?.account && receiverAddress && noError == true) {
+        addUserInFirebase(acAddress?.account);
+        addUserInFirebase(receiverAddress);
         sendMessage(
           //CHAT_ROOM,
-          acAddress?.wallet_address,
+          acAddress?.account,
           receiverAddress,
           id,
           escrow?.escrow_type,
@@ -328,11 +383,10 @@ export const EscrowSeller = (props) => {
   const handleCheckboxChangeCompleted = (filterType) => {
     setEscrowCompleted(filterType);
   };
-   
 
   return (
     <>
-      <div className="escrowPay">
+      <div className="chat-view chat-messages" style={{ marginBottom: "25px" }}>
         <Row>
           <Col lg="4">
             <Card className="cards-dark">
@@ -346,7 +400,7 @@ export const EscrowSeller = (props) => {
                           {escrowLoading && (
                             <>
                               {escrow?.user_address ===
-                              acAddress?.wallet_address
+                              acAddress?.account
                                 ? escrow?.escrow_type === "seller"
                                   ? "Seller"
                                   : "Buyer"
@@ -359,37 +413,30 @@ export const EscrowSeller = (props) => {
                       </span>
                       <span className="rounded-deposite">Depositing</span>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">Price</span>
                       <strong className="card-txt">105,02 BNB</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">You are buying</span>
                       <strong className="card-txt">1 BTC</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">You must send</span>
                       <strong className="card-txt">105,02 BNB</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">Location</span>
                       <strong className="card-txt">Anywhere</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">Depositing window</span>
                       <strong className="card-txt">29:42</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottom">
                       <span className="card-txt-left">Payment window</span>
                       <strong className="card-txt">60 minutes</strong>
                     </div>
-
                     <div className="d-flex justify-content-between align-items-center buyerBottomLast">
                       <span className="card-txt-left">
                         Buyer release address
@@ -397,129 +444,115 @@ export const EscrowSeller = (props) => {
                       <strong className="card-txt">0x...asd22A</strong>
                     </div>
                   </div>
-                  {/* <div className="chat-box-btn">
-                      <button type="button" className="btn btn-primary escrowBtn">
-                        Pay
-                      </button>
-
-                      <span className="card-txt-left">
-                        You can cancel the contract once the depositing window
-                        is expired
-                      </span>
-                    </div> */}
                 </div>
               </Card.Body>
             </Card>
             <Card className="cards-dark seller-pay">
-              {/* <Card.Body>
+              <Card.Body>
                 <div className="chat-box-pay">
                   <div className="d-flex justify-content-between buyerBottom">
-                    <span className="text-white text-lg">
-                    Status
-                    </span>
+                    <span className="text-white text-lg">Status</span>
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: " Eudoxus Sans",
+                          fontSize: "13px",
+                          color: "#808191",
+                          marginBottom: "0px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Transaction Id
+                      </p>
+                      <span
+                        style={{
+                          fontFamily: " Eudoxus Sans",
+                          fontSize: "13px",
+                          marginBottom: "0px",
+                          background:
+                            "linear-gradient(263.76deg, #7FFC8D -28.53%, #C6FA56 140.05%)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: " transparent",
+                        }}
+                      >
+                        #a001
+                      </span>
+                    </div>
                   </div>
-                  <Form.Group className="custom-input-seller">
-                  <div
-                    className="form-check"
-                    onClick={() => handleCheckboxChange("buyer")}
+                  <Stepper
+                    activeStep={activeStep}
+                    orientation="vertical"
+                    className="deposit-stepper-container escrow-stepper"
                   >
-                    <div className={`form-check-input ${
-                        escrowType === "buyer" ? "checked" : ""
-                      }`}
-                    />
-                    <span className="card-txt-left">Buyer to make payment</span>
-                    <p className="seller-p"><strong className="card-txt">1 BTC</strong></p>
-                  </div>
-                  </Form.Group>
-                  <Form.Group className="custom-input-seller">
-                  <div
-                    className="form-check"
-                    onClick={() => handleCheckboxChangeFund("fund")}
-                  >
-                    <div className={`form-check-input ${
-                        escrowFund === "fund" ? "checked" : ""
-                      }`}
-                    />
-                    <span className="card-txt-left">The funds is locked in Middn</span>
-                    <p className="seller-p"><strong className="card-txt">1 BTC</strong></p>
-                  </div>
-                  </Form.Group>
-                  <Form.Group className="custom-input-seller">
-                  <div
-                    className="form-check"
-                    onClick={() => handleCheckboxChangeCompleted("completed")}
-                  >
-                    <div className={`form-check-input ${
-                        escrowCompleted === "completed" ? "checked" : ""
-                      }`}
-                    />
-                    <span className="card-txt-left">Check for Payment</span>
-                    <p className="seller-p"><strong className="card-txt">Completed</strong></p>
-                  </div>
-                  </Form.Group>
-
+                    {steps.map((step, index) => (
+                      <Step key={step}>
+                        <StepLabel
+                          StepIconComponent={CustomStepIcon}
+                          onClick={() => handleStepClick(index)}
+                          className="step-label"
+                          style={{ color: "#fff !important" }}
+                        >
+                          {step.label}
+                          <p style={{ color: "#fff" }}>{step.status}</p>
+                        </StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
                   <div className="chat-box-btn">
                     <button type="button" className="btn btn-primary escrowBtn">
                       Pay
                     </button>
                   </div>
                 </div>
-              </Card.Body> */}
+              </Card.Body>
             </Card>
           </Col>
           <Col lg="8">
             <Card className="cards-dark chat-box">
               <Card.Body>
-                <div className="d-flex items-center justify-content-between pe-4">
+                <div className="d-flex items-center justify-content-between">
                   <Card.Title as="h2">Messages</Card.Title>
-                  {/* <p className="text-white">
-                    {receiverData &&
-                      `${receiverData?.fname_alias}  ${receiverData?.lname_alias}`}
-                  </p> */}
-                  {/* {receiverData ? (
-                    <>
-                      {receiverData?.userStatus ? (
-                        <>
-                          <Nav as="ul">
-                            <NavDropdown
-                              as="li"
-                              title={<SimpleDotedIcon width="20" height="20" />}
-                              id="nav-dropdown"
-                            >
-                              <NavDropdown.Item
-                                onClick={() =>
-                                  modalToggle(receiverData?.id, "Unblock")
-                                }
-                              >
-                                UnBlock user
-                              </NavDropdown.Item>
-                            </NavDropdown>
-                          </Nav>
-                        </>
-                      ) : (
-                        <>
-                          <Nav as="ul">
-                            <NavDropdown
-                              as="li"
-                              title={<SimpleDotedIcon width="20" height="20" />}
-                              id="nav-dropdown"
-                            >
-                              <NavDropdown.Item
-                                onClick={() =>
-                                  modalToggle(receiverData?.id, "Block")
-                                }
-                              >
-                                Block user
-                              </NavDropdown.Item>
-                            </NavDropdown>
-                          </Nav>
-                        </>
-                      )}
-                    </>
-                  ) : null} */}
+                  <div style={{ paddingRight: "32px"}}>
+                  <a id="nav-dropdown" aria-expanded="false" role="button" class="dropdown-toggle nav-link" tabindex="0" href="#">
+                    <SimpleDotedIcon width="20" height="20" />
+                  </a>
+                  </div>
                 </div>
                 <div className="chat-box-list">
-                  <ul>
+                <div
+                    style={{
+                      fontFamily: "eudoxus sans",
+                      fontSize: " 13px",
+                      fontWeight: " 700",
+                      lineHeight: "18px",
+                      textAlign: "left",
+                      padding: "12px 32px",
+                      color: "#fff",
+                      background: "#1E1E21",
+                      position: "absolute",
+                      top: " 0",
+                      left: "0",
+                      width: "100%",
+                      borderRadius: "20px 20px 0px 0px",
+                    }}
+                  >
+                    <span>Moderator</span>
+                    <span style={{ color: "#808191", padding: "0 8px" }}>
+                      Unavailable
+                    </span>
+                    <span
+                      className="dot"
+                      style={{
+                        width: "6px",
+                        height: "6px",
+                        background: " #EC6060",
+                        borderRadius: " 50%",
+                        display: "inline-block",
+                      }}
+                    />
+                  </div>
+                  <ul className="chat-box-inner" style={{
+                      marginTop: "30px"}} >
                     {escrowLoading && (
                       <MessageList
                         ReciverId={receiverAddress}
@@ -605,7 +638,7 @@ export const EscrowSeller = (props) => {
                         />
 
                         <Button variant="primary" type="submit" size="sm">
-                        <span className="chat-send-btn">Send</span>
+                          <span className="chat-send-btn">Send</span>
                           <img
                             className="chat-send-btn-icon"
                             src={require("../../content/images/Frame.png")}

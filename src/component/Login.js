@@ -1,38 +1,33 @@
 import React, { useEffect } from "react";
+import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { Modal, Button, Row, Col, Form } from "react-bootstrap";
 import { useWeb3React } from "@web3-react/core";
 import { connectors as web3Connectors } from "../connectors";
 import Fortmatic from "fortmatic";
 import Web3 from "web3";
-import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
 import { checkAuth, logoutAuth, userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import apiConfig from "../config/config";
 import { useNavigate } from "react-router-dom";
-import {
-  notificationFail,
-  notificationSuccess,
-} from "../store/slices/notificationSlice";
+import { notificationFail, notificationSuccess } from "../store/slices/notificationSlice";
 import { useConnect, useSignMessage, useAccount, useDisconnect } from "wagmi";
 
 export const LoginView = (props) => {
- console.log("props ", props);
-  const [checkValue, setCheckValue] = useState(null);
-  const [accountAddress, setAccountAddress] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userData = useSelector(userDetails);
+  const [checkValue, setCheckValue] = useState(null);
+  const [accountAddress, setAccountAddress] = useState("");
+
   const { signMessage, data, error } = useSignMessage();
   const { address, isConnected } = useAccount();
-
-  const userData = useSelector(userDetails);
   const { library,  account, activate, deactivate } = useWeb3React();
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
   const { disconnect: disonnectWalletConnect } = useDisconnect();
-  const { loading } = useSelector((state) => state?.loginLoderReducer);
-  
+  const { loading } = useSelector((state) => state?.loginLoderReducer);  
   const setProvider = (type) => {
     window.localStorage.setItem("provider", type);
   };
@@ -219,10 +214,6 @@ export const LoginView = (props) => {
         provider = ethereum.providers.find(({ isMetaMask }) => isMetaMask);
         break;
     }
-
-    // if (provider) {
-    //   ethereum.setSelectedProvider(provider);
-    // }
   };
 
   useEffect(() => {
@@ -324,13 +315,12 @@ export const LoginView = (props) => {
           };
           dispatch(checkAuth(checkAuthParams)).unwrap();    
         } catch (error) {
-          // Handle errors if necessary
           console.error("Error fetching data:", error);
         }
       }
     };
 
-    fetchData(); // Immediately invoke the async function
+    fetchData(); 
   }, [data]);
 
   useEffect(() => {
@@ -401,13 +391,10 @@ export const LoginView = (props) => {
   };
 
   const onChange = (value) => {
-    // const { value } = event.target;
     setCheckValue(value);
   };
 
   const cancelButtonHandler = () => {
-    console.log("cancel")
-    console.log("props.onHide()", props.onHide())
     props.onHide();
     setCheckValue(null);
   };

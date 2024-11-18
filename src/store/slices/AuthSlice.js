@@ -9,7 +9,7 @@ import axios from "axios";
 import apiConfigs from "../../config/config";
 import listData from "../../component/countryData";
 import { database } from "../../helper/config";
-import { firebaseStatus } from "../../helper/statusManage";
+import { firebaseStatus } from "../../helper/configVariables";
 import { get, ref, set, update } from "firebase/database";
 
 const authTokenData = JSON.parse(window?.localStorage?.getItem("userData"))
@@ -132,7 +132,7 @@ export const checkAuth = createAsyncThunk(
           userData = {
             account: account,
             authToken: verifyTokenData.data.token,
-            userid: verifyTokenData.data.userInfo._id,
+            userid: verifyTokenData.data.user_id,
             imageUrl: verifyTokenData.data.imageUrl,
           };
 
@@ -242,10 +242,27 @@ export const userGetData = createAsyncThunk(
     dispatch(setLoading(true));
     try {
       let user = {};
+      let is_2FA_login_verified = false;
+      let is_verified = 0;
+      let kyc_completed = false;
+      let is_2FA_enabled = false;
+      let email_verified = false;
       let imageUrl = "";
+      let email = "";
       await jwtAxios
-        .get(`/users/getuser`)
+        .get(`/users/getuser`, {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            "Access-Control-Allow-Origin": "*",
+          },
+        })
         .then((response) => {
+          is_2FA_login_verified = response.headers['2fa'] === 'true'; 
+          is_2FA_enabled = response.headers['2fa_enable'] === 'true';
+          is_verified = parseInt(response.headers['kyc_verify']) || 0;
+          kyc_completed = response.headers['kyc_status'] === 'true';
+          email_verified = response.headers['is_email_verified'] === 'true';
+          email = response.headers['is_email']; 
           user = response.data.User;
           imageUrl = response.data.imageUrl;
         })
@@ -253,7 +270,9 @@ export const userGetData = createAsyncThunk(
           dispatch(notificationFail("Something went wrong with get user"));
         });
       dispatch(setLoading(false));
-      return { ...user, imageUrl: imageUrl };
+      return { ...user, imageUrl: imageUrl , is_2FA_login_verified: is_2FA_login_verified,
+        email_verified: email_verified, email: email,
+        is_verified: is_verified, kyc_completed: kyc_completed, is_2FA_enabled: is_2FA_enabled};
     } catch (error) {
       dispatch(setLoading(false));
       return error.message;
