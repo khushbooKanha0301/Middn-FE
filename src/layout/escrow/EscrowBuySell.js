@@ -135,7 +135,7 @@ export const EscrowBuyer = (props) => {
       const data = {
         usdAmount: usdAmount,
         cryptoSymbol: currentCurrency,
-        cryptoCountry: currentPre,
+        cryptoCountry: currentPre
       };
     }
   };
@@ -299,7 +299,6 @@ export const EscrowBuyer = (props) => {
                       </div>
                     </Form.Group>
                   </div>
-
                   <div className="edit-btn ">
                     <>
                       <Button

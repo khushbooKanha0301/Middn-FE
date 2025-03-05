@@ -33,8 +33,12 @@ const TwoFAvalidate = (props) => {
   const navigate = useNavigate();
   const { deactivate } = useWeb3React();
   const { address } = useParams();
-  const [lastAttemptTime, setLastAttemptTime] = useState("");
-  const [invalidAttempts, setInvalidAttempts] = useState("");
+  const [lastAttemptTime, setLastAttemptTime] = useState(
+    localStorage.getItem("lastAttemptTime") || ""
+  );
+  const [invalidAttempts, setInvalidAttempts] = useState(
+    Number(localStorage.getItem("invalidAttempts")) || 0
+  );
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -42,6 +46,40 @@ const TwoFAvalidate = (props) => {
       makeAPICall();
     }
   }, [numIndex, otpValue]);
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === "lastAttemptTime" || event.key === "invalidAttempts") {
+          logoutUser();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const now = Date.now();
+    if (invalidAttempts >= 3 && now - lastAttemptTime < 5 * 60 * 1000) {
+      setError("You can try again after 5 minutes");
+    }
+  }, [invalidAttempts, lastAttemptTime]);
+
+  const handleInvalidAttempt = (now) => {
+    const newAttempts = invalidAttempts + 1;
+    localStorage.setItem("invalidAttempts", newAttempts);
+    setInvalidAttempts(newAttempts);
+
+    if (newAttempts >= 3) {
+      localStorage.setItem("lastAttemptTime", now);
+      setLastAttemptTime(now);
+      setError("You can try again after 5 minutes");
+    }
+    dispatch(notificationFail("Invalid Code"));
+    setOTPValue("");
+    inputRefs.current[0].focus();
+  }
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && index > 0 && !otpValue[index]) {
@@ -107,36 +145,37 @@ const TwoFAvalidate = (props) => {
         }
         await jwtAxios
           .post("users/validateTOTP", { token: otpValue })
-          .then((res) => {
+          .then(async (res) => {
             if (res.data.verified) {
-              dispatch(userGetData());
+              setInvalidAttempts("");
+              setLastAttemptTime("");
+              const user = await dispatch(userGetData()).unwrap();
+              if(!address) {
+                  navigate("/");
+              }
               props.setTwoFAModal(false);
-              if(!address)
-              {
-                navigate("/");
-              }
-              dispatch(notificationSuccess("user login successfully"));
-            } else {
-              if (now - lastAttemptTime1 >= 5 * 60 * 1000) {
-                setInvalidAttempts(1);
-                setLastAttemptTime(now);
+              if (user?.phoneCountry && user?.phone && user?.is_2FA_SMS_enabled) {
+                if (!user?.is_2FA_twilio_login_verified && !props?.istotptriggered) {
+                  await props.sendtwiliootp(user.phoneCountry, user.phone);
+                }
               } else {
-                setInvalidAttempts(invalidAttempts1 + 1);
+                dispatch(notificationSuccess("user login successfully"));
               }
-              dispatch(notificationFail("Invalid Code"));
-              setOTPValue("");
-              inputRefs.current[0]?.focus();
+              window.localStorage.removeItem("invalidAttempts");
+              window.localStorage.removeItem("lastAttemptTime");
+            } else {
+              handleInvalidAttempt(now);
             }
           })
-          .catch((error) => {
-            if(typeof error == "string")
-            {
-              dispatch(notificationFail(error));
-            }else if(error?.response?.data?.message){
-              dispatch(notificationFail(error?.response?.data?.message));
-            }else{
+          .catch((err) => {
+            if(typeof err == "string") {
+              dispatch(notificationFail(err));
+            } else if(err?.response?.data?.message) {
+              dispatch(notificationFail(err?.response?.data?.message));
+            } else {
               dispatch(notificationFail("Something Went Wrong"));
             }
+            handleInvalidAttempt(now);
           });
       }
     }

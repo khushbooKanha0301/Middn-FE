@@ -41,7 +41,6 @@ export const EscrowSeller = (props) => {
   const dispatch = useDispatch();
   const [showSmily, setShowSmily] = useState(false);
   const acAddress = useSelector(userDetails);
-  console.log("acAddress ", acAddress.account);
   const emojiPickerRef = useRef(null);
   const [selectedEmoji, setSelectedEmoji] = useState([]);
   const [escrow, setEscrow] = useState(null);
@@ -49,7 +48,6 @@ export const EscrowSeller = (props) => {
     acAddress?.account === escrow?.user_address
       ? escrow?.trade_address
       : escrow?.user_address;
-  console.log("-----", receiverAddress)
   const userRef = useRef(null);
   const fileInputRef = useRef(null);
   const { onClickOutside } = <Picker />;

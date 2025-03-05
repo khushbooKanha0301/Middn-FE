@@ -12,7 +12,7 @@ import { formateSize, RenderIcon } from "../../helper/RenderIcon";
 export const MessageList = () => {
   const acAddress = useSelector(userDetails);
   const [messages, setMessages] = useState([]);
-  var scrollBottom = document.getElementById("scrollBottom");
+  const scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatReducer?.MessageUser);
  

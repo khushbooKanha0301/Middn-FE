@@ -70,10 +70,10 @@ const SearchDropdown = (props) => {
 
   return (
     <div
-      className={`search-dropdown phone-number-dropdown justify-between relative`}
+      className={`search-dropdown custom-dropdown justify-between relative`}
     >
       <Dropdown
-        className="custom-dropdown"
+        className="custom-dropdown-xl"
         show={openDr}
         onToggle={(isOpen) => setOpenDr(isOpen)}
       >

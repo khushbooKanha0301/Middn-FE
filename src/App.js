@@ -1,9 +1,9 @@
 import "react-toastify/dist/ReactToastify.css";
 import React, {
+  useRef,
   useEffect,
-  useLayoutEffect,
   useState,
-  useCallback,
+  useLayoutEffect
 } from "react";
 import { ToastContainer } from "react-toastify";
 import { Container } from "react-bootstrap";
@@ -22,9 +22,11 @@ import {
   userGetData,
   userGetFullDetails,
 } from "./store/slices/AuthSlice";
+import { notificationFail } from "./store/slices/notificationSlice";
 import { get, ref, update, onValue } from "firebase/database";
 import { database } from "./helper/config";
 import { firebaseMessagesActive } from "./helper/configVariables";
+import TwoFATwilioValidate from "./component/TwoFATwilioValidate";
 import jwtDecode from "jwt-decode";
 import {
   HomePageComponent,
@@ -44,10 +46,12 @@ import {
   MarketPlaceDepositComponent,
   WithdrawComponent,
 } from "./layout";
+import jwtAxios from "./service/jwtAxios";
 
 const allowedIPs = [
-  "122.161.187.102",
-  "27.57.0.141"
+  "49.48.248.202",
+  "136.185.123.45",
+  "2403:6200:8892:408b:7c4c:cd69:16b6:7bb7"
 ];
 
 export const App = () => {
@@ -57,31 +61,74 @@ export const App = () => {
   const [modalShow, setModalShow] = useState(false);
   const modalToggle = () => setModalShow(!modalShow);
   const [isSign, setIsSign] = useState(null);
-  const [isLogin, setisLogin] = useState(false);
   const acAddress = useSelector(userDetails);
   const token = localStorage.getItem("token");
   const [twoFAModal, setTwoFAModal] = useState(true);
   const [isResponsive, setIsResponsive] = useState(false);
   const userData = useSelector(userGetFullDetails);
   const [error, setError] = useState(null);
-
-  const fetchIPAddress = useCallback(async () => {
+  const [ipAddress, setIPAddress] = useState(null);
+  const [isIpGetted, setIsIpGetted] = useState(false);
+  const [isTOTPRequested, setIsTOTPRequested] = useState(false);
+  const [isTOTPTriggered, setIsTOTPTriggered] = useState(false); // Track if TOTP has already been triggered
+  const [twoFATwilioModal, setTwoFATwilioModal] = useState(false);
+  const hasRun = useRef(false);
+ 
+  // Function to fetch the public IP
+  const fetchIPAddress = async () => {
     try {
-      const response = await fetch("https://api.ipify.org?format=json");
+      const response = await fetch("https://api64.ipify.org?format=json"); // API to fetch public IP
       const data = await response.json();
-      if (!allowedIPs.includes(data.ip)) setError(new Error("Access Denied!!"));
+      setIPAddress(data.ip);
+      setIsIpGetted(true);
+  
+      // Check if the fetched IP is allowed
+      if (isIpGetted && allowedIPs.includes(data.ip)) {
+        setError(null); // Clear any previous error
+      } else {
+        setError(new Error("Access Denied!! IP not in whitelist:", data.ip));
+      }
     } catch (error) {
+      setIsIpGetted(true);
       console.error("Error fetching IP address:", error);
     }
-  }, []);
-
+  };
+  
   useLayoutEffect(() => {
     fetchIPAddress();
   }, [fetchIPAddress]);
 
   const handleAccountAddress = (address) => {
     setIsSign(false);
-    setisLogin(true);
+  };
+  const sendTwilioOTP = async (phoneCountry, phoneNumber) => {
+    if (phoneNumber && phoneCountry) {
+      try {
+        const response = await jwtAxios.post("users/sendTOTP", {
+          phone: phoneNumber,
+          phoneCountry: phoneCountry,
+        });
+
+        if (response?.data?.sid) {
+          setIsTOTPTriggered(true);
+          setTwoFATwilioModal(true);
+          localStorage.setItem("isTOTPTriggered", "true");
+          const expiryTime = Date.now() + 20 * 1000; // 20 seconds from now
+          localStorage.setItem("expiryTime", expiryTime.toString());
+        } else {
+          setTwoFATwilioModal(false);
+          setIsTOTPTriggered(false);
+          disconnect();
+        }
+      } catch (error) {
+        dispatch(
+          notificationFail(
+            error?.response?.data?.message || "Something Went Wrong"
+          )
+        );
+        disconnect();
+      }
+    }
   };
 
   useEffect(() => {
@@ -96,9 +143,30 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    const is2FACompleted = userData?.is_2FA_login_verified;
-    if (!is2FACompleted) {
-      setTwoFAModal(true);  // Only show modal if 2FA is not completed
+    if (userData && userData?.length !== 0) {
+      if (hasRun.current) return;
+      if (userData && userData?.is_2FA_login_verified === false) {
+        setTwoFAModal(true);
+        hasRun.current = true;
+      } else if (
+        userData &&
+        userData?.is_2FA_twilio_login_verified === false &&
+        userData?.is_2FA_login_verified === true &&
+        userData?.phoneCountry &&
+        userData?.phone &&
+        userData?.is_2FA_SMS_enabled
+      ) {
+        const isTOTPTriggeredFromStorage =
+          localStorage.getItem("isTOTPTriggered") === "true";
+        if (isTOTPTriggeredFromStorage) {
+          setTwoFATwilioModal(true);
+        } else {
+          sendTwilioOTP(userData?.phoneCountry, userData?.phone);
+        }
+        hasRun.current = true;
+      }
+    } else {
+      hasRun.current = false;
     }
   }, [userData]);
 
@@ -159,15 +227,22 @@ export const App = () => {
         if (snapshot && snapshot.val() && localStorage.getItem("token")) {
           const findUser = snapshot.val();
           if (findUser.is_active === true) {
-            setIsSign(true)
+            setIsSign(true);
           }
         }
       });
     }
   }, [acAddress?.userid]);
 
-  if (error) return <h1 className="accessMsg">{error.message}</h1>;
+  const disconnect = () => {
+    setIsSign(true); // Reset the signing status
+    setTwoFAModal(false);
+    setTwoFATwilioModal(false); // Close 2FA modal if open
+    setIsTOTPTriggered(false); // Reset TOTP status
+    localStorage.removeItem("isTOTPTriggered"); // Clear TOTP flag
+  };
 
+ //if (allowedIPs.includes(ipAddress) && isIpGetted) {
     return (
       <div>
         <Container
@@ -188,9 +263,8 @@ export const App = () => {
             <Header
               clickHandler={sidebarToggle}
               clickModalHandler={modalToggle}
-              signOut={() => setIsSign(true)}
+              signOut={disconnect}
             />
-
             <div className="contain">
               <Routes>
                 <Route
@@ -200,95 +274,78 @@ export const App = () => {
                       <HomePageComponent />
                       {twoFAModal === true &&
                         userData?.is_2FA_login_verified === false && (
-                          <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
+                          <TwoFAvalidate setTwoFAModal={setTwoFAModal} istotptriggered={isTOTPTriggered}
+                          settwofatwiliomodal={setTwoFATwilioModal} 
+                          setistotptriggered={setIsTOTPTriggered} userData={userData} sendtwiliootp={sendTwilioOTP} />
+                        )}
+                      {userData &&
+                      userData?.is_2FA_twilio_login_verified === false && twoFATwilioModal && userData?.is_2FA_login_verified === true && userData?.is_2FA_SMS_enabled && (
+                          <TwoFATwilioValidate 
+                            setTwoFATwilioModal={setTwoFATwilioModal} 
+                            setIsTOTPRequested={setIsTOTPRequested} 
+                            setistotptriggered={setIsTOTPTriggered}
+                            settwofatwiliomodal={setTwoFATwilioModal} 
+                          />
                         )}
                     </>
                   }
                 />
                 <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <AccountSettingComponent />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/withdraw"
-                  element={
-                    <WithdrawComponent />
-                  }
-                />
-                <Route
-                  path="/notification"
-                  element={
-                    <ProtectedRoute>
-                      <NotificationComponent />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile/:address"
-                  element={
-                    <>
-                      <TraderProfileComponent isLogin={isLogin} />
-                      {twoFAModal === true &&
-                        userData?.is_2FA_login_verified === false && (
-                          <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
-                        )}
-                    </>
-                  }
-                />
-                <Route
-                  path="/chat"
-                  element={
-                    <ProtectedRoute>
-                      <ChatComponent />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/marketplace"
-                  element={<MarketPlaceComponent />}
-                />
-                <Route
-                  path="/marketplace-deposit"
-                  element={<MarketPlaceDepositComponent /> }
-                />
-                <Route
-                  path="/marketplace-buy"
-                  element={<MarketPlaceBuySell />}
-                />
-                <Route
-                  path="/escrows"
-                  element={<EscrowComponent />}
-                />
-                <Route
-                  path="/trade"
-                  element={ <TradeHistoryComponent />}
-                />
-                <Route
-                  path="/help"
-                  element={<HelpCenterComponent />}
-                />
-                <Route
-                  path="/deposit"
-                  element={<DepositCryptoComponent />}
-                />
-                <Route
-                  path="/deposit"
-                  element={<DepositCryptoComponent />}
-                />
-                <Route
-                  path="/confirm-order"
-                  element={
-                    <BuyerConfirmOrder />
-                  }
-                />
-                <Route path="/" element={<HomePageComponent />} />
-                <Route path="/escrow/details/:id" element={<EscrowDetails />} />
-                <Route path="/escrow/:id" element={<Escrows />} />
-                <Route path="*" element={<Navigate to="/" />} />
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <AccountSettingComponent />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/withdraw" element={<WithdrawComponent />} />
+                  <Route
+                    path="/notification"
+                    element={
+                      <ProtectedRoute>
+                        <NotificationComponent />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile/:address"
+                    element={
+                      <>
+                        <TraderProfileComponent />
+                        {twoFAModal === true &&
+                          userData?.is_2FA_login_verified === false && (
+                            <TwoFAvalidate setTwoFAModal={setTwoFAModal} />
+                          )}
+                      </>
+                    }
+                  />
+                  <Route
+                    path="/chat"
+                    element={
+                      <ProtectedRoute>
+                        <ChatComponent />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/marketplace" element={<MarketPlaceComponent />} />
+                  <Route
+                    path="/marketplace-deposit"
+                    element={<MarketPlaceDepositComponent />}
+                  />
+                  <Route
+                    path="/marketplace-buy"
+                    element={<MarketPlaceBuySell />}
+                  />
+                  <Route path="/escrows" element={<EscrowComponent />} />
+                  <Route path="/trade" element={<TradeHistoryComponent />} />
+                  <Route path="/help" element={<HelpCenterComponent />} />
+                  <Route path="/deposit" element={<DepositCryptoComponent />} />
+                  <Route path="/deposit" element={<DepositCryptoComponent />} />
+                  <Route path="/confirm-order" element={<BuyerConfirmOrder />} />
+                  <Route path="/" element={<HomePageComponent />} />
+                  <Route path="/escrow/details/:id" element={<EscrowDetails />} />
+                  <Route path="/escrow/:id" element={<Escrows />} />
+                  <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </div>
           </div>
@@ -299,9 +356,18 @@ export const App = () => {
           handleaccountaddress={handleAccountAddress}
           isSign={isSign}
           setTwoFAModal={setTwoFAModal}
+          setTwoFATwilioModal={setTwoFATwilioModal}
+          isTOTPRequested={isTOTPRequested}
+          isTOTPTriggered={isTOTPTriggered}
+          setIsTOTPRequested={setIsTOTPRequested} 
+          setIsTOTPTriggered={setIsTOTPTriggered}
+          sendtwiliootp={sendTwilioOTP}
         />
       </div>
     );
+  // } else if (error) {
+  //   return <h1 className="accessMsg">{error.message}</h1>;
+  // }
 };
 
 export default App;

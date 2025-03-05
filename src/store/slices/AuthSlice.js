@@ -65,21 +65,21 @@ export const checkAuth = createAsyncThunk(
       // let signData = action.signData;
       if (!signature) {
         await jwtAxios
-          .get(`/auth/nonce/${account}`, {
-            headers: {
-              "ngrok-skip-browser-warning": true,
-              "Access-Control-Allow-Origin": "*",
-            },
-          })
-          .then((response) => {
-            resBody = response.data;
-            setAuthToken(resBody.tempToken);
-            return response.data;
-          })
-          .catch((error) => {
-            window.localStorage.removeItem("token");
-            window.localStorage.clear();
-          });
+        .get(`/auth/nonce/${account}`, {
+          headers: {
+            "ngrok-skip-browser-warning": true,
+            "Access-Control-Allow-Origin": "*",
+          },
+        })
+        .then((response) => {
+          resBody = response.data;
+          setAuthToken(resBody.tempToken);
+          return response.data;
+        })
+        .catch((error) => {
+          window.localStorage.removeItem("token");
+          window.localStorage.clear();
+        });
 
         let provider = window.localStorage.getItem("provider");
         if (provider === "fortmatic") {
@@ -132,8 +132,7 @@ export const checkAuth = createAsyncThunk(
           userData = {
             account: account,
             authToken: verifyTokenData.data.token,
-            userid: verifyTokenData.data.user_id,
-            imageUrl: verifyTokenData.data.imageUrl,
+            userid: verifyTokenData.data.user_id
           };
 
           window.localStorage.setItem("userData", JSON.stringify(userData));
@@ -157,22 +156,23 @@ export const checkAuth = createAsyncThunk(
               const uer =  await get(userRef)
             })
             .catch((error) => {
-              console.error("Error adding/updating user in Firebase:", error);
               dispatch(notificationFail("Something went wrong!"));
             });
 
           // update(ref(database, firebaseMessages.CHAT_USERS + userData?.account), {isOnline:true});
           dispatch(setLoading(false));
           dispatch(setLoginLoading(false));
+          userData.imageUrl= verifyTokenData.data.imageUrl;
+          userData.phone = verifyTokenData.data?.phone;
+          userData.phoneCountry= verifyTokenData.data?.phoneCountry;
+          userData.is_2FA_login_verified= verifyTokenData.data?.is_2FA_login_verified;
+          userData.is_2FA_SMS_enabled= verifyTokenData.data?.is_2FA_SMS_enabled;
           if (
-            verifyTokenData.data?.userInfo?.is_2FA_login_verified ===
-              undefined ||
-            verifyTokenData.data?.userInfo?.is_2FA_login_verified === true
+            (verifyTokenData.data?.is_2FA_enabled === undefined ||
+            verifyTokenData.data?.is_2FA_enabled === false) && (verifyTokenData.data?.is_2FA_SMS_enabled === false || verifyTokenData.data?.is_2FA_SMS_enabled === undefined || verifyTokenData.data?.isPhoneCode === false)
           ) {
-            dispatch(notificationSuccess("user login successfully"));
-            // return userData;
+            dispatch(notificationSuccess("User login successfully"));
           }
-
           return userData;
         }
       }
@@ -196,7 +196,6 @@ export const logoutAuth = createAsyncThunk(
       let accountAdrr = JSON.parse(
         window.localStorage.getItem("userData")
       ).account;
-
       const userRef = ref(database, firebaseStatus?.CHAT_USERS + accountAdrr);
       get(userRef).then((snapshot) => {
         if (snapshot.exists()) {
@@ -219,9 +218,9 @@ export const logoutAuth = createAsyncThunk(
           dispatch(notificationFail(error.response.data.message));
           dispatch(setLoading(false));
         });
-
+      window.localStorage.removeItem("provider");
       window.localStorage.removeItem("userData");
-
+      window.localStorage.removeItem("isTOTPTriggered");
       let userData = {
         account: "Connect Wallet",
         authToken: null,
@@ -243,12 +242,17 @@ export const userGetData = createAsyncThunk(
     try {
       let user = {};
       let is_2FA_login_verified = false;
+      let is_2FA_twilio_login_verified = false;
       let is_verified = 0;
       let kyc_completed = false;
       let is_2FA_enabled = false;
       let email_verified = false;
       let imageUrl = "";
-      let email = "";
+      let email = null;
+      let phone = null;
+      let phone_code = null;
+      let phone_verified = false;
+      let is_2FA_SMS_enabled = false;
       await jwtAxios
         .get(`/users/getuser`, {
           headers: {
@@ -258,11 +262,25 @@ export const userGetData = createAsyncThunk(
         })
         .then((response) => {
           is_2FA_login_verified = response.headers['2fa'] === 'true'; 
+          is_2FA_twilio_login_verified = response.headers['2fa_twilio_verified'] === 'true';
           is_2FA_enabled = response.headers['2fa_enable'] === 'true';
+          is_2FA_SMS_enabled = response.headers['2fa_sms_enable']=== 'true';
           is_verified = parseInt(response.headers['kyc_verify']) || 0;
           kyc_completed = response.headers['kyc_status'] === 'true';
           email_verified = response.headers['is_email_verified'] === 'true';
-          email = response.headers['is_email']; 
+          phone_verified = response.headers['is_phone_verified'] === 'true';
+          // Ensure null values instead of "null" strings
+          email = response.headers['is_email'] && response.headers['is_email'] !== 'null' 
+          ? response.headers['is_email'] 
+          : null;
+
+          phone = response.headers['is_phone'] && response.headers['is_phone'] !== 'null' 
+          ? response.headers['is_phone'] 
+          : null;
+
+          phone_code = response.headers['phone_code'] && response.headers['phone_code'] !== 'null' 
+          ? response.headers['phone_code'] 
+          : null;
           user = response.data.User;
           imageUrl = response.data.imageUrl;
         })
@@ -270,9 +288,22 @@ export const userGetData = createAsyncThunk(
           dispatch(notificationFail("Something went wrong with get user"));
         });
       dispatch(setLoading(false));
-      return { ...user, imageUrl: imageUrl , is_2FA_login_verified: is_2FA_login_verified,
-        email_verified: email_verified, email: email,
-        is_verified: is_verified, kyc_completed: kyc_completed, is_2FA_enabled: is_2FA_enabled};
+      return { 
+        ...user, 
+        imageUrl,
+        is_2FA_login_verified,
+        email_verified,
+        email,
+        phone_verified,
+        phone,
+        is_2FA_twilio_login_verified,
+        is_2FA_SMS_enabled,
+        is_verified,
+        kyc_completed,
+        is_2FA_enabled,
+        phoneCountry: phone_code
+      };
+        
     } catch (error) {
       dispatch(setLoading(false));
       return error.message;

@@ -101,7 +101,7 @@ const SelectLocationKYCDropdown = (props) => {
       {!isMobile ? (
         <>
           <Dropdown
-            className="custom-dropdown"
+            className="custom-dropdown-xl"
             show={openDr}
             onToggle={(isOpen) => setOpenDr(isOpen)}
           >
@@ -180,6 +180,10 @@ const SelectLocationKYCDropdown = (props) => {
               <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
             </svg>
           </button>
+          <div
+            className={openDr ? "mobile-setting-dropdown-overlay" : ""}
+            onClick={handleDropdownClick}
+          ></div>
           <Sheet
             isOpen={openDr}
             onClose={() => {
@@ -187,11 +191,15 @@ const SelectLocationKYCDropdown = (props) => {
               setFilteredLocationOptions([]);
             }}
           >
-            <Sheet.Container className="phone-number-dropdown">
+            <Sheet.Container className="custom-dropdown">
               <Sheet.Header />
               <Sheet.Content>
                 {openDr && (
                   <div className="drawer-swipe-wrapper">
+                    <div
+                      className="drawer-swiper"
+                      onClick={handleDropdownClick}
+                    />
                     <div className="dropdown-menu-inner">
                       {searchLocationText && imageLocationSearchUrlSet ? (
                         <img
@@ -241,7 +249,14 @@ const SelectLocationKYCDropdown = (props) => {
                       <button
                         type="button"
                         className="btn btn-primary mx-1"
-                        onClick={selectedLocationOption ? () => handlePhoneNumberLocationMobile(selectedLocationOption) : null}
+                        onClick={
+                          selectedLocationOption
+                            ? () =>
+                                handlePhoneNumberLocationMobile(
+                                  selectedLocationOption
+                                )
+                            : null
+                        }
                       >
                         Save
                       </button>

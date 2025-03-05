@@ -21,13 +21,13 @@ import CryptoJS from 'crypto-js';
 
 const secretKey = 'your-secret-key';
 
-function decryptEmail(encryptedEmail) {
+function decryptFun(value) {
   try {
     // Split the encrypted email into IV and encrypted text (assuming 'IV:EncryptedData' format)
-    const [iv, encryptedText] = encryptedEmail.split(':');
+    const [iv, encryptedText] = value.split(':');
 
     if (!iv || !encryptedText) {
-      throw new Error('Invalid encrypted email format');
+      throw new Error('Invalid encrypted format');
     }
 
     // Ensure the secret key is hashed and truncated to 32 bytes, just like in Node.js
@@ -48,7 +48,7 @@ function decryptEmail(encryptedEmail) {
     const decryptedEmail = decryptedBytes.toString(CryptoJS.enc.Utf8);
 
     if (!decryptedEmail) {
-      throw new Error('Failed to decrypt email. Invalid data or key.');
+      throw new Error('Failed to decrypt. Invalid data or key.');
     }
 
     return decryptedEmail; // Return the decrypted email
@@ -79,6 +79,7 @@ export const AccountSetting = () => {
   const [currency, setCurrency] = useState("USD");
   const [is2FAEnabled, setIs2FAEnabled] = useState(userData?.is_2FA_enabled);
   const [imageSearchUrlSet, setImageSearchUrl] = useState();
+  const [currencyPre, setCurrencyPre] = useState("USD");
   const [selectedOption, setSelectedOption] = useState({
     country: "United States",
     code: " +1",
@@ -118,17 +119,17 @@ export const AccountSetting = () => {
     `${selectedLocationOption?.country}`
   );
 
-  const [currencyPre, setCurrencyPre] = useState("USD");
-  const currencyValueChange = () => {
-    const result = countryInfo.find(
-      (item) => item.currency.code === currentPre
-    );
-    return result?.currency.name;
-  };
+  
+  // const currencyValueChange = () => {
+  //   const result = countryInfo.find(
+  //     (item) => item.currency.code === currentPre
+  //   );
+  //   return result?.currency.name;
+  // };
 
   countryInfo.sort(function (a, b) {
-    var textA = a.currency.code.toUpperCase();
-    var textB = b.currency.code.toUpperCase();
+    const textA = a.currency.code.toUpperCase();
+    const textB = b.currency.code.toUpperCase();
     return textA < textB ? -1 : textA > textB ? 1 : 0;
   });
 
@@ -137,15 +138,15 @@ export const AccountSetting = () => {
     if (user) {
       setFname(user?.fname ? user?.fname : "");
       setLname(user?.lname ? user?.lname : "");
-      setPhone(user?.phone ? user?.phone : "");
-      const decryptedEmail = decryptEmail(user?.email || "");
-      setEmail(decryptedEmail);
+      setEmail(decryptFun(user?.email || ""));
+      setPhone(decryptFun(user?.phone || ""));
       setCity(user?.city ? user?.city : "");
     }
 
     if (user?.phoneCountry) {
       setCountryCallingCode(user?.phoneCountry);
-      const result = listData.find((item) => item?.code === user?.phoneCountry);
+      // const result = listData.find((item) => item?.code === user?.phoneCountry);
+      const result = listData.find((item) => item?.cca3 === (user?.cca3?.trim() || 'USA'));
       setSelectedOption(result);
       setImageUrl(`https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`);
       setSearchText(`${result?.country} (${result?.code})`);
@@ -206,6 +207,7 @@ export const AccountSetting = () => {
         location: country,
         city: city,
         phoneCountry: countryCallingCode,
+        cca3: selectedOption?.cca3
       };
       let updateUser = await jwtAxios
         .put(`/users/updateAccountSettings`, formSubmit, {
@@ -223,6 +225,8 @@ export const AccountSetting = () => {
           if (error?.response?.data?.message) {
             dispatch(notificationFail(error?.response?.data?.message));
           }
+          // Refresh user details after an error occurs
+          dispatch(userGetData(userGetData.userid)).unwrap();
         });
       if (updateUser) {
         dispatch(userGetData(userGetData.userid)).unwrap();
@@ -329,7 +333,7 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Phone number (required)</Form.Label>
-                        <div className="d-flex items-center phone-number-dropdown justify-between relative">
+                        <div className="d-flex items-center custom-dropdown justify-between relative">
                           <Form.Control
                             placeholder={countryCallingCode}
                             name="phone"
@@ -373,7 +377,7 @@ export const AccountSetting = () => {
                     <Col md="6">
                       <Form.Group className="form-group">
                         <Form.Label>Location</Form.Label>
-                        <div className="d-flex items-center phone-number-dropdown justify-between relative">
+                        <div className="d-flex items-center custom-dropdown justify-between relative">
                           <Form.Control
                             placeholder={"City"}
                             name="city"
@@ -424,7 +428,7 @@ export const AccountSetting = () => {
                       <Form.Group className="form-group">
                         <Form.Label>Currency preferred </Form.Label>
                         <div
-                          className={`d-flex items-center phone-number-dropdown justify-between relative`}
+                          className={`d-flex items-center custom-dropdown justify-between relative`}
                         >
                           <Form.Control
                             type="text"

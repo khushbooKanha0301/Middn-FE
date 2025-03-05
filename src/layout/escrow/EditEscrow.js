@@ -24,9 +24,6 @@ export const EditEscrowView = (props) => {
   const acAddress = useSelector(userDetails);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const [category, setCategory] = useState("");
-  // const [object, setObject] = useState("");
-  // const [processTime, setProcessTime] = useState("");
   const [object, setObject] = useState("");
   const [showObjects, setShowObject] = useState(false);
   const objects = [{ value: "Jewlery", label: "Jewlery" }];
@@ -94,88 +91,10 @@ export const EditEscrowView = (props) => {
     };
   }, []);
 
-  // const inputChangeHandler = (e) => {
-  //   let numericRegex = /[^0-9.]/g;
-  //   switch (e.target.name) {
-  //     case "radiooption":
-  //       setEscrowType(e.target.value);
-  //       break;
-  //     case "price":
-  //       if (e.target.value) {
-  //         setPriceType("fixed");
-  //         setMinPrice("");
-  //         setMaxPrice("");
-  //       } else {
-  //         if (minPrice != "" || maxPrice != "") {
-  //           setPriceType("flexible");
-  //         } else {
-  //           setPriceType("");
-  //         }
-  //       }
-  //       e.target.value = e.target.value.replace(numericRegex, "");
-  //       setPrice(e.target.value);
-  //       break;
-  //     case "minPrice":
-  //       if (e.target.value) {
-  //         setPrice("");
-  //         setPriceType("flexible");
-  //       } else {
-  //         if (maxPrice != "") {
-  //           setPriceType("flexible");
-  //         } else {
-  //           if (price != "") {
-  //             setPriceType("fixed");
-  //           } else {
-  //             setPriceType("");
-  //           }
-  //         }
-  //       }
-
-  //       e.target.value = e.target.value.replace(numericRegex, "");
-  //       setMinPrice(e.target.value);
-  //       break;
-  //     case "maxPrice":
-  //       if (e.target.value) {
-  //         setPrice("");
-  //         setPriceType("flexible");
-  //       } else {
-  //         if (minPrice != "") {
-  //           setPriceType("flexible");
-  //         } else {
-  //           if (price != "") {
-  //             setPriceType("fixed");
-  //           } else {
-  //             setPriceType("");
-  //           }
-  //         }
-  //       }
-  //       e.target.value = e.target.value.replace(numericRegex, "");
-  //       setMaxPrice(e.target.value);
-  //       break;
-  //     case "category":
-  //       setCategory(e.target.value);
-  //       break;
-  //     case "object":
-  //       setObject(e.target.value);
-  //       break;
-  //     case "description":
-  //       setDescription(e.target.value);
-  //       break;
-  //     case "processTime":
-  //       setProcessTime(e.target.value);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // };
-
   const inputChangeHandler = (e) => {
     let numericRegex = /[^0-9.]/g;
 
     switch (e.target.name) {
-      // case "radiooption":
-      //   setEscrowType(e.target.value);
-      //   break;
       case "price":
         if (e.target.value) {
           setPriceType("fixed");
@@ -464,14 +383,6 @@ export const EditEscrowView = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Category</Form.Label>
-                    {/* <Form.Select
-                      name="category"
-                      aria-label="High-value items"
-                      onChange={inputChangeHandler}
-                      value={category}
-                    >
-                      <option value="high_value_items">High-value items</option>
-                    </Form.Select> */}
                     <div className="customSelectBox" ref={countryDropdownRef}>
                       <div
                         className="form-select"
@@ -501,15 +412,6 @@ export const EditEscrowView = (props) => {
                 <Col md="6">
                   <Form.Group className="form-group">
                     <Form.Label>Object</Form.Label>
-                    {/* <Form.Select
-                      name="object"
-                      aria-label="Jewlery"
-                      onChange={inputChangeHandler}
-                      value={object}
-                    >
-                      <option value="Jewlery">Jewlery</option>
-                    </Form.Select> */}
-
                     <div className="customSelectBox" ref={optionsDropdownRef}>
                       <div
                         className="form-select"
@@ -550,14 +452,6 @@ export const EditEscrowView = (props) => {
               <h5 className="my-4">Time constraints</h5>
               <Form.Group className="form-group">
                 <Form.Label>Process time</Form.Label>
-                {/* <Form.Select
-                  aria-label="24 Hours"
-                  name="processTime"
-                  onChange={inputChangeHandler}
-                  value={processTime}
-                >
-                  <option value="24 Hours">24 Hours</option>
-                </Form.Select> */}
                 <div className="customSelectBox" ref={locationDropdownRef}>
                   <div
                     className="form-select"

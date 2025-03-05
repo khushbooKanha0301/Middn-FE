@@ -5,10 +5,6 @@ import CreateEscrowView from "../layout/escrow/CreateEscrow";
 import { userDetails } from "../store/slices/AuthSlice";
 import { useSelector } from "react-redux";
 import LoginView from "../component/Login";
-import jwtAxios from "../service/jwtAxios";
-import { database } from "../helper/config";
-import { firebaseStatus } from "../helper/configVariables";
-import { get, ref } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
@@ -77,22 +73,22 @@ export const LatestsEscrows = () => {
                 <Box sx={{display: "flex", alignItems: "start" }} >
                   {acAddress?.authToken && (
                     <>
-                        <Button
-                          variant="link"
-                          onClick={createEscrowModalToggle}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'}}
-                        >
-                          <span className="see-more ms-0">
-                            <PlusIcon width="34" height="26" />
-                          </span>
-                          <span className="create-escrow-text">
-                            Create Escrow
-                          </span>
-                        </Button>
+                      <Button
+                        variant="link"
+                        onClick={createEscrowModalToggle}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          alignItems: 'center'}}
+                      >
+                        <span className="see-more ms-0">
+                          <PlusIcon width="34" height="26" />
+                        </span>
+                        <span className="create-escrow-text">
+                          Create Escrow
+                        </span>
+                      </Button>
                     </>
                   )}
 

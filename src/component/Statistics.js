@@ -57,7 +57,7 @@ export const Statistics = () => {
           <Card.Title as="h3" className="font-family-poppins">
             Statistics
           </Card.Title>
-          <div className="statisticBox d-flex items-center phone-number-dropdown token-sales-filter  justify-between relative">
+          <div className="statisticBox d-flex items-center custom-dropdown token-sales-filter  justify-between relative">
             {!isMobile ? (
               <>
                 <div
@@ -68,7 +68,7 @@ export const Statistics = () => {
                 </div>
 
                 <Dropdown
-                  className="custom-dropdown"
+                  className="custom-dropdown-xl"
                   show={openDr}
                   onToggle={(isOpen) => setOpenDr(isOpen)}
                 >
@@ -130,6 +130,10 @@ export const Statistics = () => {
                     <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
                   </svg>
                 </button>
+                <div
+                  className={openDr ? "mobile-setting-dropdown-overlay" : ""}
+                  onClick={handleDropdownClick}
+                ></div>
                 <Sheet
                   isOpen={openDr}
                   onClose={() => {
@@ -137,11 +141,15 @@ export const Statistics = () => {
                     setShowOptions([]);
                   }}
                 >
-                  <Sheet.Container className="statisticBox phone-number-dropdown">
+                  <Sheet.Container className="statisticBox custom-dropdown">
                     <Sheet.Header />
                     <Sheet.Content>
                       {openDr && (
                         <div className="drawer-swipe-wrapper">
+                          <div
+                            className="drawer-swiper"
+                            onClick={handleDropdownClick}
+                          />
                           <div className="filter-option">
                             {showOptions.map((data, key) => (
                               <div

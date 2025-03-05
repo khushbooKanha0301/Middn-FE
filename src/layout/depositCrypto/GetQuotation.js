@@ -47,8 +47,6 @@ const GetQuotation = (props) => {
     setSelectedOptionAny(e);
   };
   const handleSubmit = (e) => {
-    console.log("fucked");
-
     e.preventDefault();
     props.onClose?.();
   };
@@ -56,8 +54,6 @@ const GetQuotation = (props) => {
     setStep((s) => s + 1);
   };
   const handleBackBtn = () => {
-    console.log("executed");
-
     setStep((s) => s - 1);
   };
   return (

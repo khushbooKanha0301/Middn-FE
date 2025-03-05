@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode.react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import jwtAxios from "../service/jwtAxios";
 import {
   notificationFail,

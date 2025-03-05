@@ -13,7 +13,7 @@ export const MessageList = (props) => {
   const { ReciverId , escrowId} = props;
   const acAddress = useSelector(userDetails);
   const [messages, setMessages] = useState([]);
-  var scrollBottom = document.getElementById("scrollBottom");
+  const scrollBottom = document.getElementById("scrollBottom");
   const userData = useSelector(userDetails);
   const receiverData = useSelector((state) => state.chatEscrowReducer?.MessageUser);
  

@@ -26,6 +26,7 @@ export const LoginView = (props) => {
   const { library,  account, activate, deactivate } = useWeb3React();
   const { ethereum } = window;
   const { connect, connectors: wagmiConnector } = useConnect();
+ console.log("connect ", connect);
   const { disconnect: disonnectWalletConnect } = useDisconnect();
   const { loading } = useSelector((state) => state?.loginLoderReducer);  
   const setProvider = (type) => {
@@ -33,10 +34,9 @@ export const LoginView = (props) => {
   };
 
   const refreshState = () => {
-    window.localStorage.setItem("provider", undefined);
+    window.localStorage.removeItem("provider");
     window.localStorage.removeItem("userData");
   };
-
   useEffect(() => {
     const connectWalletOnPageLoad = async () => {
       let storageProvider = window.localStorage.getItem("provider");
@@ -171,7 +171,6 @@ export const LoginView = (props) => {
         }
 
         if (
-          //!metaAccounts ||
           metaAccounts &&
           metaAccounts[0] != userData.account.toLowerCase()
         ) {
@@ -192,7 +191,7 @@ export const LoginView = (props) => {
         };
         props.setTwoFAModal(false);
         props.onHide();
-        dispatch(checkAuth(checkAuthParams)).unwrap();
+        await dispatch(checkAuth(checkAuthParams)).unwrap();
       }
     };
     checkMetaAcc();
@@ -208,7 +207,9 @@ export const LoginView = (props) => {
         provider = ethereum.providers.find(
           ({ isCoinbaseWallet }) => isCoinbaseWallet
         );
-        provider.disableReloadOnDisconnect();
+        if (provider) {
+          provider.disableReloadOnDisconnect(); // Ensures no forced reload
+        }
         break;
       case "injected":
         provider = ethereum.providers.find(({ isMetaMask }) => isMetaMask);
@@ -274,7 +275,7 @@ export const LoginView = (props) => {
       };
       props.onHide();
       setAccountAddress(accounts[0]);
-      dispatch(checkAuth(checkAuthParams)).unwrap();
+      await dispatch(checkAuth(checkAuthParams)).unwrap();
     });
   };
 
@@ -285,7 +286,7 @@ export const LoginView = (props) => {
       checkValue: checkValue,
       signMessage: signMessage,
     };
-    dispatch(checkAuth(checkAuthParams)).unwrap();
+    await dispatch(checkAuth(checkAuthParams)).unwrap();
     setAccountAddress(address);
   };
 
@@ -313,7 +314,7 @@ export const LoginView = (props) => {
             checkValue: checkValue,
             signature: data,
           };
-          dispatch(checkAuth(checkAuthParams)).unwrap();    
+          await dispatch(checkAuth(checkAuthParams)).unwrap();    
         } catch (error) {
           console.error("Error fetching data:", error);
         }

@@ -89,7 +89,6 @@ export const KYCVerification = (props) => {
         day: "2-digit",
       })
       .replace(/\//g, "-");
-      console.log("formattedDate ", formattedDate);
     return formattedDate;
   };
 
@@ -351,7 +350,7 @@ export const KYCVerification = (props) => {
             <>
               <Form.Group className="form-group">
                 <Form.Label>Nationality</Form.Label>
-                <div className="d-flex items-center phone-number-dropdown justify-between phone-number-dropdown-kyc">
+                <div className="d-flex items-center custom-dropdown justify-between custom-dropdown-kyc">
                   <Form.Control
                     name="nationality"
                     placeholder={userData.nationality}
@@ -502,7 +501,7 @@ export const KYCVerification = (props) => {
             <>
               <Form.Group className="form-group mb-4">
                 <Form.Label>Country/Region of Issue</Form.Label>
-                <div className="d-flex items-center phone-number-dropdown justify-between phone-number-dropdown-kyc">
+                <div className="d-flex items-center custom-dropdown justify-between custom-dropdown-kyc">
                   <Form.Control
                     name="country"
                     placeholder={userData.country_of_issue}

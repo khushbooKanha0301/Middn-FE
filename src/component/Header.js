@@ -41,8 +41,8 @@ export const Header = (props) => {
   // Function to update the address line
   const updateAddressLine = () => {
     if (
-      acAddress?.account &&
-      userDetailsAll?.is_2FA_login_verified
+      acAddress?.account && 
+      userDetailsAll?.is_2FA_login_verified && userDetailsAll?.is_2FA_twilio_login_verified
     ) {
       setAddressLine(hideAddress(acAddress.account, 5)); // Hide address if verified
     } else {
@@ -227,7 +227,8 @@ export const Header = (props) => {
         </Nav.Item>
         {acAddress &&
         acAddress?.authToken &&
-        userDetailsAll?.is_2FA_login_verified  ? (
+        userDetailsAll?.is_2FA_login_verified &&
+        userDetailsAll?.is_2FA_twilio_login_verified ? (
           <NavDropdown
             className="dropdownProfile"
             as="li"

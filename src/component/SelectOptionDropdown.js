@@ -10,7 +10,6 @@ const SelectOptionDropdown = (props) => {
     setSelectedOption,
     selectedOption,
     setCountryCallingCode,
-    countryCallingCode,
     setSearchText,
     searchText,
     setImageSearchUrl,
@@ -51,11 +50,12 @@ const SelectOptionDropdown = (props) => {
       setImageSearchUrl(null);
     }
   };
+  
   const handleCheckboxChange = (option) => {
     setFilteredOptions(listData);
     setSelectedOption(option);
     setCountryCallingCode(option.code);
-    const imageUrl = phoneCountryData(option.code);
+    const imageUrl = phoneCountryData(option.cca3);
     setImageUrl(imageUrl);
     setImageSearchUrl(imageUrl);
     setSearchText(`${option.country} (${option.code})`);
@@ -65,7 +65,7 @@ const SelectOptionDropdown = (props) => {
 
   const handleCheckboxChangeOnMobile = (option) => {
     setSelectedOption(option);
-    const imageUrl = phoneCountryData(option.code);
+    const imageUrl = phoneCountryData(option.cca3);
     setImageSearchUrl(imageUrl);
     setSearchText(`${option.country} (${option.code})`);
     setSearchTextOrigin(option);
@@ -74,13 +74,13 @@ const SelectOptionDropdown = (props) => {
   const handlePhoneNumberMobile = (option) => {
     setSelectedOption(option);
     setCountryCallingCode(option.code);
-    const imageUrl = phoneCountryData(option.code);
+    const imageUrl = phoneCountryData(option.cca3);
     setImageUrl(imageUrl);
     setOpenDr(false);
   };
 
-  const phoneCountryData = (code) => {
-    const result = listData.find((item) => item?.code === code);
+  const phoneCountryData = (cca3) => {
+    const result = listData.find((item) => item?.cca3 === cca3);
     return `https://flagcdn.com/h40/${result?.iso?.toLowerCase()}.png`;
   };
 
@@ -93,13 +93,12 @@ const SelectOptionDropdown = (props) => {
     <>
       {!isMobile ? (
         <Dropdown
-          className="custom-dropdown"
+          className="custom-dropdown-xl"
           show={openDr}
           onToggle={(isOpen) => setOpenDr(isOpen)}
         >
           <Dropdown.Toggle onClick={handleDropdownClick}>
-            {listData?.find((item) => item?.code === countryCallingCode)
-              ?.cca3 || "United States"}
+            {listData.find((item) => item?.iso === selectedOption?.iso)?.cca3 || "United States"}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
               <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
             </svg>
@@ -133,7 +132,7 @@ const SelectOptionDropdown = (props) => {
                   >
                     <label className="form-check-label">
                       <img
-                        src={phoneCountryData(data.code)}
+                        src={phoneCountryData(data.cca3)}
                         alt="Flag"
                         className="rectangle-data"
                       />
@@ -166,13 +165,16 @@ const SelectOptionDropdown = (props) => {
             onClick={handleDropdownClick}
           >
             <p className="text-white mb-0 personalDataLocation">
-              {listData.find((item) => item?.code === countryCallingCode)
-                ?.cca3 || "United States"}
+            {listData.find((item) => item?.iso === selectedOption?.iso)?.cca3 || "United States"}
             </p>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
               <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z" />
             </svg>
           </button>
+          <div
+            className={openDr ? "mobile-setting-dropdown-overlay" : ""}
+            onClick={handleDropdownClick}
+          ></div>
           <Sheet
             isOpen={openDr}
             onClose={() => {
@@ -180,11 +182,15 @@ const SelectOptionDropdown = (props) => {
               setFilteredOptions([]);
             }}
           >
-            <Sheet.Container className="phone-number-dropdown">
+            <Sheet.Container className="custom-dropdown">
               <Sheet.Header />
               <Sheet.Content>
                 {openDr && (
                   <div className="drawer-swipe-wrapper">
+                    <div
+                      className="drawer-swiper"
+                      onClick={handleDropdownClick}
+                    />
                     <div className="dropdown-menu-inner">
                       {searchText && imageSearchUrlSet && (
                         <img
@@ -212,7 +218,7 @@ const SelectOptionDropdown = (props) => {
                         >
                           <label className="form-check-label">
                             <img
-                              src={phoneCountryData(data.code)}
+                              src={phoneCountryData(data.cca3)}
                               alt="Flag"
                               className="rectangle-data"
                             />

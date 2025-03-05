@@ -167,7 +167,6 @@ export const Escrow = () => {
 
   const onBuySellClick = async (escrow_id) => {
     if (acAddress.authToken) {
-      //navigate("/escrow", { state: { id :  escrow_id } });
       navigate(`/escrow/${escrow_id}`);
     } else {
       setModalShow(true);
@@ -568,13 +567,6 @@ export const Escrow = () => {
             pageSize={PageSize}
             onPageChange={(page) => setCurrentPage(page)}
           />
-          {/* <div className="table-info">
-            {currentPage === 1
-              ? `${totalEscrowCount > 0 ? 1 : 0}`
-              : `${(currentPage - 1) * PageSize + 1}`}{" "}
-            - {`${Math.min(currentPage * PageSize, totalEscrowCount)}`} of{" "}
-            {totalEscrowCount}
-          </div> */}
         </div>
       )}
       {modalShow && (

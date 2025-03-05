@@ -10,8 +10,6 @@ function BankDeposit() {
   };
   const [radioButton, setRadioButton] = useState("selected");
   const handleOptionClick = (value) => {
-    console.log(value, "value");
-
     setRadioButton(value);
   };
   return (

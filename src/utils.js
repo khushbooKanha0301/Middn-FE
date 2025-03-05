@@ -15,7 +15,7 @@ export const toHex = (num) => {
 export const hideAddress = (address, keep) => {
   if(address && address !== "Connect Wallet"){
     let str = address;
-    var len = str.length,
+    let len = str.length,
       re = new RegExp("(.{" + keep + "})(.{" + (len - keep * 2) + "})(.{" + keep + "})", "g")
     return str.replace(re, function(match, a, b, c) {
       return a + "***" + c
@@ -23,22 +23,17 @@ export const hideAddress = (address, keep) => {
   }else{
     return "Connect Wallet";
   }
-  
 }
 
 
 export const Timestamp = (date) => {
   const timestamp = new Date(date);
-
   const hours = timestamp.getHours();
   const minutes = timestamp.getMinutes();
   const amPm = hours >= 12 ? 'PM' : 'AM';
   const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
   const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
   const formattedTime = `${formattedHours}:${formattedMinutes} ${amPm}`;
-
-  // format the date and time in a readable way
-  //${timestamp.toLocaleDateString(undefined, options)}
   const formattedDateTime = `${formattedTime}`;
 
   return formattedDateTime;
